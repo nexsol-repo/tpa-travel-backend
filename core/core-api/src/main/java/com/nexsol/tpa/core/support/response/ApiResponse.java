@@ -2,12 +2,12 @@ package com.nexsol.tpa.core.support.response;
 
 import com.nexsol.tpa.core.error.CoreErrorType;
 import com.nexsol.tpa.core.support.error.CoreApiErrorMessage;
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Getter
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+@RequiredArgsConstructor
+//@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class ApiResponse<T> {
 
     private final ResultType result;
