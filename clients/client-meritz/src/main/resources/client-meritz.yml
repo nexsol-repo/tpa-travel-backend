@@ -1,0 +1,15 @@
+meritz:
+  api:
+    url: ${MERITZ_API_URL:https://apiportaldev.meritzfire.com:26000}
+    oauth-uri: ${MERITZ_OAUTH_URI:/b2b/v1/oauth/2.0/token}
+
+  client-id: ${MERITZ_CLIENT_ID:}
+  client-secret: ${MERITZ_CLIENT_SECRET:}
+
+  http:
+    connect-timeout-ms: 120000
+    response-timeout-ms: 120000
+
+  ssl:
+    # 로컬에서만 true로 쓰는 옵션 (신뢰서버/인증서 문제 우회용)
+    insecure: ${MERITZ_SSL_INSECURE:false}

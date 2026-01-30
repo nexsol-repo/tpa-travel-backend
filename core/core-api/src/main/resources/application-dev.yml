@@ -1,0 +1,7 @@
+spring:
+  config:
+    import: optional:classpath:application-secret-dev.properties
+
+logging:
+  level:
+    org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping: DEBUG

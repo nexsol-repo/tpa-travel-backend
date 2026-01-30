@@ -1,0 +1,63 @@
+package com.nexsol.tpa.core.api.controller.v1;
+
+import com.nexsol.tpa.core.api.dto.v1.contract.*;
+import com.nexsol.tpa.core.api.meritz.dto.contract.MeritzCtrLstInqBody;
+import com.nexsol.tpa.core.api.meritz.dto.contract.MeritzJoinCertBody;
+import com.nexsol.tpa.core.api.meritz.dto.contract.MeritzTrvCtrInqBody;
+import com.nexsol.tpa.core.api.service.v1.MeritzContractService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/v1/meritz")
+public class MeritzContractController {
+
+    private final MeritzContractService service;
+
+    /** 계약 목록 조회 (Meritz: /ctrLstInq) */
+    @GetMapping("/contracts/list")
+    public String contractList(@RequestParam(defaultValue = "TPA") String companyCode,
+            @RequestBody MeritzCtrLstInqBody request) {
+        return service.contractList(companyCode, request);
+    }
+
+    /** 계약 조회 (Meritz: /trvCtrInq) */
+    @PostMapping("/contracts/inquiry")
+    public String contractInquiry(@RequestParam(defaultValue = "TPA") String companyCode,
+            @RequestBody MeritzTrvCtrInqBody request) {
+        return service.contractInquiry(companyCode, request);
+    }
+
+    /** 가입증명서 출력 */
+    @PostMapping("/contracts/certificate")
+    public String joinCertificate(@RequestParam(defaultValue = "TPA") String companyCode,
+            @RequestBody MeritzJoinCertBody request) {
+        return service.joinCertificate(companyCode, request);
+    }
+
+    /** 여행자보험 접수 */
+    @PostMapping("/travel/contract/apply")
+    public ContractApplyResponse apply(@RequestBody ContractApplyRequest request) {
+        return service.apply(request);
+    }
+
+    /** 여행자보험 가입(결제) */
+    @PostMapping("/travel/contract/completed")
+    public ContractCompletedResponse completed(
+            @RequestParam(defaultValue = "TPA") String companyCode,
+            @RequestBody ContractCompletedRequest request
+    ) {
+        return service.completed(companyCode, request);
+    }
+
+    /** 여행자보험 가입(결제취소) */
+    @PostMapping("/travel/contract/cancel")
+    public ContractCancelResponse cancel(
+            @RequestParam(defaultValue = "TPA") String companyCode,
+            @RequestBody ContractCancelRequest request
+    ) {
+        return service.cancel(companyCode, request);
+    }
+
+}

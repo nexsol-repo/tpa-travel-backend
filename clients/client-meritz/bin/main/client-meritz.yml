@@ -1,0 +1,11 @@
+meritz:
+  host-url: "${MERITZ_HOST_URL:https://bizapidev.meritzfire.com:25200}"
+  api-uri: "${MERITZ_TOKEN_URI:/b2b/v1/oauth/2.0/token}"
+  client-id: "${MERITZ_CLIENT_ID:}"
+  client-secret-key: "${MERITZ_CLIENT_SECRET:}"
+  content-type: "application/x-www-form-urlencoded"
+  aflco-div-cd: "${MERITZ_AFLCO_DIV_CD:TPA}"
+  gnr-aflco-cd: "${MERITZ_GNR_AFLCO_CD:020}"
+  # 타임아웃(ms)
+  connect-timeout-ms: 120000
+  response-timeout-ms: 120000

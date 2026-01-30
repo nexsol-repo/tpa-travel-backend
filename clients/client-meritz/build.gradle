@@ -1,0 +1,18 @@
+plugins {
+    id 'java-library'
+}
+
+dependencies {
+    implementation "org.springframework.boot:spring-boot-autoconfigure"
+    implementation "org.springframework.boot:spring-boot"
+    implementation "org.springframework:spring-web"
+
+    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
+
+    implementation "com.fasterxml.jackson.core:jackson-databind"
+    implementation "org.springframework.boot:spring-boot-starter-json"
+}
+
+test {
+    useJUnitPlatform()
+}

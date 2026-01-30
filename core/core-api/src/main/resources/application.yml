@@ -1,13 +1,15 @@
 spring.application.name: core-api
-spring.profiles.active: local
+#spring.profiles.active: dev
 
 spring:
   config:
     import:
+      - optional:file:.env[.properties]
       - monitoring.yml
       - logging.yml
       - db-core.yml
       - client-example.yml
+      - client-meritz.yml
   web.resources.add-mappings: false
 
 server:
@@ -35,4 +37,3 @@ spring.config.activate.on-profile: staging
 
 ---
 spring.config.activate.on-profile: live
-

@@ -13,3 +13,8 @@ out/
 
 .env
 .env.**
+.classpath
+.project
+**.class
+org.eclipse.**
+org.springframework.ide.eclipse.**
