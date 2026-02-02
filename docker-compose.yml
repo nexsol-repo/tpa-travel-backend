@@ -1,0 +1,26 @@
+services:
+  app:
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    image: ${DOCKER_IMAGE}
+    container_name: ${COMPOSE_PROJECT_NAME}
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - "127.0.0.1:${HOST_PORT}:8080"
+    environment:
+      - TZ=Asia/Seoul
+      - SERVER_PORT=8080
+      - SPRING_PROFILES_ACTIVE=${TARGET_ENV}
+      # .env 파일에서 주입받는 변수들
+      - STORAGE_DATASOURCE_CORE_JDBC_URL=${DB_URL}
+      - STORAGE_DATASOURCE_CORE_USERNAME=${DB_USERNAME}
+      - STORAGE_DATASOURCE_CORE_PASSWORD=${DB_PASSWORD}
+      # 외부 API 설정 등 추가 변수가 있다면 여기에 매핑
+
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
