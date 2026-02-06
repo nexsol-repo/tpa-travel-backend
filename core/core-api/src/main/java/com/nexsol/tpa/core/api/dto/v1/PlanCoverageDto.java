@@ -1,4 +1,4 @@
-package com.nexsol.tpa.core.api.dto;
+package com.nexsol.tpa.core.api.dto.v1;
 
 public class PlanCoverageDto {
 

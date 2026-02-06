@@ -5,3 +5,10 @@ spring:
 logging:
   level:
     org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping: DEBUG
+
+portone:
+  v1:
+    base-url: https://api.iamport.kr
+    api-key: ${PORTONE_API_KEY}
+    api-secret: ${PORTONE_API_SECRET}
+    timeout-ms: 5000

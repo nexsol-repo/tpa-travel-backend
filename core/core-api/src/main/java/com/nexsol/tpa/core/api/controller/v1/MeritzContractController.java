@@ -1,11 +1,13 @@
 package com.nexsol.tpa.core.api.controller.v1;
 
+import com.nexsol.tpa.core.api.dto.v1.MeritzCertRequest;
 import com.nexsol.tpa.core.api.dto.v1.contract.*;
 import com.nexsol.tpa.core.api.meritz.dto.contract.MeritzCtrLstInqBody;
-import com.nexsol.tpa.core.api.meritz.dto.contract.MeritzJoinCertBody;
 import com.nexsol.tpa.core.api.meritz.dto.contract.MeritzTrvCtrInqBody;
 import com.nexsol.tpa.core.api.service.v1.MeritzContractService;
+import com.nexsol.tpa.core.api.service.v1.TravelContractQueryService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -14,6 +16,8 @@ import org.springframework.web.bind.annotation.*;
 public class MeritzContractController {
 
     private final MeritzContractService service;
+
+    private final TravelContractQueryService queryService;
 
     /** 계약 목록 조회 (Meritz: /ctrLstInq) */
     @GetMapping("/contracts/list")
@@ -32,7 +36,7 @@ public class MeritzContractController {
     /** 가입증명서 출력 */
     @PostMapping("/contracts/certificate")
     public String joinCertificate(@RequestParam(defaultValue = "TPA") String companyCode,
-            @RequestBody MeritzJoinCertBody request) {
+            @RequestBody MeritzCertRequest request) {
         return service.joinCertificate(companyCode, request);
     }
 
@@ -58,6 +62,22 @@ public class MeritzContractController {
             @RequestBody ContractCancelRequest request
     ) {
         return service.cancel(companyCode, request);
+    }
+
+    /** 계약 목록 (auth_unique_key 최신순 기본) */
+    @GetMapping("/travel/contracts")
+    public Page<TravelContractQueryDto.ContractListItem> list(
+            @RequestParam(required = false) String authUniqueKey,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
+    ) {
+        return queryService.list(authUniqueKey, page, size);
+    }
+
+    /** 계약 단건 조회 (id) */
+    @GetMapping("/travel/contracts/{id}")
+    public TravelContractQueryDto.ContractDetail get(@PathVariable Long id) {
+        return queryService.get(id);
     }
 
 }

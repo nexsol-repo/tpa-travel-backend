@@ -1,7 +1,8 @@
-package com.nexsol.tpa.core.api.dto;
+package com.nexsol.tpa.core.api.dto.v1;
 
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 
 import java.util.List;
 
@@ -51,8 +52,25 @@ public class QuoteResponse {
 
         private Premium premium;
 
-        private List<Coverage> coverages;
+        private List<InsuredPremium> insuredPremiums;
 
+        private String coverageTitle;
+
+        private List<Coverage> coverages;
+    }
+
+    @Getter
+    @Builder
+    public static class InsuredPremium {
+        private Integer index;         // insuredList index
+        private String currency;       // "KRW"
+        private Long ppsPrem;          // 인당 보험료 (정수)
+        private String birth;
+        private String gndrCd;         // 메리츠 응답 gndrCd (optional)
+        private String cusNm;          // optional
+        private String cusEngNm;       // optional
+        private String ageBandCode;    // optional
+        private String ageBandLabel;   // optional
     }
 
     @Data
@@ -91,8 +109,20 @@ public class QuoteResponse {
 
         private String cur;
 
-        private List<Object> units;
+        private List<CoverageUnit> units;
 
+        private String categoryCode;
+
+    }
+
+    @Data
+    @Builder
+    public static class CoverageUnit {
+        private String ageBandCode;   // "AGE_15_69"
+        private String ageBandLabel;  // "15~69세"
+        private int count;            // 해당 연령대 인원수
+        private long insdAmt;         // 해당 연령대 보장금액
+        private long premSum;         // 해당 연령대 보험료 합 (optional)
     }
 
     public static QuoteResponse success(Period period, int representativeIndex, int insuredCount, List<PlanCard> plans) {

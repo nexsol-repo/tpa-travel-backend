@@ -5,9 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface TravelContractSnapshotRepository
-        extends JpaRepository<TravelContractSnapshotEntity, Long> {
+public interface TravelContractSnapshotRepository extends JpaRepository<TravelContractSnapshotEntity, Long> {
 
-    Optional<TravelContractSnapshotEntity>
-    findByContractIdAndSnapshotType(Long contractId, String snapshotType);
+    Optional<TravelContractSnapshotEntity> findByContractIdAndSnapshotType(Long contractId, String snapshotType);
 }

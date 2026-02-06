@@ -3,6 +3,8 @@ package com.nexsol.tpa.core.api.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "travel_favorite_city")
 @Getter
@@ -36,6 +38,9 @@ public class FavoriteCityEntity extends AuditEntity {
     @Column(name = "sort_order", nullable = false)
     private Integer sortOrder;
 
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
+
     @PrePersist
     private void prePersist() {
         if (sortOrder == null) {
@@ -49,6 +54,6 @@ public class FavoriteCityEntity extends AuditEntity {
     }
 
     public void softDelete(String actor) {
-        markDeleted(actor);
+        this.updatedAt = LocalDateTime.now();
     }
 }

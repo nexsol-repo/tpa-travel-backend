@@ -16,6 +16,10 @@ public interface TravelPlanCoverageRow {
 
     boolean isMajorCoverage();
 
+    boolean isTitleYn();
+
+    String getCategoryCode();
+
     // override용 (필요 시)
     String getClaimReasonOverride();
 

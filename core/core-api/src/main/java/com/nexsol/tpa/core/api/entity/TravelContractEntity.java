@@ -93,6 +93,26 @@ public class TravelContractEntity extends AuditEntity {
     @Column(name = "marketing_consent_used", nullable = false)
     private Boolean marketingConsentUsed = false;
 
+    @Column(name = "auth_provider", length = 20)
+    private String authProvider; // ex) DANAL_PASS
+
+    @Column(name = "auth_imp_uid", length = 100)
+    private String authImpUid;
+
+    @Column(name = "auth_request_id", length = 100)
+    private String authRequestId;
+
+    @Column(name = "auth_unique_key", length = 200)
+    private String authUniqueKey;
+
+    @Column(name = "auth_status", length = 20)
+    private String authStatus = "NONE"; // NONE / SUCCESS / FAIL
+
+    @Column(name = "auth_date")
+    private LocalDateTime authDate;
+
+    /* ========================= */
+
     @OneToMany(
             mappedBy = "contract",
             cascade = CascadeType.ALL,

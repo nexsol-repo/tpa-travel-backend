@@ -1,6 +1,6 @@
 package com.nexsol.tpa.core.api.service.v1;
 
-import com.nexsol.tpa.core.api.dto.CityResponseDto;
+import com.nexsol.tpa.core.api.dto.v1.CityResponseDto;
 import com.nexsol.tpa.core.api.entity.FavoriteCityEntity;
 import com.nexsol.tpa.core.api.repository.v1.FavoriteCityRepository;
 import lombok.RequiredArgsConstructor;
