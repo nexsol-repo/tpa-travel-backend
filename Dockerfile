@@ -14,14 +14,12 @@ COPY lint.gradle .
 COPY core/core-api/build.gradle ./core/core-api/
 COPY core/core-domain/build.gradle ./core/core-domain/
 COPY core/core-enum/build.gradle ./core/core-enum/
-COPY clients/client-aligo/build.gradle ./clients/client-aligo/
-COPY clients/client-memo/build.gradle ./clients/client-memo/
+
 COPY clients/client-meritz/build.gradle ./clients/client-meritz/
-COPY clients/client-example/build.gradle ./clients/client-example/
 COPY storage/db-core/build.gradle ./storage/db-core/
 COPY support/logging/build.gradle ./support/logging/
 COPY support/monitoring/build.gradle ./support/monitoring/
-COPY support/mailer/build.gradle ./support/mailer/
+
 COPY tests/api-docs/build.gradle ./tests/api-docs/
 
 RUN chmod +x ./gradlew

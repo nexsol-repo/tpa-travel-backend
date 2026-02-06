@@ -1,9 +1,0 @@
-dependencies {
-    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
-    implementation 'io.github.openfeign:feign-hc5'
-    implementation 'io.github.openfeign:feign-micrometer'
-
-    // 토큰 응답 JSON 파싱을 Jackson으로 할지 Gson으로 할지 선택인데
-    // 프로젝트 기본이 Spring/Jackson이면 보통 Jackson 그대로 사용
-    testImplementation 'com.fasterxml.jackson.core:jackson-databind'
-}
