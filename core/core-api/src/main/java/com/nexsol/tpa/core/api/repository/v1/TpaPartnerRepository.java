@@ -11,4 +11,5 @@ public interface TpaPartnerRepository extends JpaRepository<TpaPartnerEntity, Lo
     Optional<TpaPartnerEntity> findByPartnerCode(String partnerCode);
 
     List<TpaPartnerEntity> findAllByIsActiveTrueOrderByIdAsc();
+
 }

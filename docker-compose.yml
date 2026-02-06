@@ -1,26 +1,25 @@
 services:
   app:
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+    # 이미지 이름은 환경변수로 주입받음 (deploy.sh 또는 .env)
     image: ${DOCKER_IMAGE}
-    container_name: ${COMPOSE_PROJECT_NAME}
     restart: always
+    # 실행 시점에 지정된 .env 파일을 로드
     env_file:
       - .env
-    ports:
-      - "127.0.0.1:${HOST_PORT}:8080"
+    # network_mode: host 사용 시 ports 불필요, SERVER_PORT로 직접 바인딩
+    network_mode: host
     environment:
       - TZ=Asia/Seoul
-      - SERVER_PORT=8080
-      - SPRING_PROFILES_ACTIVE=${TARGET_ENV}
-      # .env 파일에서 주입받는 변수들
-      - STORAGE_DATASOURCE_CORE_JDBC_URL=${DB_URL}
-      - STORAGE_DATASOURCE_CORE_USERNAME=${DB_USERNAME}
-      - STORAGE_DATASOURCE_CORE_PASSWORD=${DB_PASSWORD}
-      # 외부 API 설정 등 추가 변수가 있다면 여기에 매핑
-
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
+      - SERVER_PORT=${HOST_PORT}
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_DATABASE=${DB_DATABASE}
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      #- GMAIL_EMAIL=${GMAIL_EMAIL}
+      #- GMAIL_PASSWORD=${GMAIL_PASSWORD}
+      #- S3_URL=${S3_URL}
+      #- S3_ACCESS_KEY=${S3_ACCESS_KEY}
+      #- S3_SECRET_KEY=${S3_SECRET_KEY}
+      #- JWT_SECRET_KEY=${JWT_SECRET_KEY}

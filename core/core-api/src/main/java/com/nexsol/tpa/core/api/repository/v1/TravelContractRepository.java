@@ -10,21 +10,21 @@ import org.springframework.data.repository.query.Param;
 public interface TravelContractRepository extends JpaRepository<TravelContractEntity, Long> {
 
     @Query("""
-        select c
-        from TravelContractEntity c
-        order by
-          case when c.authUniqueKey is null then 1 else 0 end asc,
-          c.authUniqueKey desc,
-          c.id desc
-    """)
+                select c
+                from TravelContractEntity c
+                order by
+                  case when c.authUniqueKey is null then 1 else 0 end asc,
+                  c.authUniqueKey desc,
+                  c.id desc
+            """)
     Page<TravelContractEntity> findAllOrderByAuthUniqueKeyDesc(Pageable pageable);
 
     @Query("""
-        select c
-        from TravelContractEntity c
-        where c.authUniqueKey = :authUniqueKey
-        order by c.id desc
-    """)
+                select c
+                from TravelContractEntity c
+                where c.authUniqueKey = :authUniqueKey
+                order by c.id desc
+            """)
     Page<TravelContractEntity> findByAuthUniqueKey(String authUniqueKey, Pageable pageable);
 
 }

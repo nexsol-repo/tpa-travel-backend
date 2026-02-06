@@ -23,13 +23,8 @@ public class MeritzBridgeRequest {
 
     private Object body;
 
-    public MeritzBridgeRequest(
-            String company,
-            String endpoint,
-            String method,
-            Map<String, String> headers,
-            Object body
-    ) {
+    public MeritzBridgeRequest(String company, String endpoint, String method, Map<String, String> headers,
+            Object body) {
         this.insurerType = "MERITZ_TRAVEL";
         this.company = company;
         this.endpoint = endpoint;
@@ -37,4 +32,5 @@ public class MeritzBridgeRequest {
         this.headers = headers;
         this.body = body;
     }
+
 }

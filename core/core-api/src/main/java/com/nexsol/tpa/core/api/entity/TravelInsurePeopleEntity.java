@@ -41,4 +41,5 @@ public class TravelInsurePeopleEntity extends AuditEntity {
 
     @Column(name = "insure_premium", nullable = false, precision = 15, scale = 2)
     private BigDecimal insurePremium = BigDecimal.ZERO;
+
 }

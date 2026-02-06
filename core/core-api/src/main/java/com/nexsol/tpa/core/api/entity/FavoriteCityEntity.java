@@ -56,4 +56,5 @@ public class FavoriteCityEntity extends AuditEntity {
     public void softDelete(String actor) {
         this.updatedAt = LocalDateTime.now();
     }
+
 }

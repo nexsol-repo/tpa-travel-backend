@@ -15,10 +15,11 @@ public interface TravelInsurePeopleRepository extends JpaRepository<TravelInsure
 
     // contract_id 여러건 조회 (목록 N+1 방지)
     @Query("""
-        select p
-        from TravelInsurePeopleEntity p
-        where p.contract.id in :contractIds
-        order by p.contract.id asc, p.id asc
-    """)
+                select p
+                from TravelInsurePeopleEntity p
+                where p.contract.id in :contractIds
+                order by p.contract.id asc, p.id asc
+            """)
     List<TravelInsurePeopleEntity> findByContractIds(@Param("contractIds") Collection<Long> contractIds);
+
 }

@@ -38,12 +38,20 @@ RUN ./gradlew :core:core-api:clean :core:core-api:bootJar \
 # 2. Runtime Stage
 FROM eclipse-temurin:25-jre
 # HealthCheck용 curl 설치
-RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# 보안: non-root 사용자로 실행
+RUN groupadd -r appuser && useradd -r -g appuser -d /app appuser
 
 WORKDIR /app
 
 # 빌드된 core-api jar 파일 복사
 COPY --from=builder /app/core/core-api/build/libs/*.jar app.jar
+
+RUN chown -R appuser:appuser /app
+
+USER appuser
 
 ENV TZ=Asia/Seoul
 EXPOSE 8080

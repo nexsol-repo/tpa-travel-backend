@@ -7,15 +7,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(
-        name = "tpa_partner",
-        indexes = {
-                @Index(name = "idx_partner_name", columnList = "partner_name")
-        },
-        uniqueConstraints = {
-                @UniqueConstraint(name = "uq_partner_code", columnNames = "partner_code")
-        }
-)
+@Table(name = "tpa_partner", indexes = { @Index(name = "idx_partner_name", columnList = "partner_name") },
+        uniqueConstraints = { @UniqueConstraint(name = "uq_partner_code", columnNames = "partner_code") })
 public class TpaPartnerEntity extends AuditEntity {
 
     @Id
@@ -50,4 +43,5 @@ public class TpaPartnerEntity extends AuditEntity {
     /** soft delete */
     @Column(name = "deleted_at")
     private java.time.LocalDateTime deletedAt;
+
 }

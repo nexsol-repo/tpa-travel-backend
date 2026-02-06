@@ -11,4 +11,5 @@ public interface FavoriteCityRepository extends JpaRepository<FavoriteCityEntity
     List<FavoriteCityEntity> findByDeletedAtIsNullOrderBySortOrderAsc();
 
     Optional<FavoriteCityEntity> findByIdAndDeletedAtIsNull(Long id);
+
 }

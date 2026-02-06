@@ -6,5 +6,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ContractCancelRequest {
+
     private Long contractId;
+
 }

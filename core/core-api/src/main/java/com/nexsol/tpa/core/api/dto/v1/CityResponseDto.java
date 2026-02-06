@@ -23,14 +23,8 @@ public class CityResponseDto {
     private Integer sortOrder;
 
     public static CityResponseDto from(FavoriteCityEntity e) {
-        return new CityResponseDto(
-                e.getCountryCode(),
-                e.getCountryNameKorean(),
-                e.getCountryNameEnglish(),
-                e.getCityNameKorean(),
-                e.getCityNameEnglish(),
-                e.getTravelRiskGradeCode(),
-                e.getSortOrder());
+        return new CityResponseDto(e.getCountryCode(), e.getCountryNameKorean(), e.getCountryNameEnglish(),
+                e.getCityNameKorean(), e.getCityNameEnglish(), e.getTravelRiskGradeCode(), e.getSortOrder());
     }
 
 }

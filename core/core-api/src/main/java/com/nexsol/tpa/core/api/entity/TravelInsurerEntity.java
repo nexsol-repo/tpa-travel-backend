@@ -9,12 +9,8 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Entity
-@Table(
-        name = "tpa_insurer",
-        uniqueConstraints = {
-                @UniqueConstraint(name = "uq_insurer_code", columnNames = "insurer_code")
-        }
-)
+@Table(name = "tpa_insurer",
+        uniqueConstraints = { @UniqueConstraint(name = "uq_insurer_code", columnNames = "insurer_code") })
 public class TravelInsurerEntity extends AuditEntity {
 
     @Id
@@ -34,13 +30,9 @@ public class TravelInsurerEntity extends AuditEntity {
     private String apiBaseUrl;
 
     /**
-     * 서비스 타입(JSON)
-     * 예: {"travel": true, "health": false}
+     * 서비스 타입(JSON) 예: {"travel": true, "health": false}
      */
-    @Column(
-            name = "service_type",
-            columnDefinition = "longtext"
-    )
+    @Column(name = "service_type", columnDefinition = "longtext")
     private String serviceType;
 
     /** 사용 여부 */
@@ -50,4 +42,5 @@ public class TravelInsurerEntity extends AuditEntity {
     /** 삭제일시 (soft delete) */
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
+
 }

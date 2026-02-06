@@ -1,0 +1,19 @@
+.git
+.github
+.gradle
+.idea
+.DS_Store
+*.md
+*.log
+
+# 빌드 결과물 (Docker 내에서 새로 빌드)
+**/build/
+**/out/
+
+# 환경 파일
+.env*
+*.env
+
+# 스크립트
+scripts/
+deploy.sh

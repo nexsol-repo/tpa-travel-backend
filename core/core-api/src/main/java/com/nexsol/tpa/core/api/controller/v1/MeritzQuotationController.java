@@ -21,10 +21,7 @@ public class MeritzQuotationController {
     }
 
     @PostMapping(value = "/plans/{planId}/coverages", produces = MediaType.APPLICATION_JSON_VALUE)
-    public QuoteResponse.PlanCard planCoverages(
-            @PathVariable Long planId,
-            @Valid @RequestBody QuoteRequest request
-    ) {
+    public QuoteResponse.PlanCard planCoverages(@PathVariable Long planId, @Valid @RequestBody QuoteRequest request) {
         return quoteService.quotePlanCoverages(planId, request);
     }
 

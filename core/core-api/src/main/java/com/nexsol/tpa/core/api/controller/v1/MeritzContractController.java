@@ -48,29 +48,22 @@ public class MeritzContractController {
 
     /** 여행자보험 가입(결제) */
     @PostMapping("/travel/contract/completed")
-    public ContractCompletedResponse completed(
-            @RequestParam(defaultValue = "TPA") String companyCode,
-            @RequestBody ContractCompletedRequest request
-    ) {
+    public ContractCompletedResponse completed(@RequestParam(defaultValue = "TPA") String companyCode,
+            @RequestBody ContractCompletedRequest request) {
         return service.completed(companyCode, request);
     }
 
     /** 여행자보험 가입(결제취소) */
     @PostMapping("/travel/contract/cancel")
-    public ContractCancelResponse cancel(
-            @RequestParam(defaultValue = "TPA") String companyCode,
-            @RequestBody ContractCancelRequest request
-    ) {
+    public ContractCancelResponse cancel(@RequestParam(defaultValue = "TPA") String companyCode,
+            @RequestBody ContractCancelRequest request) {
         return service.cancel(companyCode, request);
     }
 
     /** 계약 목록 (auth_unique_key 최신순 기본) */
     @GetMapping("/travel/contracts")
-    public Page<TravelContractQueryDto.ContractListItem> list(
-            @RequestParam(required = false) String authUniqueKey,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size
-    ) {
+    public Page<TravelContractQueryDto.ContractListItem> list(@RequestParam(required = false) String authUniqueKey,
+            @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "20") int size) {
         return queryService.list(authUniqueKey, page, size);
     }
 

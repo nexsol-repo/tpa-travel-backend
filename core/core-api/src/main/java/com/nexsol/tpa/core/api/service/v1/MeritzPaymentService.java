@@ -20,10 +20,13 @@ import java.util.Map;
 public class MeritzPaymentService {
 
     private static final String CARD_APPROVE = "/b2b/v1/organ/meritz/handleOpapiTrvCtrCrdApv";
-    private static final String CARD_CANCEL  = "/b2b/v1/organ/meritz/handleOpapiTrvCtrCrdCnc";
+
+    private static final String CARD_CANCEL = "/b2b/v1/organ/meritz/handleOpapiTrvCtrCrdCnc";
 
     private final MeritzBridgeClient bridgeClient;
+
     private final CompaniesConfigsProperties companies;
+
     private final ObjectMapper objectMapper;
 
     public String approveCard(String companyCode, MeritzCardApproveBody body) {
@@ -37,22 +40,12 @@ public class MeritzPaymentService {
     private String call(String companyCode, String endpoint, Object body, String logPrefix) {
         var cfg = resolve(companyCode);
 
-        var wrapper = new MeritzApiRequest<>(
-                new MeritzApiRequest.Header(null, null),
-                body
-        );
+        var wrapper = new MeritzApiRequest<>(new MeritzApiRequest.Header(null, null), body);
 
         logJson(logPrefix + "[REQ]", endpoint, wrapper);
 
-        MeritzBridgeResponse res = bridgeClient.call(
-                new MeritzBridgeRequest(
-                        cfg.getCompanyCode(),
-                        endpoint,
-                        "POST",
-                        headers(),
-                        wrapper
-                )
-        );
+        MeritzBridgeResponse res = bridgeClient
+            .call(new MeritzBridgeRequest(cfg.getCompanyCode(), endpoint, "POST", headers(), wrapper));
 
         if (res.getStatus() != 200) {
             throw new IllegalStateException(
@@ -70,15 +63,20 @@ public class MeritzPaymentService {
     private void logJson(String prefix, String endpoint, Object body) {
         try {
             log.info("{} endpoint={}, body={}", prefix, endpoint, objectMapper.writeValueAsString(body));
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             log.info("{} endpoint={}, body=(json serialize fail) {}", prefix, endpoint, body);
         }
     }
 
     private CompaniesConfigsProperties.CompanyConfig resolve(String companyCode) {
-        if (companyCode == null || companyCode.isBlank()) companyCode = "TPA";
-        if ("TPA".equalsIgnoreCase(companyCode)) return companies.getTpa();
-        if ("INSBOON".equalsIgnoreCase(companyCode)) return companies.getInsboon();
+        if (companyCode == null || companyCode.isBlank())
+            companyCode = "TPA";
+        if ("TPA".equalsIgnoreCase(companyCode))
+            return companies.getTpa();
+        if ("INSBOON".equalsIgnoreCase(companyCode))
+            return companies.getInsboon();
         throw new IllegalArgumentException("Unknown companyCode: " + companyCode);
     }
+
 }
