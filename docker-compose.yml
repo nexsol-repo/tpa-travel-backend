@@ -1,25 +1,11 @@
 services:
   app:
-    # 이미지 이름은 환경변수로 주입받음 (deploy.sh 또는 .env)
     image: ${DOCKER_IMAGE}
     restart: always
-    # 실행 시점에 지정된 .env 파일을 로드
+    network_mode: host
     env_file:
       - .env
-    # network_mode: host 사용 시 ports 불필요, SERVER_PORT로 직접 바인딩
-    network_mode: host
     environment:
       - TZ=Asia/Seoul
       - SERVER_PORT=${HOST_PORT}
-      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
-      - DB_HOST=${DB_HOST}
-      - DB_PORT=${DB_PORT}
-      - DB_DATABASE=${DB_DATABASE}
-      - DB_USERNAME=${DB_USERNAME}
-      - DB_PASSWORD=${DB_PASSWORD}
-      #- GMAIL_EMAIL=${GMAIL_EMAIL}
-      #- GMAIL_PASSWORD=${GMAIL_PASSWORD}
-      #- S3_URL=${S3_URL}
-      #- S3_ACCESS_KEY=${S3_ACCESS_KEY}
-      #- S3_SECRET_KEY=${S3_SECRET_KEY}
-      #- JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      - SPRING_PROFILES_ACTIVE=${TARGET_ENV}
