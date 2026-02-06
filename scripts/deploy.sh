@@ -6,15 +6,15 @@ TARGET_ENV=${1:-""}
 APP_NAME="tpa-travel-api"
 ROUTE_PATH="/api/travel/"
 
-# [중요] Dev/Prod 경로 및 포트 분리
+# 공통 경로 (dev/prod 모두 동일 디렉토리, .env.dev/.env.prod로 구분)
+BASE_PATH="/home/nex3/app/${APP_NAME}"
+
 if [ "$TARGET_ENV" == "prod" ]; then
-  BASE_PATH="/home/nex3/app/${APP_NAME}"
   ENV_FILE=".env.prod"
   NGINX_CONF="/etc/nginx/conf.d/tpa-travel-api.conf"
   DEFAULT_PORT="8061"
   ALT_PORT="8062"
 elif [ "$TARGET_ENV" == "dev" ]; then
-  BASE_PATH="/home/nex3/app/${APP_NAME}-dev"
   ENV_FILE=".env.dev"
   NGINX_CONF="/etc/nginx/conf.d/tpa-travel-api-dev.conf"
   DEFAULT_PORT="8071"
