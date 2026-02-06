@@ -83,7 +83,7 @@ fi
 echo "🏥 헬스체크 시작... (http://127.0.0.1:${TARGET_PORT}/health)"
 HEALTH_OK=false
 for i in {1..24}; do
-  STATUS=$(curl -s -o /dev/null -w "%{http_code}" "http://127.0.0.1:${TARGET_PORT}/health" 2>/dev/null || echo "000")
+  STATUS=$(curl -s -o /dev/null -w "%{http_code}" "http://127.0.0.1:${TARGET_PORT}/health" 2>/dev/null) || STATUS="000"
   if [ "$STATUS" == "200" ]; then
     echo "✅ 헬스체크 성공! (${i}번째 시도)"
     HEALTH_OK=true
