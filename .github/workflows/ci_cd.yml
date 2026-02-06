@@ -26,13 +26,13 @@ jobs:
       # 환경별 변수 설정 (Prod vs Dev)
       - name: Set Environment Variables
         run: |
+          DEPLOY_PATH="/home/nex3/app/tpa-travel-api"
+          echo "DEPLOY_PATH=${DEPLOY_PATH}" >> $GITHUB_ENV
           if [[ "${{ github.ref_name }}" == "main" ]]; then
             echo "TARGET_ENV=prod" >> $GITHUB_ENV
-            echo "DEPLOY_PATH=/home/nex3/app/tpa-travel-api" >> $GITHUB_ENV
             echo "DOCKER_TAG=prod" >> $GITHUB_ENV
           else
             echo "TARGET_ENV=dev" >> $GITHUB_ENV
-            echo "DEPLOY_PATH=/home/nex3/app/tpa-travel-api-dev" >> $GITHUB_ENV
             echo "DOCKER_TAG=dev" >> $GITHUB_ENV
           fi
 
