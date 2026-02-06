@@ -63,9 +63,9 @@ jobs:
 
           chmod +x ${{ env.DEPLOY_PATH }}/deploy.sh
 
-          # Blue/Green 배포 스크립트 실행
+          # Blue/Green 배포 스크립트 실행 (로그 캡처)
           cd ${{ env.DEPLOY_PATH }}
-          ./deploy.sh ${{ env.TARGET_ENV }}
+          ./deploy.sh ${{ env.TARGET_ENV }} 2>&1 | tee /tmp/deploy.log
 
       - name: Cleanup Docker
         if: always()
@@ -91,3 +91,18 @@ jobs:
           echo "| 환경 | ${{ env.TARGET_ENV }} |" >> $GITHUB_STEP_SUMMARY
           echo "| 브랜치 | ${{ github.ref_name }} |" >> $GITHUB_STEP_SUMMARY
           echo "| 커밋 | ${{ github.sha }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📋 배포 로그" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          if [ -f /tmp/deploy.log ]; then
+            tail -80 /tmp/deploy.log >> $GITHUB_STEP_SUMMARY
+          else
+            echo "배포 로그 없음" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🐳 컨테이너 로그" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          CONTAINER_NAME="${{ env.IMAGE_NAME }}-${{ env.TARGET_ENV }}"
+          docker ps -a --filter "name=${CONTAINER_NAME}" --format "{{.Names}}" | head -1 | xargs -r docker logs --tail 100 2>&1 >> $GITHUB_STEP_SUMMARY || echo "컨테이너 로그 조회 실패" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
