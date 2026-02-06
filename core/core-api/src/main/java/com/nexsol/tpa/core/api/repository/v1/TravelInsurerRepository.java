@@ -4,4 +4,5 @@ import com.nexsol.tpa.core.api.entity.TravelInsurerEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface TravelInsurerRepository extends JpaRepository<TravelInsurerEntity, Long> {
+
 }

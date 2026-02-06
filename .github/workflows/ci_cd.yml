@@ -1,0 +1,93 @@
+name: CI/CD - TPA Travel API
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+  workflow_dispatch:
+
+# 브랜치별 동시 배포 방지 (같은 브랜치에서 새 배포 시 이전 배포 취소)
+concurrency:
+  group: deploy-${{ github.ref_name }}
+  cancel-in-progress: true
+
+env:
+  IMAGE_NAME: tpa-travel-api
+
+jobs:
+  build-and-deploy:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v4
+
+      # 환경별 변수 설정 (Prod vs Dev)
+      - name: Set Environment Variables
+        run: |
+          if [[ "${{ github.ref_name }}" == "main" ]]; then
+            echo "TARGET_ENV=prod" >> $GITHUB_ENV
+            echo "DEPLOY_PATH=/home/nex3/app/tpa-travel-api" >> $GITHUB_ENV
+            echo "DOCKER_TAG=prod" >> $GITHUB_ENV
+          else
+            echo "TARGET_ENV=dev" >> $GITHUB_ENV
+            echo "DEPLOY_PATH=/home/nex3/app/tpa-travel-api-dev" >> $GITHUB_ENV
+            echo "DOCKER_TAG=dev" >> $GITHUB_ENV
+          fi
+
+      - name: Docker Image Build
+        run: |
+          echo "🐳 Build Docker Image (${{ env.TARGET_ENV }})"
+          docker build \
+            --network=host \
+            -t ${{ env.IMAGE_NAME }}:${{ env.DOCKER_TAG }} \
+            -f Dockerfile .
+
+      - name: Prepare & Execute Deployment
+        run: |
+          mkdir -p ${{ env.DEPLOY_PATH }}
+
+          # 필요한 파일 복사
+          cp docker-compose.yml ${{ env.DEPLOY_PATH }}/
+
+          # scripts 폴더 유무에 따라 deploy.sh 복사
+          if [ -f "scripts/deploy.sh" ]; then
+            cp scripts/deploy.sh ${{ env.DEPLOY_PATH }}/
+          elif [ -f "deploy.sh" ]; then
+            cp deploy.sh ${{ env.DEPLOY_PATH }}/
+          else
+            echo "❌ deploy.sh not found!"
+            exit 1
+          fi
+
+          chmod +x ${{ env.DEPLOY_PATH }}/deploy.sh
+
+          # Blue/Green 배포 스크립트 실행
+          cd ${{ env.DEPLOY_PATH }}
+          ./deploy.sh ${{ env.TARGET_ENV }}
+
+      - name: Cleanup Docker
+        if: always()
+        run: docker image prune -f
+
+      - name: Deployment Summary
+        if: success()
+        run: |
+          echo "### ✅ 배포 완료" >> $GITHUB_STEP_SUMMARY
+          echo "| 항목 | 값 |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|-----|" >> $GITHUB_STEP_SUMMARY
+          echo "| 환경 | ${{ env.TARGET_ENV }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 브랜치 | ${{ github.ref_name }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 커밋 | ${{ github.sha }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 이미지 | ${{ env.IMAGE_NAME }}:${{ env.DOCKER_TAG }} |" >> $GITHUB_STEP_SUMMARY
+
+      - name: Deployment Failed Summary
+        if: failure()
+        run: |
+          echo "### ❌ 배포 실패" >> $GITHUB_STEP_SUMMARY
+          echo "| 항목 | 값 |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|-----|" >> $GITHUB_STEP_SUMMARY
+          echo "| 환경 | ${{ env.TARGET_ENV }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 브랜치 | ${{ github.ref_name }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 커밋 | ${{ github.sha }} |" >> $GITHUB_STEP_SUMMARY

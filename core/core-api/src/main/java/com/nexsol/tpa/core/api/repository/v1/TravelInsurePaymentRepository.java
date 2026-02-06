@@ -10,14 +10,16 @@ import java.util.List;
 import java.util.Optional;
 
 public interface TravelInsurePaymentRepository extends JpaRepository<TravelInsurePaymentEntity, Long> {
+
     Optional<TravelInsurePaymentEntity> findByContractId(Long contractId);
+
     boolean existsByContractId(Long contractId);
 
     @Query("""
-    select p
-    from TravelInsurePaymentEntity p
-    where p.contractId in :contractIds
-    """)
+            select p
+            from TravelInsurePaymentEntity p
+            where p.contractId in :contractIds
+            """)
     List<TravelInsurePaymentEntity> findByContractIdIn(@Param("contractIds") Collection<Long> contractIds);
 
 }

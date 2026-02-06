@@ -13,4 +13,5 @@ public interface TpaChannelRepository extends JpaRepository<TpaChannelEntity, Lo
     List<TpaChannelEntity> findAllByIsActiveTrueOrderByIdAsc();
 
     List<TpaChannelEntity> findAllByPartnerIdAndIsActiveTrueOrderByIdAsc(Long partnerId);
+
 }

@@ -113,11 +113,7 @@ public class TravelContractEntity extends AuditEntity {
 
     /* ========================= */
 
-    @OneToMany(
-            mappedBy = "contract",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
-    )
+    @OneToMany(mappedBy = "contract", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TravelInsurePeopleEntity> people = new ArrayList<>();
 
     public void addPerson(TravelInsurePeopleEntity person) {
@@ -141,4 +137,5 @@ public class TravelContractEntity extends AuditEntity {
         c.applyDate = LocalDateTime.now();
         return c;
     }
+
 }

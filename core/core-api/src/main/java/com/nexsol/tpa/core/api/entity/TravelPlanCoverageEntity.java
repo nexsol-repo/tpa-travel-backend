@@ -9,19 +9,11 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Entity
-@Table(
-        name = "travel_plan_coverage",
+@Table(name = "travel_plan_coverage",
         uniqueConstraints = {
-                @UniqueConstraint(
-                        name = "uq_plan_coverage",
-                        columnNames = {"plan_id", "coverage_id"}
-                )
-        },
-        indexes = {
-                @Index(name = "idx_pc_plan", columnList = "plan_id"),
-                @Index(name = "idx_pc_coverage", columnList = "coverage_id")
-        }
-)
+                @UniqueConstraint(name = "uq_plan_coverage", columnNames = { "plan_id", "coverage_id" }) },
+        indexes = { @Index(name = "idx_pc_plan", columnList = "plan_id"),
+                @Index(name = "idx_pc_coverage", columnList = "coverage_id") })
 public class TravelPlanCoverageEntity extends AuditEntity {
 
     @Id
@@ -60,7 +52,6 @@ public class TravelPlanCoverageEntity extends AuditEntity {
     @Column(name = "category_code", length = 50)
     private String categoryCode;
 
-
     /** 지급사유 override */
     @Column(name = "claim_reason_override", length = 300)
     private String claimReasonOverride;
@@ -80,4 +71,5 @@ public class TravelPlanCoverageEntity extends AuditEntity {
     /** 삭제일시 (soft delete) */
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
+
 }

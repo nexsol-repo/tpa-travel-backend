@@ -6,6 +6,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class MeritzCertRequest {
+
     /** 내부 계약 ID (travel_contract.id) */
     private Long contractId;
 
@@ -14,5 +15,5 @@ public class MeritzCertRequest {
 
     /** 출력유형코드: V(Viewer), D(Download) */
     private String otptTpCd;
-}
 
+}

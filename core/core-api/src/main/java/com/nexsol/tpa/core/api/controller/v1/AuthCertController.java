@@ -18,36 +18,28 @@ public class AuthCertController {
 
     @PostMapping("/cert/complete")
     public ApiResponse<AuthCertResultResponse> complete(@RequestBody AuthCertCompleteRequest req,
-                                                        HttpServletRequest httpReq) {
-        AuthCertResultResponse res = authCertService.complete(
-                req,
-                httpReq.getHeader("User-Agent"),
-                extractClientIp(httpReq),
-                httpReq.getHeader("Referer")
-        );
+            HttpServletRequest httpReq) {
+        AuthCertResultResponse res = authCertService.complete(req, httpReq.getHeader("User-Agent"),
+                extractClientIp(httpReq), httpReq.getHeader("Referer"));
         return ApiResponse.success(res);
     }
 
     @PostMapping("/cert/history/complete")
-    public ApiResponse<AuthCertResultResponse> historyComplete(
-            @RequestBody AuthCertHistoryCompleteRequest req,
-            HttpServletRequest httpReq
-    ) {
-        AuthCertResultResponse res = authCertService.historyComplete(
-                req,
-                httpReq.getHeader("User-Agent"),
-                extractClientIp(httpReq),
-                httpReq.getHeader("Referer")
-        );
+    public ApiResponse<AuthCertResultResponse> historyComplete(@RequestBody AuthCertHistoryCompleteRequest req,
+            HttpServletRequest httpReq) {
+        AuthCertResultResponse res = authCertService.historyComplete(req, httpReq.getHeader("User-Agent"),
+                extractClientIp(httpReq), httpReq.getHeader("Referer"));
         return ApiResponse.success(res);
     }
 
-
     private String extractClientIp(HttpServletRequest request) {
         String xff = request.getHeader("X-Forwarded-For");
-        if (xff != null && !xff.isBlank()) return xff.split(",")[0].trim();
+        if (xff != null && !xff.isBlank())
+            return xff.split(",")[0].trim();
         String xrip = request.getHeader("X-Real-IP");
-        if (xrip != null && !xrip.isBlank()) return xrip.trim();
+        if (xrip != null && !xrip.isBlank())
+            return xrip.trim();
         return request.getRemoteAddr();
     }
+
 }

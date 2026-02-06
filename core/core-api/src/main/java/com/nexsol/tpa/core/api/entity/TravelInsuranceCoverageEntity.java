@@ -44,4 +44,5 @@ public class TravelInsuranceCoverageEntity extends AuditEntity {
 
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
+
 }

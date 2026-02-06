@@ -18,28 +18,20 @@ import java.time.LocalDateTime;
 public class AuthCertPersistenceService {
 
     private final TpaAuthCertLogRepository logRepo;
+
     private final TpaAuthCertResultRepository resultRepo;
+
     private final TravelContractRepository contractRepo;
+
     private final TravelContractSnapshotRepository snapshotRepo;
 
     /**
      * tpa_auth_cert_log : impUid 기준 멱등 upsert
      */
     @Transactional
-    public Long createOrUpdateLog(
-            Long contractId,
-            String bizNum,
-            String impUid,
-            String requestId,
-            String pathRoot,
-            String moid,
-            String pg,
-            String provider,
-            String userAgent,
-            String clientIp,
-            String referer,
-            String rawReqJson
-    ) {
+    public Long createOrUpdateLog(Long contractId, String bizNum, String impUid, String requestId, String pathRoot,
+            String moid, String pg, String provider, String userAgent, String clientIp, String referer,
+            String rawReqJson) {
 
         TpaAuthCertLogEntity log = logRepo.findByImpUid(impUid).orElseGet(TpaAuthCertLogEntity::new);
 
@@ -63,26 +55,13 @@ public class AuthCertPersistenceService {
      * result upsert + contract update + snapshot upsert
      */
     @Transactional
-    public AuthCertResultResponse saveResultAndUpdateContract(
-            Long contractId,
-            String provider,
-            String moid,
-            String impUid,
-            String requestId,
-            String uniqueKey,
-            String resultStatus,
-            String resultCode,
-            String resultMsg,
-            String certName,
-            String certBirthday,
-            String certGender,
-            String certPhone,
-            boolean matched,
-            String matchFailReason,
-            String rawResJson
-    ) {
+    public AuthCertResultResponse saveResultAndUpdateContract(Long contractId, String provider, String moid,
+            String impUid, String requestId, String uniqueKey, String resultStatus, String resultCode, String resultMsg,
+            String certName, String certBirthday, String certGender, String certPhone, boolean matched,
+            String matchFailReason, String rawResJson) {
 
-        TravelContractEntity contract = contractRepo.findById(contractId).orElseThrow(() -> new EntityNotFoundException("계약 없음. contractId=" + contractId));
+        TravelContractEntity contract = contractRepo.findById(contractId)
+            .orElseThrow(() -> new EntityNotFoundException("계약 없음. contractId=" + contractId));
 
         // 계약 업데이트
         contract.setAuthProvider(provider);
@@ -94,13 +73,10 @@ public class AuthCertPersistenceService {
         contractRepo.save(contract);
 
         // logId 연결 (impUid 기준)
-        Long logId = logRepo.findByImpUid(impUid)
-                .map(TpaAuthCertLogEntity::getId)
-                .orElse(null);
+        Long logId = logRepo.findByImpUid(impUid).map(TpaAuthCertLogEntity::getId).orElse(null);
 
         // result 멱등 upsert
-        TpaAuthCertResultEntity result = resultRepo.findByImpUid(impUid)
-                .orElseGet(TpaAuthCertResultEntity::new);
+        TpaAuthCertResultEntity result = resultRepo.findByImpUid(impUid).orElseGet(TpaAuthCertResultEntity::new);
 
         // result.setContractId(contractId); // 컬럼 추가하면 활성화
         result.setLogId(logId);
@@ -147,7 +123,8 @@ public class AuthCertPersistenceService {
     }
 
     private String normalizeBirthday(String raw) {
-        if (raw == null) return null;
+        if (raw == null)
+            return null;
         // 숫자만 남김
         String digits = raw.replaceAll("\\D", "");
 
@@ -165,45 +142,29 @@ public class AuthCertPersistenceService {
         final String SNAPSHOT_TYPE = "AUTH";
         final String METHOD = "API";
 
-        TravelContractSnapshotEntity snap = snapshotRepo
-                .findByContractIdAndSnapshotType(contractId, SNAPSHOT_TYPE)
-                .orElseGet(() -> {
-                    TravelContractSnapshotEntity s = new TravelContractSnapshotEntity();
-                    s.setContractId(contractId);
-                    s.setInsurerId(insurerId);
-                    s.setMethod(METHOD);
-                    s.setSnapshotType(SNAPSHOT_TYPE);
-                    return s;
-                });
+        TravelContractSnapshotEntity snap = snapshotRepo.findByContractIdAndSnapshotType(contractId, SNAPSHOT_TYPE)
+            .orElseGet(() -> {
+                TravelContractSnapshotEntity s = new TravelContractSnapshotEntity();
+                s.setContractId(contractId);
+                s.setInsurerId(insurerId);
+                s.setMethod(METHOD);
+                s.setSnapshotType(SNAPSHOT_TYPE);
+                return s;
+            });
 
         snap.setJsonSnapshot(jsonSnapshot);
         snapshotRepo.save(snap);
     }
 
     @Transactional
-    public AuthCertResultResponse saveHistoryResult(
-            String provider,
-            String moid,
-            String impUid,
-            String requestId,
-            String uniqueKey,
-            String resultStatus,
-            String resultCode,
-            String resultMsg,
-            String certName,
-            String certBirthday,
-            String certGender,
-            String certPhone,
-            String rawResJson
-    ) {
+    public AuthCertResultResponse saveHistoryResult(String provider, String moid, String impUid, String requestId,
+            String uniqueKey, String resultStatus, String resultCode, String resultMsg, String certName,
+            String certBirthday, String certGender, String certPhone, String rawResJson) {
         // logId 연결 (impUid 기준)
-        Long logId = logRepo.findByImpUid(impUid)
-                .map(TpaAuthCertLogEntity::getId)
-                .orElse(null);
+        Long logId = logRepo.findByImpUid(impUid).map(TpaAuthCertLogEntity::getId).orElse(null);
 
         // result 멱등 upsert
-        TpaAuthCertResultEntity result = resultRepo.findByImpUid(impUid)
-                .orElseGet(TpaAuthCertResultEntity::new);
+        TpaAuthCertResultEntity result = resultRepo.findByImpUid(impUid).orElseGet(TpaAuthCertResultEntity::new);
 
         result.setLogId(logId);
         result.setImpUid(impUid);

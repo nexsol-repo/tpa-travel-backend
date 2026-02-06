@@ -8,4 +8,5 @@ import java.util.Optional;
 public interface TravelContractSnapshotRepository extends JpaRepository<TravelContractSnapshotEntity, Long> {
 
     Optional<TravelContractSnapshotEntity> findByContractIdAndSnapshotType(Long contractId, String snapshotType);
+
 }

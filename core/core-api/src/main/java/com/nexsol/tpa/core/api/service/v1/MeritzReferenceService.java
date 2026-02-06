@@ -21,10 +21,13 @@ import java.util.Optional;
 public class MeritzReferenceService {
 
     private static final String PLAN_INQ = "/b2b/v1/organ/meritz/planInq";
+
     private static final String CITY_NATION_INQ = "/b2b/v1/organ/meritz/citynatlcdInq";
 
     private final MeritzBridgeClient bridgeClient;
+
     private final CompaniesConfigsProperties companies;
+
     private final ObjectMapper objectMapper;
 
     public String getPlans(String stdDt) {
@@ -37,13 +40,8 @@ public class MeritzReferenceService {
         body.put("polNo", "15540-19125");
         body.put("stdDt", stdDt);
 
-        MeritzBridgeRequest req = new MeritzBridgeRequest(
-                cfg.getCompanyCode(),
-                PLAN_INQ,
-                "POST",
-                Map.of("Content-Type", "application/json; charset=UTF-8"),
-                body
-        );
+        MeritzBridgeRequest req = new MeritzBridgeRequest(cfg.getCompanyCode(), PLAN_INQ, "POST",
+                Map.of("Content-Type", "application/json; charset=UTF-8"), body);
 
         MeritzBridgeResponse res = bridgeClient.call(req);
 
@@ -64,13 +62,8 @@ public class MeritzReferenceService {
         body.put("gnrAflcoCd", cfg.getGnrAflcoCd());
         body.put("aflcoDivCd", cfg.getAflcoDivCd());
 
-        MeritzBridgeRequest req = new MeritzBridgeRequest(
-                cfg.getCompanyCode(),
-                CITY_NATION_INQ,
-                "POST",
-                Map.of("Content-Type", "application/json; charset=UTF-8"),
-                body
-        );
+        MeritzBridgeRequest req = new MeritzBridgeRequest(cfg.getCompanyCode(), CITY_NATION_INQ, "POST",
+                Map.of("Content-Type", "application/json; charset=UTF-8"), body);
 
         MeritzBridgeResponse res = bridgeClient.call(req);
 
@@ -89,25 +82,22 @@ public class MeritzReferenceService {
             List<MeritzCityItemDto> cities = Optional.ofNullable(meritzResponse.getCities()).orElse(List.of());
 
             return cities.stream()
-                    .map(item -> new CityResponseDto(
-                            item.getCityNatlCd(),
-                            item.getKorNatlNm(),
-                            item.getEngNatlNm(),
-                            item.getKorCityNm(),
-                            item.getEngCityNm(),
-                            item.getTrvRskGrdeCd(),
-                            null
-                    ))
-                    .toList();
+                .map(item -> new CityResponseDto(item.getCityNatlCd(), item.getKorNatlNm(), item.getEngNatlNm(),
+                        item.getKorCityNm(), item.getEngCityNm(), item.getTrvRskGrdeCd(), null))
+                .toList();
 
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             throw new IllegalStateException("Meritz citynatlcdInq parse failed. body=" + res.getBody(), e);
         }
     }
 
     private CompaniesConfigsProperties.CompanyConfig resolve(String companyCode) {
-        if ("TPA".equalsIgnoreCase(companyCode)) return companies.getTpa();
-        if ("INSBOON".equalsIgnoreCase(companyCode)) return companies.getInsboon();
+        if ("TPA".equalsIgnoreCase(companyCode))
+            return companies.getTpa();
+        if ("INSBOON".equalsIgnoreCase(companyCode))
+            return companies.getInsboon();
         throw new IllegalArgumentException("Unknown companyCode: " + companyCode);
     }
+
 }

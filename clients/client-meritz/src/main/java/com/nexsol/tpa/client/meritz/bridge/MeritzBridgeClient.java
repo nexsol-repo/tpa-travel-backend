@@ -13,7 +13,9 @@ import java.util.List;
 public class MeritzBridgeClient {
 
     private final RestTemplate restTemplate;
+
     private final ObjectMapper objectMapper;
+
     private final String bridgeBaseUrl;
 
     public MeritzBridgeClient(RestTemplate restTemplate, ObjectMapper objectMapper, String bridgeBaseUrl) {
@@ -25,15 +27,13 @@ public class MeritzBridgeClient {
     public MeritzBridgeResponse call(MeritzBridgeRequest req) {
         String url = bridgeBaseUrl + "/internal/meritz-bridge";
 
-        req.setHeaders(
-                req.getHeaders() == null
-                        ? java.util.Map.of("Content-Type", "application/json; charset=UTF-8")
-                        : filterBridgeForwardHeaders(req.getHeaders())
-        );
+        req.setHeaders(req.getHeaders() == null ? java.util.Map.of("Content-Type", "application/json; charset=UTF-8")
+                : filterBridgeForwardHeaders(req.getHeaders()));
 
         try {
             log.info("[MERITZ][BRIDGE][REQ] url={}, payload={}", url, objectMapper.writeValueAsString(req));
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             log.info("[MERITZ][BRIDGE][REQ] url={}, payload=(json serialize fail) {}", url, req);
         }
 
@@ -43,17 +43,18 @@ public class MeritzBridgeClient {
 
         HttpEntity<MeritzBridgeRequest> entity = new HttpEntity<>(req, headers);
 
-        ResponseEntity<MeritzBridgeResponse> res =
-                restTemplate.exchange(url, HttpMethod.POST, entity, MeritzBridgeResponse.class);
+        ResponseEntity<MeritzBridgeResponse> res = restTemplate.exchange(url, HttpMethod.POST, entity,
+                MeritzBridgeResponse.class);
 
         MeritzBridgeResponse body = res.getBody();
 
         try {
-            log.info("[MERITZ][BRIDGE][RES] httpStatus={}, payload={}",
-                    res.getStatusCode(), objectMapper.writeValueAsString(body));
-        } catch (Exception e) {
-            log.info("[MERITZ][BRIDGE][RES] httpStatus={}, payload=(json serialize fail) {}",
-                    res.getStatusCode(), body);
+            log.info("[MERITZ][BRIDGE][RES] httpStatus={}, payload={}", res.getStatusCode(),
+                    objectMapper.writeValueAsString(body));
+        }
+        catch (Exception e) {
+            log.info("[MERITZ][BRIDGE][RES] httpStatus={}, payload=(json serialize fail) {}", res.getStatusCode(),
+                    body);
         }
 
         if (body == null) {
@@ -66,12 +67,16 @@ public class MeritzBridgeClient {
         java.util.LinkedHashMap<String, String> out = new java.util.LinkedHashMap<>();
         for (var e : in.entrySet()) {
             String k = e.getKey();
-            if (k == null) continue;
+            if (k == null)
+                continue;
             String keyLower = k.toLowerCase();
 
-            if (keyLower.equals("authorization")) continue;
-            if (keyLower.equals("x-api-tran-id")) continue;
-            if (keyLower.equals("timestamp")) continue;
+            if (keyLower.equals("authorization"))
+                continue;
+            if (keyLower.equals("x-api-tran-id"))
+                continue;
+            if (keyLower.equals("timestamp"))
+                continue;
 
             out.put(k, e.getValue());
         }
@@ -84,9 +89,10 @@ public class MeritzBridgeClient {
     public <T> T parseInnerBody(MeritzBridgeResponse bridgeResponse, Class<T> clazz) {
         try {
             return objectMapper.readValue(bridgeResponse.getBody(), clazz);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             throw new IllegalStateException("Failed to parse meritz inner body json", e);
         }
     }
-}
 
+}

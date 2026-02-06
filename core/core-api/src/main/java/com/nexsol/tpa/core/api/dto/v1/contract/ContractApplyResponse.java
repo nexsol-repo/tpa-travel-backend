@@ -6,6 +6,9 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class ContractApplyResponse {
+
     private Long contractId;
+
     private String status; // PENDING
+
 }

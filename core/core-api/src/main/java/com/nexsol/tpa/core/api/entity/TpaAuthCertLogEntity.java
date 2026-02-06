@@ -9,18 +9,12 @@ import org.hibernate.type.SqlTypes;
 @Getter
 @Setter
 @Entity
-@Table(
-        name = "tpa_auth_cert_log",
-        indexes = {
-                @Index(name = "idx_auth_log_requestid", columnList = "request_id"),
+@Table(name = "tpa_auth_cert_log",
+        indexes = { @Index(name = "idx_auth_log_requestid", columnList = "request_id"),
                 @Index(name = "idx_auth_log_insured", columnList = "insured_seq_no"),
                 @Index(name = "idx_auth_log_created", columnList = "created_at"),
-                @Index(name = "idx_auth_log_biznum", columnList = "biz_num")
-        },
-        uniqueConstraints = {
-                @UniqueConstraint(name = "uq_auth_log_impuid", columnNames = "imp_uid")
-        }
-)
+                @Index(name = "idx_auth_log_biznum", columnList = "biz_num") },
+        uniqueConstraints = { @UniqueConstraint(name = "uq_auth_log_impuid", columnNames = "imp_uid") })
 public class TpaAuthCertLogEntity extends AuditEntity {
 
     @Id
@@ -68,9 +62,7 @@ public class TpaAuthCertLogEntity extends AuditEntity {
     private String referer;
 
     /**
-     * 요청 원문(JSON)
-     * - MySQL JSON 컬럼
-     * - JPA에선 일단 String으로 저장 (필요하면 Converter/JsonType로 고도화)
+     * 요청 원문(JSON) - MySQL JSON 컬럼 - JPA에선 일단 String으로 저장 (필요하면 Converter/JsonType로 고도화)
      */
     @JdbcTypeCode(SqlTypes.LONGVARCHAR)
     @Column(name = "raw_req_json", columnDefinition = "longtext")

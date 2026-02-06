@@ -8,7 +8,6 @@ spring:
       - monitoring.yml
       - logging.yml
       - db-core.yml
-      - client-example.yml
       - client-meritz.yml
   web.resources.add-mappings: false
 

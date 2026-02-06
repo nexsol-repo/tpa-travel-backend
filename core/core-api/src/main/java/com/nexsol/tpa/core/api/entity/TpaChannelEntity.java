@@ -7,15 +7,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(
-        name = "tpa_channel",
-        indexes = {
-                @Index(name = "idx_channel_name", columnList = "channel_name")
-        },
-        uniqueConstraints = {
-                @UniqueConstraint(name = "uq_channel_code", columnNames = "channel_code")
-        }
-)
+@Table(name = "tpa_channel", indexes = { @Index(name = "idx_channel_name", columnList = "channel_name") },
+        uniqueConstraints = { @UniqueConstraint(name = "uq_channel_code", columnNames = "channel_code") })
 public class TpaChannelEntity extends AuditEntity {
 
     @Id
@@ -36,8 +29,7 @@ public class TpaChannelEntity extends AuditEntity {
     private Boolean isActive = true;
 
     /**
-     * JSON string (MySQL JSON valid check)
-     * ex) ["PUNGSU","TRAVEL","SOLAR"]
+     * JSON string (MySQL JSON valid check) ex) ["PUNGSU","TRAVEL","SOLAR"]
      */
     @Lob
     @Column(name = "service_type", columnDefinition = "longtext")
@@ -46,4 +38,5 @@ public class TpaChannelEntity extends AuditEntity {
     /** soft delete */
     @Column(name = "deleted_at")
     private java.time.LocalDateTime deletedAt;
+
 }

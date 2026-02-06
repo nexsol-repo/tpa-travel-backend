@@ -9,18 +9,12 @@ import org.hibernate.type.SqlTypes;
 @Getter
 @Setter
 @Entity
-@Table(
-        name = "tpa_auth_cert_result",
-        indexes = {
-                @Index(name = "idx_auth_result_insured", columnList = "insured_seq_no"),
+@Table(name = "tpa_auth_cert_result",
+        indexes = { @Index(name = "idx_auth_result_insured", columnList = "insured_seq_no"),
                 @Index(name = "idx_auth_result_status", columnList = "result_status"),
                 @Index(name = "idx_auth_result_created", columnList = "created_at"),
-                @Index(name = "idx_auth_result_logid", columnList = "log_id")
-        },
-        uniqueConstraints = {
-                @UniqueConstraint(name = "uq_auth_result_impuid", columnNames = "imp_uid")
-        }
-)
+                @Index(name = "idx_auth_result_logid", columnList = "log_id") },
+        uniqueConstraints = { @UniqueConstraint(name = "uq_auth_result_impuid", columnNames = "imp_uid") })
 public class TpaAuthCertResultEntity extends AuditEntity {
 
     @Id
@@ -28,8 +22,7 @@ public class TpaAuthCertResultEntity extends AuditEntity {
     private Long id;
 
     /**
-     * tpa_auth_cert_log.id (없으면 NULL)
-     * - FK: ON DELETE SET NULL
+     * tpa_auth_cert_log.id (없으면 NULL) - FK: ON DELETE SET NULL
      */
     @Column(name = "log_id")
     private Long logId;
@@ -90,4 +83,5 @@ public class TpaAuthCertResultEntity extends AuditEntity {
     @JdbcTypeCode(SqlTypes.LONGVARCHAR)
     @Column(name = "raw_res_json", columnDefinition = "json")
     private String rawResJson;
+
 }

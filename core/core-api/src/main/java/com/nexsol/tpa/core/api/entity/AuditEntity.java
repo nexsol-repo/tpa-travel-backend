@@ -34,7 +34,8 @@ public abstract class AuditEntity {
         this.updatedAt = LocalDateTime.now();
     }
 
-//    protected void markDeleted(String actor) {
-//        this.updatedAt = LocalDateTime.now();
-//    }
+    // protected void markDeleted(String actor) {
+    // this.updatedAt = LocalDateTime.now();
+    // }
+
 }

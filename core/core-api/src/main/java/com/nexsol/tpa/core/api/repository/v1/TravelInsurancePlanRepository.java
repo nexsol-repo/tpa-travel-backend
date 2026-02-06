@@ -8,8 +8,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.Collection;
 import java.util.List;
 
-public interface TravelInsurancePlanRepository
-        extends JpaRepository<TravelInsurancePlanEntity, Long> {
+public interface TravelInsurancePlanRepository extends JpaRepository<TravelInsurancePlanEntity, Long> {
 
     @Query("""
                 select p
@@ -18,9 +17,7 @@ public interface TravelInsurancePlanRepository
                   and p.isActive = true
                 order by p.sortOrder asc, p.id asc
             """)
-    List<TravelInsurancePlanEntity> findActiveByInsurerId(
-            @Param("insurerId") Long insurerId
-    );
+    List<TravelInsurancePlanEntity> findActiveByInsurerId(@Param("insurerId") Long insurerId);
 
     @Query("""
                 select p
@@ -30,4 +27,3 @@ public interface TravelInsurancePlanRepository
     List<TravelInsurancePlanEntity> findByIdIn(@Param("ids") Collection<Long> ids);
 
 }
-

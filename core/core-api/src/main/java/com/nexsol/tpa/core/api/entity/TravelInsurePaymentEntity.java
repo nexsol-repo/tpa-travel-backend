@@ -32,19 +32,15 @@ public class TravelInsurePaymentEntity extends AuditEntity {
     @Column(name = "cancel_date")
     private LocalDateTime cancelDate;
 
-    @Column(
-            name = "paid_amount",
-            nullable = false,
-            precision = 15,
-            scale = 2
-    )
+    @Column(name = "paid_amount", nullable = false, precision = 15, scale = 2)
     private BigDecimal paidAmount = BigDecimal.ZERO;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 20)
     private TravelPaymentStatus status = TravelPaymentStatus.COMPLETED;
 
-    public static TravelInsurePaymentEntity createReady(Long contractId, TravelPaymentMethod method, BigDecimal amount) {
+    public static TravelInsurePaymentEntity createReady(Long contractId, TravelPaymentMethod method,
+            BigDecimal amount) {
         TravelInsurePaymentEntity p = new TravelInsurePaymentEntity();
         p.contractId = contractId;
         p.paymentMethod = method;
@@ -62,4 +58,5 @@ public class TravelInsurePaymentEntity extends AuditEntity {
         this.status = TravelPaymentStatus.CANCELED;
         this.cancelDate = canceledAt == null ? LocalDateTime.now() : canceledAt;
     }
+
 }

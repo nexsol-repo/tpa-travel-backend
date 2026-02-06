@@ -29,20 +29,31 @@ import java.util.Map;
 public class MeritzContractService {
 
     private static final String EST_SAVE = "/b2b/v1/organ/meritz/estSave";
-//    private static final String CRD_CANCEL = "/b2b/v1/organ/meritz/handleOpapiTrvCtrCrdCnc";
+
+    // private static final String CRD_CANCEL =
+    // "/b2b/v1/organ/meritz/handleOpapiTrvCtrCrdCnc";
     private static final String CTR_CANCEL = "/b2b/v1/organ/meritz/trvChangeCtr";
+
     private static final String CTR_LST_INQ = "/b2b/v1/organ/meritz/ctrLstInq";
+
     private static final String TRV_CTR_INQ = "/b2b/v1/organ/meritz/trvCtrInq";
+
     private static final String JOIN_CERT = "/b2b/v1/organ/meritz/sbcCtfOtpt";
 
     private final MeritzBridgeClient bridgeClient;
+
     private final CompaniesConfigsProperties companies;
+
     private final ObjectMapper objectMapper;
 
     private final TravelContractRepository contractRepository;
+
     private final TravelInsurePaymentRepository paymentRepository;
+
     private final TravelInsurancePlanRepository planRepository;
+
     private final TravelInsurerRepository insurerRepository;
+
     private final TravelContractSnapshotRepository snapshotRepository;
 
     public String contractList(String companyCode, MeritzCtrLstInqBody body) {
@@ -50,15 +61,11 @@ public class MeritzContractService {
 
         logJson("[MERITZ][CTR_LST_INQ][REQ]", body);
 
-        MeritzBridgeResponse res = bridgeClient.call(
-                new MeritzBridgeRequest(
-                        cfg.getCompanyCode(),
-                        CTR_LST_INQ,
-                        "POST",
-                        headers(),
-                        body // ✅ Object 그대로
-                )
-        );
+        MeritzBridgeResponse res = bridgeClient
+            .call(new MeritzBridgeRequest(cfg.getCompanyCode(), CTR_LST_INQ, "POST", headers(), body // ✅
+                                                                                                     // Object
+                                                                                                     // 그대로
+            ));
 
         if (res.getStatus() != 200) {
             throw new IllegalStateException(
@@ -72,15 +79,11 @@ public class MeritzContractService {
 
         logJson("[MERITZ][TRV_CTR_INQ][REQ]", body);
 
-        MeritzBridgeResponse res = bridgeClient.call(
-                new MeritzBridgeRequest(
-                        cfg.getCompanyCode(),
-                        TRV_CTR_INQ,
-                        "POST",
-                        headers(),
-                        body // ✅ Object 그대로
-                )
-        );
+        MeritzBridgeResponse res = bridgeClient
+            .call(new MeritzBridgeRequest(cfg.getCompanyCode(), TRV_CTR_INQ, "POST", headers(), body // ✅
+                                                                                                     // Object
+                                                                                                     // 그대로
+            ));
 
         if (res.getStatus() != 200) {
             throw new IllegalStateException(
@@ -105,15 +108,15 @@ public class MeritzContractService {
         TravelContractEntity c = TravelContractEntity.createPending();
 
         c.setInsurerId(req.getInsurerId());
-//        c.setInsurerName(req.getInsuerName());
+        // c.setInsurerName(req.getInsuerName());
         c.setInsurerName("MERITZ");
 
         c.setPartnerId(req.getPartnerId());
-//        c.setPartnerName(req.getPartnerName());
+        // c.setPartnerName(req.getPartnerName());
         c.setPartnerName("TPA KOREA");
 
         c.setChannelId(req.getChannelId());
-//        c.setChannelName();
+        // c.setChannelName();
         c.setChannelName("TPA KOREA");
 
         c.setPlanId(req.getPlanId());
@@ -128,7 +131,7 @@ public class MeritzContractService {
         c.setContractPeopleHp(req.getContractPeopleHp());
         c.setContractPeopleMail(req.getContractPeopleMail());
 
-//        c.setPolicyNumber(req.getPolicyNumber());
+        // c.setPolicyNumber(req.getPolicyNumber());
         c.setPolicyNumber("15540-148539"); // 일단 하드코딩
 
         c.setMeritzQuoteGroupNumber(req.getMeritzQuoteGroupNumber());
@@ -159,7 +162,8 @@ public class MeritzContractService {
         String snapshotJson;
         try {
             snapshotJson = objectMapper.writeValueAsString(res);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             throw new IllegalStateException("failed to serialize ContractApplyResponse", e);
         }
 
@@ -179,7 +183,7 @@ public class MeritzContractService {
         CompaniesConfigsProperties.CompanyConfig cfg = resolve(companyCode);
 
         TravelContractEntity contract = contractRepository.findById(req.getContractId())
-                .orElseThrow(() -> new IllegalArgumentException("contract not found: " + req.getContractId()));
+            .orElseThrow(() -> new IllegalArgumentException("contract not found: " + req.getContractId()));
 
         if (contract.getStatus() != TravelContractStatus.PENDING) {
             throw new IllegalStateException("contract status must be PENDING. current=" + contract.getStatus());
@@ -192,10 +196,10 @@ public class MeritzContractService {
         require(contract.getPolicyNumber(), "policyNumber(polNo) is required");
 
         TravelInsurancePlanEntity plan = planRepository.findById(contract.getPlanId())
-                .orElseThrow(() -> new IllegalStateException("plan not found. planId=" + contract.getPlanId()));
+            .orElseThrow(() -> new IllegalStateException("plan not found. planId=" + contract.getPlanId()));
 
         TravelInsurerEntity insurer = insurerRepository.findById(plan.getInsurerId())
-                .orElseThrow(() -> new IllegalStateException("insurer not found. insurerId=" + plan.getInsurerId()));
+            .orElseThrow(() -> new IllegalStateException("insurer not found. insurerId=" + plan.getInsurerId()));
 
         String sbcpDt = java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd"));
 
@@ -209,8 +213,10 @@ public class MeritzContractService {
         body.put("untPdCd", plan.getUnitProductCode());
         body.put("sbcpDt", sbcpDt);
 
-        body.put("insBgnDt", contract.getInsureStartDate().format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd")));
-        body.put("insEdDt", contract.getInsureEndDate().format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd")));
+        body.put("insBgnDt",
+                contract.getInsureStartDate().format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd")));
+        body.put("insEdDt",
+                contract.getInsureEndDate().format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd")));
         body.put("trvArCd", contract.getCountryCode());
 
         body.put("inspeCnt", contract.getPeople().size());
@@ -237,29 +243,31 @@ public class MeritzContractService {
 
         logJson("[MERITZ][EST_SAVE][REQ]", body);
 
-        MeritzBridgeResponse res = bridgeClient.call(
-                new MeritzBridgeRequest(
-                        cfg.getCompanyCode(),
-                        EST_SAVE,
-                        "POST",
-                        headers(),
-                        body // ✅ Object 그대로
-                )
-        );
+        MeritzBridgeResponse res = bridgeClient
+            .call(new MeritzBridgeRequest(cfg.getCompanyCode(), EST_SAVE, "POST", headers(), body // ✅
+                                                                                                  // Object
+                                                                                                  // 그대로
+            ));
 
         if (res.getStatus() != 200) {
-            throw new IllegalStateException("Meritz estSave failed. status=" + res.getStatus() + ", body=" + res.getBody());
+            throw new IllegalStateException(
+                    "Meritz estSave failed. status=" + res.getStatus() + ", body=" + res.getBody());
         }
 
         MeritzCommonResponse meritz = readMeritz(res.getBody());
         if (!"00001".equals(meritz.getErrCd())) {
-            throw new IllegalStateException("Meritz estSave errCd=" + meritz.getErrCd() + ", errMsg=" + meritz.getErrMsg());
+            throw new IllegalStateException(
+                    "Meritz estSave errCd=" + meritz.getErrCd() + ", errMsg=" + meritz.getErrMsg());
         }
 
-        if (meritz.getTtPrem() != null) contract.setTotalPremium(meritz.getTtPrem());
-        if (meritz.getPolNo() != null && !meritz.getPolNo().isBlank()) contract.setPolicyNumber(meritz.getPolNo());
-        if (meritz.getQuotGrpNo() != null && !meritz.getQuotGrpNo().isBlank()) contract.setMeritzQuoteGroupNumber(meritz.getQuotGrpNo());
-        if (meritz.getQuotReqNo() != null && !meritz.getQuotReqNo().isBlank()) contract.setMeritzQuoteRequestNumber(meritz.getQuotReqNo());
+        if (meritz.getTtPrem() != null)
+            contract.setTotalPremium(meritz.getTtPrem());
+        if (meritz.getPolNo() != null && !meritz.getPolNo().isBlank())
+            contract.setPolicyNumber(meritz.getPolNo());
+        if (meritz.getQuotGrpNo() != null && !meritz.getQuotGrpNo().isBlank())
+            contract.setMeritzQuoteGroupNumber(meritz.getQuotGrpNo());
+        if (meritz.getQuotReqNo() != null && !meritz.getQuotReqNo().isBlank())
+            contract.setMeritzQuoteRequestNumber(meritz.getQuotReqNo());
 
         contract.markCompleted();
         contractRepository.save(contract);
@@ -284,41 +292,16 @@ public class MeritzContractService {
         snapshot.setJsonSnapshot(res.getBody());
         snapshotRepository.save(snapshot);
 
-        return new ContractCompletedResponse(
-                new ContractCompletedResponse.Contract(
-                        contract.getId(),
-                        contract.getPartnerId(),
-                        contract.getChannelId(),
-                        contract.getPlanId(),
-                        contract.getPolicyNumber(),
-                        contract.getMeritzQuoteGroupNumber(),
-                        contract.getMeritzQuoteRequestNumber(),
-                        contract.getCountryName(),
-                        contract.getCountryCode(),
-                        contract.getInsuredPeopleNumber(),
-                        contract.getTotalPremium(),
-                        contract.getStatus().name(),
-                        contract.getInsureStartDate(),
-                        contract.getInsureEndDate(),
-                        contract.getContractPeopleName(),
-                        contract.getContractPeopleHp(),
-                        contract.getContractPeopleMail()
-                ),
-                new ContractCompletedResponse.Insurer(
-                        insurer.getId(),
-                        insurer.getInsurerName(),
-                        insurer.getInsurerCode()
-                ),
-                new ContractCompletedResponse.Plan(
-                        plan.getId(),
-                        plan.getInsuranceProductName(),
-                        plan.getPlanName(),
-                        plan.getProductCode(),
-                        plan.getUnitProductCode(),
-                        plan.getPlanGroupCode(),
-                        plan.getPlanCode()
-                )
-        );
+        return new ContractCompletedResponse(new ContractCompletedResponse.Contract(contract.getId(),
+                contract.getPartnerId(), contract.getChannelId(), contract.getPlanId(), contract.getPolicyNumber(),
+                contract.getMeritzQuoteGroupNumber(), contract.getMeritzQuoteRequestNumber(), contract.getCountryName(),
+                contract.getCountryCode(), contract.getInsuredPeopleNumber(), contract.getTotalPremium(),
+                contract.getStatus().name(), contract.getInsureStartDate(), contract.getInsureEndDate(),
+                contract.getContractPeopleName(), contract.getContractPeopleHp(), contract.getContractPeopleMail()),
+                new ContractCompletedResponse.Insurer(insurer.getId(), insurer.getInsurerName(),
+                        insurer.getInsurerCode()),
+                new ContractCompletedResponse.Plan(plan.getId(), plan.getInsuranceProductName(), plan.getPlanName(),
+                        plan.getProductCode(), plan.getUnitProductCode(), plan.getPlanGroupCode(), plan.getPlanCode()));
     }
 
     @Transactional
@@ -326,16 +309,16 @@ public class MeritzContractService {
         CompaniesConfigsProperties.CompanyConfig cfg = resolve(companyCode);
 
         TravelContractEntity contract = contractRepository.findById(req.getContractId())
-                .orElseThrow(() -> new IllegalArgumentException("contract not found: " + req.getContractId()));
+            .orElseThrow(() -> new IllegalArgumentException("contract not found: " + req.getContractId()));
 
         TravelInsurePaymentEntity payment = paymentRepository.findByContractId(contract.getId())
-                .orElseThrow(() -> new IllegalStateException("payment not found. contractId=" + contract.getId()));
+            .orElseThrow(() -> new IllegalStateException("payment not found. contractId=" + contract.getId()));
 
         TravelInsurancePlanEntity plan = planRepository.findById(contract.getPlanId())
-                .orElseThrow(() -> new IllegalStateException("plan not found. planId=" + contract.getPlanId()));
+            .orElseThrow(() -> new IllegalStateException("plan not found. planId=" + contract.getPlanId()));
 
         TravelInsurerEntity insurer = insurerRepository.findById(plan.getInsurerId())
-                .orElseThrow(() -> new IllegalStateException("insurer not found. insurerId=" + plan.getInsurerId()));
+            .orElseThrow(() -> new IllegalStateException("insurer not found. insurerId=" + plan.getInsurerId()));
 
         if (payment.getStatus() == TravelPaymentStatus.CANCELED) {
             return buildCancelResponse(contract, payment, plan, insurer);
@@ -360,27 +343,25 @@ public class MeritzContractService {
             body.put("quotReqNo", contract.getMeritzQuoteRequestNumber());
         }
 
-//        body.put("paidAmt", payment.getPaidAmount());
+        // body.put("paidAmt", payment.getPaidAmount());
 
         logJson("[MERITZ][CRD_CANCEL][REQ]", body);
 
-        MeritzBridgeResponse res = bridgeClient.call(
-                new MeritzBridgeRequest(
-                        cfg.getCompanyCode(),
-                        CTR_CANCEL,
-                        "POST",
-                        headers(),
-                        body // ✅ Object 그대로
-                )
-        );
+        MeritzBridgeResponse res = bridgeClient
+            .call(new MeritzBridgeRequest(cfg.getCompanyCode(), CTR_CANCEL, "POST", headers(), body // ✅
+                                                                                                    // Object
+                                                                                                    // 그대로
+            ));
 
         if (res.getStatus() != 200) {
-            throw new IllegalStateException("Meritz cancel failed. status=" + res.getStatus() + ", body=" + res.getBody());
+            throw new IllegalStateException(
+                    "Meritz cancel failed. status=" + res.getStatus() + ", body=" + res.getBody());
         }
 
         MeritzCommonResponse meritz = readMeritz(res.getBody());
         if (!"00001".equals(meritz.getErrCd())) {
-            throw new IllegalStateException("Meritz cancel errCd=" + meritz.getErrCd() + ", errMsg=" + meritz.getErrMsg());
+            throw new IllegalStateException(
+                    "Meritz cancel errCd=" + meritz.getErrCd() + ", errMsg=" + meritz.getErrMsg());
         }
 
         payment.setStatus(TravelPaymentStatus.CANCELED);
@@ -398,52 +379,21 @@ public class MeritzContractService {
         return buildCancelResponse(contract, payment, plan, insurer);
     }
 
-    private ContractCancelResponse buildCancelResponse(
-            TravelContractEntity contract,
-            TravelInsurePaymentEntity payment,
-            TravelInsurancePlanEntity plan,
-            TravelInsurerEntity insurer
-    ) {
+    private ContractCancelResponse buildCancelResponse(TravelContractEntity contract, TravelInsurePaymentEntity payment,
+            TravelInsurancePlanEntity plan, TravelInsurerEntity insurer) {
         BigDecimal refundAmount = contract.getTotalPremium();
-        return new ContractCancelResponse(
-                new ContractCancelResponse.Contract(
-                        contract.getId(),
-                        contract.getStatus().name(),
-                        contract.getPolicyNumber(),
-                        contract.getMeritzQuoteGroupNumber(),
-                        contract.getMeritzQuoteRequestNumber(),
-                        contract.getCountryName(),
-                        contract.getCountryCode(),
-                        contract.getInsuredPeopleNumber(),
-                        contract.getTotalPremium(),
-                        contract.getInsureStartDate(),
-                        contract.getInsureEndDate(),
-                        new ContractCancelResponse.Insurer(
-                                insurer.getId(),
-                                insurer.getInsurerCode(),
-                                insurer.getInsurerName()
-                        ),
-                        new ContractCancelResponse.Plan(
-                                plan.getId(),
-                                plan.getInsuranceProductName(),
-                                plan.getPlanName(),
-                                plan.getProductCode(),
-                                plan.getUnitProductCode(),
-                                plan.getPlanGroupCode(),
-                                plan.getPlanCode()
-                        ),
-                        new ContractCancelResponse.Payment(
-                                payment.getId(),
-                                payment.getPaymentMethod().name(),
-                                payment.getStatus().name(),
-                                payment.getPaidAmount(),
-                                payment.getPaymentDate(),
-                                payment.getCancelDate(),
-                                null
-                        ),
-                        refundAmount
-                )
-        );
+        return new ContractCancelResponse(new ContractCancelResponse.Contract(contract.getId(),
+                contract.getStatus().name(), contract.getPolicyNumber(), contract.getMeritzQuoteGroupNumber(),
+                contract.getMeritzQuoteRequestNumber(), contract.getCountryName(), contract.getCountryCode(),
+                contract.getInsuredPeopleNumber(), contract.getTotalPremium(), contract.getInsureStartDate(),
+                contract.getInsureEndDate(),
+                new ContractCancelResponse.Insurer(insurer.getId(), insurer.getInsurerCode(), insurer.getInsurerName()),
+                new ContractCancelResponse.Plan(plan.getId(), plan.getInsuranceProductName(), plan.getPlanName(),
+                        plan.getProductCode(), plan.getUnitProductCode(), plan.getPlanGroupCode(), plan.getPlanCode()),
+                new ContractCancelResponse.Payment(payment.getId(), payment.getPaymentMethod().name(),
+                        payment.getStatus().name(), payment.getPaidAmount(), payment.getPaymentDate(),
+                        payment.getCancelDate(), null),
+                refundAmount));
     }
 
     /** ======================= 공통 ======================= */
@@ -455,7 +405,8 @@ public class MeritzContractService {
     private void logJson(String prefix, Object body) {
         try {
             log.info("{} body={}", prefix, objectMapper.writeValueAsString(body));
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             log.info("{} body=(json serialize fail) {}", prefix, body);
         }
     }
@@ -463,34 +414,44 @@ public class MeritzContractService {
     private MeritzCommonResponse readMeritz(String json) {
         try {
             return objectMapper.readValue(json, MeritzCommonResponse.class);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             throw new IllegalStateException("Failed to parse meritz response JSON: " + json, e);
         }
     }
 
     private CompaniesConfigsProperties.CompanyConfig resolve(String companyCode) {
-        if (companyCode == null || companyCode.isBlank()) companyCode = "TPA";
-        if ("TPA".equalsIgnoreCase(companyCode)) return companies.getTpa();
-        if ("INSBOON".equalsIgnoreCase(companyCode)) return companies.getInsboon();
+        if (companyCode == null || companyCode.isBlank())
+            companyCode = "TPA";
+        if ("TPA".equalsIgnoreCase(companyCode))
+            return companies.getTpa();
+        if ("INSBOON".equalsIgnoreCase(companyCode))
+            return companies.getInsboon();
         throw new IllegalArgumentException("Unknown companyCode: " + companyCode);
     }
 
     private static void require(String v, String msg) {
-        if (v == null || v.isBlank()) throw new IllegalArgumentException(msg);
+        if (v == null || v.isBlank())
+            throw new IllegalArgumentException(msg);
     }
 
     private static String extractBirthYmd(String rrn) {
-        if (rrn == null) throw new IllegalStateException("residentNumber is required to build inspeBdt");
+        if (rrn == null)
+            throw new IllegalStateException("residentNumber is required to build inspeBdt");
         String digits = rrn.replaceAll("[^0-9]", "");
-        if (digits.length() < 7) throw new IllegalStateException("invalid residentNumber: " + rrn);
+        if (digits.length() < 7)
+            throw new IllegalStateException("invalid residentNumber: " + rrn);
 
         String yymmdd = digits.substring(0, 6);
         char s = digits.charAt(6);
 
         String century;
-        if (s == '1' || s == '2' || s == '5' || s == '6') century = "19";
-        else if (s == '3' || s == '4' || s == '7' || s == '8') century = "20";
-        else century = "19";
+        if (s == '1' || s == '2' || s == '5' || s == '6')
+            century = "19";
+        else if (s == '3' || s == '4' || s == '7' || s == '8')
+            century = "20";
+        else
+            century = "19";
 
         return century + yymmdd;
     }
@@ -498,16 +459,21 @@ public class MeritzContractService {
     private static String normalizeGenderToMeritz(String gender, String rrn) {
         if (gender != null) {
             String g = gender.trim().toUpperCase();
-            if ("1".equals(g) || "2".equals(g)) return g;
-            if ("M".equals(g) || "MALE".equals(g) || "남".equals(g)) return "1";
-            if ("F".equals(g) || "FEMALE".equals(g) || "여".equals(g)) return "2";
+            if ("1".equals(g) || "2".equals(g))
+                return g;
+            if ("M".equals(g) || "MALE".equals(g) || "남".equals(g))
+                return "1";
+            if ("F".equals(g) || "FEMALE".equals(g) || "여".equals(g))
+                return "2";
         }
 
         String digits = rrn == null ? "" : rrn.replaceAll("[^0-9]", "");
         if (digits.length() >= 7) {
             char s = digits.charAt(6);
-            if (s == '1' || s == '3' || s == '5' || s == '7') return "1";
-            if (s == '2' || s == '4' || s == '6' || s == '8') return "2";
+            if (s == '1' || s == '3' || s == '5' || s == '7')
+                return "1";
+            if (s == '2' || s == '4' || s == '6' || s == '8')
+                return "2";
         }
 
         throw new IllegalStateException("cannot determine gender. gender=" + gender + ", rrn=" + rrn);
@@ -525,10 +491,10 @@ public class MeritzContractService {
         String otptTpCd = (req.getOtptTpCd() == null || req.getOtptTpCd().isBlank()) ? "V" : req.getOtptTpCd().trim();
 
         TravelContractEntity contract = contractRepository.findById(req.getContractId())
-                .orElseThrow(() -> new IllegalArgumentException("contract not found: " + req.getContractId()));
+            .orElseThrow(() -> new IllegalArgumentException("contract not found: " + req.getContractId()));
 
         TravelInsurancePlanEntity plan = planRepository.findById(contract.getPlanId())
-                .orElseThrow(() -> new IllegalStateException("plan not found. planId=" + contract.getPlanId()));
+            .orElseThrow(() -> new IllegalStateException("plan not found. planId=" + contract.getPlanId()));
 
         // 필수값 검증
         require(contract.getPolicyNumber(), "policyNumber(polNo) is required");
@@ -549,26 +515,19 @@ public class MeritzContractService {
 
         logJson("[MERITZ][JOIN_CERT][REQ]", body);
 
-        MeritzBridgeResponse res = bridgeClient.call(
-                new MeritzBridgeRequest(
-                        cfg.getCompanyCode(),
-                        JOIN_CERT,
-                        "POST",
-                        headers(),
-                        body
-                )
-        );
+        MeritzBridgeResponse res = bridgeClient
+            .call(new MeritzBridgeRequest(cfg.getCompanyCode(), JOIN_CERT, "POST", headers(), body));
 
         if (res.getStatus() != 200) {
             throw new IllegalStateException(
-                    "Meritz sbcCtfOtpt failed. status=" + res.getStatus() + ", body=" + res.getBody()
-            );
+                    "Meritz sbcCtfOtpt failed. status=" + res.getStatus() + ", body=" + res.getBody());
         }
 
         // 공통 에러코드 체크(성공코드 00000/00001 둘다 허용 추천)
         MeritzCommonResponse meritz = readMeritz(res.getBody());
         if (!isMeritzSuccess(meritz.getErrCd())) {
-            throw new IllegalStateException("Meritz joinCertificate errCd=" + meritz.getErrCd() + ", errMsg=" + meritz.getErrMsg());
+            throw new IllegalStateException(
+                    "Meritz joinCertificate errCd=" + meritz.getErrCd() + ", errMsg=" + meritz.getErrMsg());
         }
 
         // 스냅샷 저장(원하면 유지)
@@ -584,9 +543,9 @@ public class MeritzContractService {
     }
 
     private static boolean isMeritzSuccess(String errCd) {
-        if (errCd == null) return false;
+        if (errCd == null)
+            return false;
         return "00000".equals(errCd) || "00001".equals(errCd);
     }
-
 
 }

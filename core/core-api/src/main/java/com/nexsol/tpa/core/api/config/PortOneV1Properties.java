@@ -10,8 +10,13 @@ import org.springframework.stereotype.Component;
 @Component
 @ConfigurationProperties(prefix = "portone.v1")
 public class PortOneV1Properties {
+
     private String baseUrl;
+
     private String apiKey;
+
     private String apiSecret;
+
     private int timeoutMs = 5000;
+
 }

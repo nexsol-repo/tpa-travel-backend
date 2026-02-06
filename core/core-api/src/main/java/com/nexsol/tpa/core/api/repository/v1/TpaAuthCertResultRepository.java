@@ -8,7 +8,7 @@ import java.util.Optional;
 public interface TpaAuthCertResultRepository extends JpaRepository<TpaAuthCertResultEntity, Long> {
 
     Optional<TpaAuthCertResultEntity> findByImpUid(String impUid);
+
     Optional<TpaAuthCertResultEntity> findTop1ByMoidOrderByCreatedAtDesc(String moid);
 
 }
-

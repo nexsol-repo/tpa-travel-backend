@@ -35,4 +35,5 @@ public class TravelContractSnapshotEntity {
 
     @Column(name = "created_at", insertable = false, updatable = false)
     private LocalDateTime createdAt;
+
 }

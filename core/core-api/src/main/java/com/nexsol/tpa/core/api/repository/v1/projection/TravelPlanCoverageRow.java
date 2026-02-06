@@ -28,5 +28,5 @@ public interface TravelPlanCoverageRow {
     String getSubTitleOverride();
 
     String getSubContentOverride();
-}
 
+}
