@@ -4,7 +4,6 @@ set -euo pipefail
 # 사용법: ./deploy.sh [dev|prod]
 TARGET_ENV=${1:-""}
 APP_NAME="tpa-travel-api"
-ROUTE_PATH="/api/travel/"
 
 # 공통 경로 (dev/prod 모두 동일 디렉토리, .env.dev/.env.prod로 구분)
 BASE_PATH="/home/nex3/app/${APP_NAME}"
@@ -111,8 +110,8 @@ else
     # Nginx 설정 백업
     sudo cp "$NGINX_CONF" "${NGINX_CONF}.bak"
 
-    # ROUTE_PATH에 해당하는 블록의 포트를 변경
-    sudo sed -i "/location ${ROUTE_PATH//\//\\/}/,/}/ s/127.0.0.1:[0-9]\{4\}/127.0.0.1:${TARGET_PORT}/" "$NGINX_CONF"
+    # Nginx conf 내 proxy_pass 포트 변경
+    sudo sed -i "s/127.0.0.1:[0-9]\{4\}/127.0.0.1:${TARGET_PORT}/g" "$NGINX_CONF"
 
     # Nginx 설정 검증 및 리로드
     if sudo nginx -t 2>/dev/null; then
