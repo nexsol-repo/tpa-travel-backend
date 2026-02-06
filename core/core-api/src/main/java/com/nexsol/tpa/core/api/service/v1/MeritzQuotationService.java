@@ -4,8 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.nexsol.tpa.client.meritz.bridge.MeritzBridgeClient;
 import com.nexsol.tpa.client.meritz.bridge.dto.MeritzBridgeRequest;
 import com.nexsol.tpa.client.meritz.bridge.dto.MeritzBridgeResponse;
-import com.nexsol.tpa.core.api.dto.QuoteRequest;
-import com.nexsol.tpa.core.api.dto.QuoteResponse;
+import com.nexsol.tpa.core.api.dto.v1.QuoteRequest;
+import com.nexsol.tpa.core.api.dto.v1.QuoteResponse;
 import com.nexsol.tpa.core.api.entity.TravelInsurancePlanEntity;
 import com.nexsol.tpa.core.api.meritz.config.CompaniesConfigsProperties;
 import com.nexsol.tpa.core.api.repository.v1.TravelInsurancePlanRepository;
@@ -21,13 +21,15 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.concurrent.*;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class MeritzQuotationService {
 
-    private static final String HNDY_PREM_CMPT = "/b2b/v1/organ/meritz/hndyPremCmpt";
+    private static final String PLAN_INQ = "/b2b/v1/organ/meritz/planInq"; // 플랜조회
+    private static final String HNDY_PREM_CMPT = "/b2b/v1/organ/meritz/hndyPremCmpt"; // 간편보험료 산출
 
     // 고정값
     private static final String FIXED_GNR_AFLCO_CD = "020";
@@ -111,7 +113,7 @@ public class MeritzQuotationService {
             // API001 covCd map (이 플랜이 제공하는 담보 목록)
             Map<String, MeritzPlanInqInner.PlanCovRow> api001CovMap = api001ByPlanKey.get(PlanKey.from(plan));
 
-            Map<String, QuoteResponse.Coverage> api003CoverageMap = buildApiCoverageMapKeepingUnits(prem, repIdx);
+            Map<String, QuoteResponse.Coverage> api003CoverageMap = buildApiCoverageMapKeepingUnits(prem, request, repIdx);
 
             List<TravelPlanCoverageRow> dbCoverages = travelPlanCoverageRepository.findRowsByPlanId(plan.getId());
             List<QuoteResponse.Coverage> merged = new ArrayList<>();
@@ -121,7 +123,7 @@ public class MeritzQuotationService {
 
                 String covCd = row.getCoverageCode();
 
-                // ✅ API001에 없는 담보는 제외
+                // API001에 없는 담보는 제외
                 if (api001CovMap == null || !api001CovMap.containsKey(covCd)) continue;
 
                 String covNm = (row.getDisplayName() != null && !row.getDisplayName().isBlank())
@@ -135,6 +137,7 @@ public class MeritzQuotationService {
                             .covNm(covNm)
                             .cur("KRW")
                             .insdAmt(0L)
+                            .categoryCode(row.getCategoryCode())
                             .units(List.of())
                             .build());
                 } else {
@@ -143,10 +146,14 @@ public class MeritzQuotationService {
                             .covNm(covNm)
                             .cur(apiCov.getCur())
                             .insdAmt(apiCov.getInsdAmt())
+                            .categoryCode(row.getCategoryCode())
                             .units(apiCov.getUnits())
                             .build());
                 }
             }
+
+            List<QuoteResponse.InsuredPremium> insuredPremiums = buildInsuredPremiums(prem, request);
+            String coverageTitle = buildCoverageTitle(dbCoverages, api003CoverageMap);
 
             cards.add(QuoteResponse.PlanCard.builder()
                     .planId(plan.getId())
@@ -158,6 +165,8 @@ public class MeritzQuotationService {
                             .ttPrem(parseLong(prem.getTtPrem()))
                             .currency("KRW")
                             .build())
+                    .insuredPremiums(insuredPremiums)
+                    .coverageTitle(coverageTitle)
                     .coverages(merged)
                     .build());
         }
@@ -175,6 +184,132 @@ public class MeritzQuotationService {
                 request.getInsuredList().size(),
                 cards
         );
+    }
+
+    public QuoteResponse.PlanCard quotePlanCoverages(Long planId, QuoteRequest request) {
+        QuoteResponse res = quote(request);
+
+        if (res == null || !res.isOk()) {
+            // quote()가 이미 실패 포맷을 내려주므로 여기서는 예외로 처리 (ControllerAdvice로 400 변환 가능)
+            throw new IllegalStateException(
+                    "quote failed. errCd=" + (res == null ? "null" : res.getErrCd()) +
+                            ", errMsg=" + (res == null ? "null" : res.getErrMsg())
+            );
+        }
+
+        if (res.getPlans() == null || res.getPlans().isEmpty()) {
+            throw new NoSuchElementException("quote result has no plans");
+        }
+
+        return res.getPlans().stream()
+                .filter(p -> Objects.equals(p.getPlanId(), planId))
+                .findFirst()
+                .orElseThrow(() -> new NoSuchElementException("plan not found. planId=" + planId));
+    }
+
+    private List<QuoteResponse.InsuredPremium> buildInsuredPremiums(
+            MeritzHndyPremInner prem,
+            QuoteRequest request
+    ) {
+        List<MeritzHndyPremInner.InspeInfo> insured = prem.getOpapiGnrCoprCtrInspeInfCbcVo();
+        if (insured == null || insured.isEmpty()) return List.of();
+
+        // 요청 insuredList와 인덱스 매칭(메리츠 응답도 동일 순서라고 가정 / 일반적으로 그럼)
+        int n = Math.min(insured.size(),
+                request.getInsuredList() == null ? 0 : request.getInsuredList().size());
+
+        List<QuoteResponse.InsuredPremium> out = new ArrayList<>();
+        for (int i = 0; i < n; i++) {
+            MeritzHndyPremInner.InspeInfo m = insured.get(i);
+            QuoteRequest.Insured r = request.getInsuredList().get(i);
+
+            // ppsPrem은 "4110" 처럼 문자열 -> long
+            long ppsPrem = parseLong(m.getPpsPrem());
+
+            out.add(QuoteResponse.InsuredPremium.builder()
+                    .index(i)
+                    .currency("KRW")
+                    .ppsPrem(ppsPrem)
+                    .birth(r.getBirth())
+                    .gndrCd(m.getGndrCd())
+                    .cusNm(m.getCusNm())
+                    .cusEngNm(m.getCusEngNm())
+                    // .ageBandCode(band.code())
+                    // .ageBandLabel(band.label())
+                    .build());
+        }
+        return List.copyOf(out);
+    }
+
+    private enum AgeBand {
+        AGE_0_14("AGE_0_14", "0~14세", 0, 14),
+        AGE_15_69("AGE_15_69", "15~69세", 15, 69);
+
+        private final String code;
+        private final String label;
+        private final int min;
+        private final int max;
+
+        AgeBand(String code, String label, int min, int max) {
+            this.code = code;
+            this.label = label;
+            this.min = min;
+            this.max = max;
+        }
+
+        static AgeBand fromAge(int age) {
+            for (AgeBand b : values()) {
+                if (age >= b.min && age <= b.max) return b;
+            }
+            return null; // 가입불가(예: 70+) 처리용
+        }
+    }
+
+    private int calcAgeAtStartDate(String birthYmd, String insBgnDtYmd) {
+        // birth: "YYYYMMDD" / insBgnDt: "YYYYMMDD"
+        LocalDate birth = LocalDate.parse(birthYmd, YYYYMMDD);
+        LocalDate std = LocalDate.parse(insBgnDtYmd, YYYYMMDD);
+        return java.time.Period.between(birth, std).getYears(); // 만 나이(보험개시일 기준)
+    }
+
+    private String buildCoverageTitle(List<TravelPlanCoverageRow> dbCoverages,
+                                      Map<String, QuoteResponse.Coverage> api003CoverageMap) {
+
+        // titleYn = 1 인 담보들만, sortOrder 순서대로 "담보명 금액" 형태로 만들기
+        List<String> parts = new ArrayList<>();
+
+        for (TravelPlanCoverageRow row : dbCoverages) {
+            if (!row.isIncluded()) continue;
+            if (!row.isTitleYn()) continue;
+
+            String covCd = row.getCoverageCode();
+
+            String name = (row.getDisplayName() != null && !row.getDisplayName().isBlank())
+                    ? row.getDisplayName()
+                    : row.getCoverageName();
+
+            QuoteResponse.Coverage apiCov = api003CoverageMap.get(covCd);
+            long amt = (apiCov != null) ? apiCov.getInsdAmt() : 0L;
+
+            // 0이면 굳이 타이틀에 넣지 않거나, 넣고 싶으면 정책대로
+            if (amt <= 0) continue;
+
+            parts.add(name + " " + formatWonShort(amt));
+        }
+
+        if (parts.isEmpty()) return null;
+        return "보장금액 : " + String.join(" / ", parts);
+    }
+
+    private String formatWonShort(long amount) {
+        // 아주 단순화 버전: 억/만원 단위
+        long eok = amount / 100_000_000L;
+        long man = (amount % 100_000_000L) / 10_000L;
+
+        if (eok > 0 && man == 0) return eok + "억원";
+        if (eok > 0) return eok + "억" + String.format("%,d", man) + "만원";
+        if (man > 0) return String.format("%,d", man) + "만원";
+        return String.format("%,d", amount) + "원";
     }
 
     private MeritzPlanInqInner callPlanInq(String companyCode, String stdDt) {
@@ -223,14 +358,19 @@ public class MeritzQuotationService {
         return out;
     }
 
-    private Map<String, QuoteResponse.Coverage> buildApiCoverageMapKeepingUnits(MeritzHndyPremInner prem, int repIdx) {
-        Map<String, List<Object>> unitsByCovCd = extractUnitsByCovCd(prem);
+    private Map<String, QuoteResponse.Coverage> buildApiCoverageMapKeepingUnits(
+            MeritzHndyPremInner prem,
+            QuoteRequest request,
+            int repIdx
+    ) {
+        Map<String, List<QuoteResponse.CoverageUnit>> unitsByCovCd = extractUnitsByCovCdGroupedByAgeBand(prem, request);
+
         Map<String, Long> repInsdAmtByCovCd = extractRepInsdAmtByCovCd(prem, repIdx);
         Map<String, String> curByCovCd = extractCurrencyByCovCd(prem, repIdx);
 
         Map<String, QuoteResponse.Coverage> map = new HashMap<>();
         for (String covCd : unitsByCovCd.keySet()) {
-            List<Object> units = unitsByCovCd.getOrDefault(covCd, List.of());
+            List<QuoteResponse.CoverageUnit> units = unitsByCovCd.getOrDefault(covCd, List.of());
             long insdAmt = repInsdAmtByCovCd.getOrDefault(covCd, 0L);
             String cur = curByCovCd.getOrDefault(covCd, "KRW");
 
@@ -245,34 +385,138 @@ public class MeritzQuotationService {
         return map;
     }
 
-    private Map<String, List<Object>> extractUnitsByCovCd(MeritzHndyPremInner prem) {
-        Map<String, List<Object>> out = new HashMap<>();
+    private Map<String, List<Object>> extractUnitsByCovCdGroupedByAgeBandAsObject(
+            MeritzHndyPremInner prem,
+            QuoteRequest req
+    ) {
+        // covCd -> ageBandCode -> unitMap
+        Map<String, Map<String, Map<String, Object>>> acc = new HashMap<>();
 
         List<MeritzHndyPremInner.InspeInfo> insuredList = prem.getOpapiGnrCoprCtrInspeInfCbcVo();
-        if (insuredList == null || insuredList.isEmpty()) return out;
+        if (insuredList == null || insuredList.isEmpty()) return Map.of();
 
-        for (MeritzHndyPremInner.InspeInfo insured : insuredList) {
-            List<MeritzHndyPremInner.CovInfo> covs = insured.getOpapiGnrCoprCtrQuotCovInfCbcVo();
+        for (int i = 0; i < insuredList.size(); i++) {
+            var insured = insuredList.get(i);
+            if (req.getInsuredList() == null || req.getInsuredList().size() <= i) continue;
+
+            var reqInsured = req.getInsuredList().get(i);
+
+            String birthYmd = reqInsured.getBirth();   // 네 QuoteRequest 구조에 맞게
+            int age = calcAgeAtStartDate(birthYmd, req.getInsBgnDt());
+            AgeBand band = AgeBand.fromAge(age);
+            if (band == null) continue;
+
+            var covs = insured.getOpapiGnrCoprCtrQuotCovInfCbcVo();
             if (covs == null) continue;
 
-            for (MeritzHndyPremInner.CovInfo c : covs) {
+            for (var c : covs) {
                 String covCd = c.getCovCd();
                 if (covCd == null || covCd.isBlank()) continue;
 
-                Map<String, Object> unit = new LinkedHashMap<>();
-                unit.put("covCd", c.getCovCd());
-                unit.put("covNm", c.getCovNm());
-                unit.put("insdAmt", c.getInsdAmt());
-                unit.put("prem", c.getPrem());
-                unit.put("sbcAmtCurCd", c.getSbcAmtCurCd());
+                long insdAmt = parseLong(c.getInsdAmt());
+                long premAmt = parseLong(c.getPrem());
 
-                out.computeIfAbsent(covCd, k -> new ArrayList<>()).add(unit);
+                acc.computeIfAbsent(covCd, k -> new LinkedHashMap<>());
+                Map<String, Map<String, Object>> byBand = acc.get(covCd);
+
+                Map<String, Object> unit = byBand.get(band.code);
+                if (unit == null) {
+                    unit = new LinkedHashMap<>();
+                    unit.put("ageBandCode", band.code);
+                    unit.put("ageBandLabel", band.label);
+                    unit.put("count", 0);
+                    unit.put("insdAmt", insdAmt);
+                    unit.put("premSum", 0L);
+                    byBand.put(band.code, unit);
+                }
+
+                unit.put("count", ((int) unit.get("count")) + 1);
+                unit.put("premSum", ((long) unit.get("premSum")) + premAmt);
+
+                // insdAmt 정책(최대값)
+                long current = (long) unit.get("insdAmt");
+                if (insdAmt > current) unit.put("insdAmt", insdAmt);
             }
         }
 
-        out.replaceAll((k, v) -> List.copyOf(v));
+        Map<String, List<Object>> out = new HashMap<>();
+        for (var e : acc.entrySet()) {
+            out.put(e.getKey(), List.copyOf(e.getValue().values()));
+        }
         return out;
     }
+
+    private Map<String, List<QuoteResponse.CoverageUnit>> extractUnitsByCovCdGroupedByAgeBand(
+            MeritzHndyPremInner prem,
+            QuoteRequest req
+    ) {
+        Map<String, Map<String, QuoteResponse.CoverageUnit>> acc = new HashMap<>();
+
+        List<MeritzHndyPremInner.InspeInfo> insuredList = prem.getOpapiGnrCoprCtrInspeInfCbcVo();
+        if (insuredList == null || insuredList.isEmpty()) return Map.of();
+
+        // insured index 기준으로 request insuredList와 매칭 (너 코드 전제 그대로)
+        for (int i = 0; i < insuredList.size(); i++) {
+            var insured = insuredList.get(i);
+
+            if (req.getInsuredList() == null || req.getInsuredList().size() <= i) continue;
+            var reqInsured = req.getInsuredList().get(i);
+
+            // birth는 너 QuoteRequest 구조에 맞게 가져와
+            String birth = reqInsured.getBirth(); // "YYYYMMDD"
+            int age = calcAgeAtStartDate(birth, req.getInsBgnDt());
+            AgeBand band = AgeBand.fromAge(age);
+
+            // 가입불가 밴드는 스킵 (또는 별도 처리)
+            if (band == null) continue;
+
+            List<MeritzHndyPremInner.CovInfo> covs = insured.getOpapiGnrCoprCtrQuotCovInfCbcVo();
+            if (covs == null) continue;
+
+            for (var c : covs) {
+                String covCd = c.getCovCd();
+                if (covCd == null || covCd.isBlank()) continue;
+
+                long insdAmt = parseLong(c.getInsdAmt());
+                long premAmt = parseLong(c.getPrem()); // prem이 "1699.325" 처럼 소수면 parseLong(BigDecimal)로 처리됨
+
+                acc.computeIfAbsent(covCd, k -> new LinkedHashMap<>());
+                Map<String, QuoteResponse.CoverageUnit> byBand = acc.get(covCd);
+
+                QuoteResponse.CoverageUnit unit = byBand.get(band.code);
+                if (unit == null) {
+                    unit = QuoteResponse.CoverageUnit.builder()
+                            .ageBandCode(band.code)
+                            .ageBandLabel(band.label)
+                            .count(0)
+                            .insdAmt(insdAmt)
+                            .premSum(0L)
+                            .build();
+                    byBand.put(band.code, unit);
+                }
+
+                // 같은 연령대 인원 추가
+                unit.setCount(unit.getCount() + 1);
+
+                // 연령대 보험료 합 (원하면)
+                unit.setPremSum(unit.getPremSum() + premAmt);
+
+                // 보장금액은 같은 연령대면 일반적으로 동일하지만,
+                // 혹시라도 다르면 "최대값" 같은 정책으로 통일 가능
+                if (insdAmt > unit.getInsdAmt()) {
+                    unit.setInsdAmt(insdAmt);
+                }
+            }
+        }
+
+        // 최종: covCd -> (연령대별 unit 리스트)
+        Map<String, List<QuoteResponse.CoverageUnit>> out = new HashMap<>();
+        for (var e : acc.entrySet()) {
+            out.put(e.getKey(), List.copyOf(e.getValue().values()));
+        }
+        return out;
+    }
+
 
     private Map<String, Long> extractRepInsdAmtByCovCd(MeritzHndyPremInner prem, int repIdx) {
         Map<String, Long> out = new HashMap<>();
@@ -422,6 +666,140 @@ public class MeritzQuotationService {
             return "어린이는 가입이 불가합니다. 가입 조건을 확인 바랍니다.";
         }
         return (raw == null || raw.isBlank()) ? "처리 중 오류가 발생했습니다." : raw;
+    }
+
+    private Map<String, MeritzHndyPremInner> callApi003Parallel(
+            String companyCode,
+            QuoteRequest req,
+            List<TravelInsurancePlanEntity> plans
+    ) {
+        // =========================
+        // Step 0) 동시 호출 제한 (플랜 3개)
+        // - fixed thread pool size = min(3, planCount)
+        // =========================
+        int poolSize = Math.min(3, Math.max(1, plans.size()));
+        ExecutorService executor = Executors.newFixedThreadPool(poolSize);
+
+        try {
+            // =========================
+            // Step 1) 플랜별 비동기 호출 작업 생성
+            // =========================
+            List<CompletableFuture<Map.Entry<String, MeritzHndyPremInner>>> futures = plans.stream()
+                    .map(plan -> CompletableFuture.supplyAsync(() -> {
+                        String planCd = plan.getPlanCode();
+                        try {
+                            // Step 1-1) API003 호출
+                            MeritzHndyPremInner prem = callHndyPremCmpt(companyCode, req, plan);
+
+                            // Step 1-2) 응답 errCd 확인 (00001 성공)
+                            if (prem == null) {
+                                log.warn("[MERITZ][HNDY_PREM_CMPT][FAIL] planCd={}, prem=null", planCd);
+                                return null;
+                            }
+                            if (!"00001".equals(prem.getErrCd())) {
+                                log.warn("[MERITZ][HNDY_PREM_CMPT][FAIL] planCd={}, errCd={}, errMsg={}",
+                                        planCd, prem.getErrCd(), prem.getErrMsg());
+                                return null;
+                            }
+
+                            // Step 1-3) 성공 결과 반환 (planCd -> prem)
+                            return Map.entry(planCd, prem);
+
+                        } catch (Exception e) {
+                            // Step 1-4) 예외는 해당 플랜만 실패 처리
+                            log.warn("[MERITZ][HNDY_PREM_CMPT][EXCEPTION] planCd={}, msg={}", planCd, e.getMessage(), e);
+                            return null;
+                        }
+                    }, executor))
+                    .toList();
+
+            // =========================
+            // Step 2) 전체 타임아웃 설정 (예: 8초)
+            // - 플랜이 3개라 충분히 짧게 잡아도 됨
+            // =========================
+            CompletableFuture<Void> all =
+                    CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
+
+            try {
+                all.get(30, TimeUnit.SECONDS);
+            } catch (TimeoutException te) {
+                log.warn("[MERITZ][HNDY_PREM_CMPT][TIMEOUT] timeout=8s, plans={}",
+                        plans.stream().map(TravelInsurancePlanEntity::getPlanCode).toList());
+                // 타임아웃이 나도 가능한 것만 취합 (부분 성공 허용)
+            } catch (InterruptedException ie) {
+                // 인터럽트는 반드시 현재 스레드에 다시 표시해주는 게 정석
+                Thread.currentThread().interrupt();
+                log.warn("[MERITZ][HNDY_PREM_CMPT][INTERRUPTED] plans={}",
+                        plans.stream().map(TravelInsurancePlanEntity::getPlanCode).toList(), ie);
+                // 그래도 부분 성공 취합은 진행 가능
+            } catch (ExecutionException ee) {
+                // allOf는 내부 future 중 하나라도 예외면 ExecutionException이 날 수 있음
+                log.warn("[MERITZ][HNDY_PREM_CMPT][EXECUTION_EXCEPTION] plans={}",
+                        plans.stream().map(TravelInsurancePlanEntity::getPlanCode).toList(), ee);
+                // 그래도 부분 성공 취합은 진행 가능
+            }
+
+            // =========================
+            // Step 3) 결과 취합 (null 제외)
+            // =========================
+            Map<String, MeritzHndyPremInner> out = new LinkedHashMap<>();
+            for (CompletableFuture<Map.Entry<String, MeritzHndyPremInner>> f : futures) {
+                try {
+                    Map.Entry<String, MeritzHndyPremInner> e = f.getNow(null);
+                    if (e != null && e.getKey() != null && e.getValue() != null) {
+                        out.put(e.getKey(), e.getValue());
+                    }
+                } catch (Exception ignore) {
+                    // getNow는 예외 거의 안 나지만 안전하게 무시
+                }
+            }
+
+            return out;
+
+        } finally {
+            // =========================
+            // Step 4) Executor 종료
+            // =========================
+            executor.shutdownNow();
+        }
+    }
+
+    private record PlanKey(String untPdCd, String pdCd, String planGrpCd, String planCd) {
+        static PlanKey from(TravelInsurancePlanEntity p) {
+            return new PlanKey(
+                    p.getUnitProductCode(),
+                    p.getProductCode(),
+                    p.getPlanGroupCode(),
+                    p.getPlanCode()
+            );
+        }
+    }
+
+    @Data
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    private static class MeritzPlanInqInner {
+        private String errCd;
+        private String errMsg;
+        private String inqCnt;
+        private List<PlanCovRow> opapiGnrPdPlanInfCbcVo;
+
+        @Data
+        @JsonIgnoreProperties(ignoreUnknown = true)
+        private static class PlanCovRow {
+            private String stdDt;
+            private String pdCd;
+            private String untPdCd;
+            private String planGrpCd;
+            private String planGrpNm;
+            private String planCd;
+            private String planNm;
+
+            private String covCd;
+            private String covNm;
+            private String sbcAmtCurCd;
+            private String sbcAmt;
+            private String owbrAmt;
+        }
     }
 
     private static class PlanQuoteResult {

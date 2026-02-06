@@ -1,6 +1,6 @@
 package com.nexsol.tpa.core.api.controller.v1;
 
-import com.nexsol.tpa.core.api.dto.CityResponseDto;
+import com.nexsol.tpa.core.api.dto.v1.CityResponseDto;
 import com.nexsol.tpa.core.api.service.v1.FavoriteCityService;
 import com.nexsol.tpa.core.api.service.v1.MeritzReferenceService;
 import com.nexsol.tpa.core.support.response.ApiResponse;

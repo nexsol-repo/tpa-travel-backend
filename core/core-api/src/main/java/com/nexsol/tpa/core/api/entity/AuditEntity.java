@@ -18,9 +18,6 @@ public abstract class AuditEntity {
     @Column(name = "updated_at")
     protected LocalDateTime updatedAt;
 
-    @Column(name = "deleted_at")
-    protected LocalDateTime deletedAt;
-
     @PrePersist
     protected void onCreate() {
         LocalDateTime now = LocalDateTime.now();
@@ -37,7 +34,7 @@ public abstract class AuditEntity {
         this.updatedAt = LocalDateTime.now();
     }
 
-    protected void markDeleted(String actor) {
-        this.deletedAt = LocalDateTime.now();
-    }
+//    protected void markDeleted(String actor) {
+//        this.updatedAt = LocalDateTime.now();
+//    }
 }

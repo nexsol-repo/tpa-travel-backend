@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface TravelInsurancePlanRepository
@@ -20,6 +21,13 @@ public interface TravelInsurancePlanRepository
     List<TravelInsurancePlanEntity> findActiveByInsurerId(
             @Param("insurerId") Long insurerId
     );
+
+    @Query("""
+                select p
+                from TravelInsurancePlanEntity p
+                where p.id in :ids
+            """)
+    List<TravelInsurancePlanEntity> findByIdIn(@Param("ids") Collection<Long> ids);
 
 }
 

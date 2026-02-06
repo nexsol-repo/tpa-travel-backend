@@ -20,6 +20,8 @@ public interface TravelPlanCoverageRepository
             pc.isIncluded as included,
             pc.sortOrder as sortOrder,
             pc.isMajorCoverage as majorCoverage,
+            pc.titleYn as titleYn,
+            pc.categoryCode as categoryCode,
             pc.claimReasonOverride as claimReasonOverride,
             pc.claimContentOverride as claimContentOverride,
             pc.subTitleOverride as subTitleOverride,

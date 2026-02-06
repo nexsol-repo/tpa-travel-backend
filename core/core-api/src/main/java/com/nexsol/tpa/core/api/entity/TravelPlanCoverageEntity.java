@@ -52,6 +52,15 @@ public class TravelPlanCoverageEntity extends AuditEntity {
     @Column(name = "is_major_coverage", nullable = false)
     private Boolean isMajorCoverage = false;
 
+    /** 보장금액 타이틀 여부 (0:N,1:Y) */
+    @Column(name = "title_yn", nullable = false)
+    private Boolean titleYn = false;
+
+    /** 담보 UI 카테고리 코드 */
+    @Column(name = "category_code", length = 50)
+    private String categoryCode;
+
+
     /** 지급사유 override */
     @Column(name = "claim_reason_override", length = 300)
     private String claimReasonOverride;

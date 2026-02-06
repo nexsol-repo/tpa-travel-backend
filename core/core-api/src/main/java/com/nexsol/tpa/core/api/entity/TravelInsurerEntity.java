@@ -4,11 +4,13 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @Entity
 @Table(
-        name = "travel_insurer",
+        name = "tpa_insurer",
         uniqueConstraints = {
                 @UniqueConstraint(name = "uq_insurer_code", columnNames = "insurer_code")
         }
@@ -31,7 +33,21 @@ public class TravelInsurerEntity extends AuditEntity {
     @Column(name = "api_base_url", length = 200)
     private String apiBaseUrl;
 
+    /**
+     * 서비스 타입(JSON)
+     * 예: {"travel": true, "health": false}
+     */
+    @Column(
+            name = "service_type",
+            columnDefinition = "longtext"
+    )
+    private String serviceType;
+
     /** 사용 여부 */
     @Column(name = "is_active", nullable = false)
     private Boolean isActive = true;
+
+    /** 삭제일시 (soft delete) */
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
 }
