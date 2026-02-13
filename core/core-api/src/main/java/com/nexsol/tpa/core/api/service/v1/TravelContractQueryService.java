@@ -84,6 +84,8 @@ public class TravelContractQueryService {
                 .applyDate(c.getApplyDate())
                 .insureStartDate(c.getInsureStartDate())
                 .insureEndDate(c.getInsureEndDate())
+                .termsUrl("https://filer.bucket.nexsol.ai/buckets/tpa-travel-dev/insurance/term.pdf")
+                .policyLink(c.getPolicyLink())
 
                 .contractPeopleName(c.getContractPeopleName())
                 .contractPeopleResidentNumberMasked(maskRrn(c.getContractPeopleResidentNumber()))
@@ -147,6 +149,8 @@ public class TravelContractQueryService {
 
             .payment(toPayment(pay))
             .people(c.getPeople().stream().map(this::toPerson).toList())
+            .termsUrl("https://filer.bucket.nexsol.ai/buckets/tpa-travel-dev/insurance/term.pdf")
+            .policyLink(c.getPolicyLink())
             .build();
     }
 

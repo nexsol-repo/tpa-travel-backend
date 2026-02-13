@@ -5,6 +5,7 @@ import com.nexsol.tpa.client.meritz.bridge.dto.MeritzBridgeRequest;
 import com.nexsol.tpa.client.meritz.bridge.dto.MeritzBridgeResponse;
 import com.nexsol.tpa.core.api.dto.v1.MeritzCertRequest;
 import com.nexsol.tpa.core.api.dto.v1.MeritzCommonResponse;
+import com.nexsol.tpa.core.api.dto.v1.TravelAlimtalkCompletedCommand;
 import com.nexsol.tpa.core.api.dto.v1.contract.*;
 import com.nexsol.tpa.core.api.entity.*;
 import com.nexsol.tpa.core.api.meritz.config.CompaniesConfigsProperties;
@@ -55,6 +56,8 @@ public class MeritzContractService {
     private final TravelInsurerRepository insurerRepository;
 
     private final TravelContractSnapshotRepository snapshotRepository;
+
+    private final AlimtalkService alimtalkService;
 
     public String contractList(String companyCode, MeritzCtrLstInqBody body) {
         var cfg = resolve(companyCode);
@@ -256,8 +259,20 @@ public class MeritzContractService {
 
         MeritzCommonResponse meritz = readMeritz(res.getBody());
         if (!"00001".equals(meritz.getErrCd())) {
-            throw new IllegalStateException(
-                    "Meritz estSave errCd=" + meritz.getErrCd() + ", errMsg=" + meritz.getErrMsg());
+//            throw new IllegalStateException("Meritz estSave errCd=" + meritz.getErrCd() + ", errMsg=" + meritz.getErrMsg());
+
+            TravelContractSnapshotEntity snapshot = new TravelContractSnapshotEntity();
+            snapshot.setContractId(contract.getId());
+            snapshot.setInsurerId(contract.getInsurerId());
+            snapshot.setMethod("api");
+            snapshot.setSnapshotType("PAYMENT_FAIL"); // 타입 구분 추천
+            snapshot.setJsonSnapshot(res.getBody());
+            snapshotRepository.save(snapshot);
+
+            return new ContractCompletedResponse(
+                    meritz.getErrCd(),
+                    meritz.getErrMsg()
+            );
         }
 
         if (meritz.getTtPrem() != null)
@@ -268,6 +283,20 @@ public class MeritzContractService {
             contract.setMeritzQuoteGroupNumber(meritz.getQuotGrpNo());
         if (meritz.getQuotReqNo() != null && !meritz.getQuotReqNo().isBlank())
             contract.setMeritzQuoteRequestNumber(meritz.getQuotReqNo());
+
+        try {
+            // joinCertificate에서 이미 body 구성/호출/스냅샷 저장을 하고 있으니
+            // 여기서는 "링크만" 리턴하도록 메서드 하나 더 만드는 걸 추천
+            String policyLink = joinCertificateLink(companyCode, contract.getId(), "A", "V"); // 국문 + viewer
+
+            if (policyLink != null && !policyLink.isBlank()) {
+                contract.setPolicyLink(policyLink);
+            }
+        } catch (Exception e) {
+            // 증명서 링크 실패해도 결제완료 자체는 유지 (운영적으로 더 안전)
+            // 로그만 남겨두자
+            log.warn("joinCertificate failed. contractId={}, msg={}", contract.getId(), e.getMessage(), e);
+        }
 
         contract.markCompleted();
         contractRepository.save(contract);
@@ -292,17 +321,119 @@ public class MeritzContractService {
         snapshot.setJsonSnapshot(res.getBody());
         snapshotRepository.save(snapshot);
 
-        return new ContractCompletedResponse(new ContractCompletedResponse.Contract(contract.getId(),
-                contract.getPartnerId(), contract.getChannelId(), contract.getPlanId(), contract.getPolicyNumber(),
-                contract.getMeritzQuoteGroupNumber(), contract.getMeritzQuoteRequestNumber(), contract.getCountryName(),
-                contract.getCountryCode(), contract.getInsuredPeopleNumber(), contract.getTotalPremium(),
-                contract.getStatus().name(), contract.getInsureStartDate(), contract.getInsureEndDate(),
-                contract.getContractPeopleName(), contract.getContractPeopleHp(), contract.getContractPeopleMail()),
-                new ContractCompletedResponse.Insurer(insurer.getId(), insurer.getInsurerName(),
-                        insurer.getInsurerCode()),
-                new ContractCompletedResponse.Plan(plan.getId(), plan.getInsuranceProductName(), plan.getPlanName(),
-                        plan.getProductCode(), plan.getUnitProductCode(), plan.getPlanGroupCode(), plan.getPlanCode()));
+        // 알림톡 발송
+        try {
+            alimtalkService.sendTravelContractCompleted(
+                    TravelAlimtalkCompletedCommand.builder()
+                            .receiverHp(contract.getContractPeopleHp())
+                            .receiverName(contract.getContractPeopleName())
+                            .productName("여행자보험") // 너희 표기
+                            .policyNumber(contract.getPolicyNumber())
+                            .certificateUrl(contract.getPolicyLink())
+                            .termsUrl("https://filer.bucket.nexsol.ai/buckets/tpa-travel-dev/insurance/term.pdf")
+                            .build()
+            );
+        } catch (Exception ignore) {
+            // send 내부에서 이미 catch하므로 여기까지 안 와도 됨 (안전빵)
+        }
+
+        return new ContractCompletedResponse(
+                new ContractCompletedResponse.Contract(
+                        contract.getId(),
+                        contract.getPartnerId(),
+                        contract.getChannelId(),
+                        contract.getPlanId(),
+                        contract.getPolicyNumber(),
+                        contract.getMeritzQuoteGroupNumber(),
+                        contract.getMeritzQuoteRequestNumber(),
+                        contract.getCountryName(),
+                        contract.getCountryCode(),
+                        contract.getInsuredPeopleNumber(),
+                        contract.getTotalPremium(),
+                        contract.getStatus().name(),
+                        contract.getInsureStartDate(),
+                        contract.getInsureEndDate(),
+                        contract.getContractPeopleName(),
+                        contract.getContractPeopleHp(),
+                        contract.getContractPeopleMail()
+                ),
+                new ContractCompletedResponse.Insurer(
+                        insurer.getId(),
+                        insurer.getInsurerName(),
+                        insurer.getInsurerCode()
+                ),
+                new ContractCompletedResponse.Plan(
+                        plan.getId(),
+                        plan.getInsuranceProductName(),
+                        plan.getPlanName(),
+                        plan.getProductCode(),
+                        plan.getUnitProductCode(),
+                        plan.getPlanGroupCode(),
+                        plan.getPlanCode()
+                )
+        );
     }
+
+    public String joinCertificateLink(String companyCode, Long contractId, String otptDiv, String otptTpCd) {
+        var cfg = resolve(companyCode);
+
+        TravelContractEntity contract = contractRepository.findById(contractId)
+                .orElseThrow(() -> new IllegalArgumentException("contract not found: " + contractId));
+
+        TravelInsurancePlanEntity plan = planRepository.findById(contract.getPlanId())
+                .orElseThrow(() -> new IllegalStateException("plan not found. planId=" + contract.getPlanId()));
+
+        // 기본값
+        String div = (otptDiv == null || otptDiv.isBlank()) ? "A" : otptDiv.trim();
+        String tp  = (otptTpCd == null || otptTpCd.isBlank()) ? "V" : otptTpCd.trim();
+
+        // 필수값 검증
+        require(contract.getPolicyNumber(), "policyNumber(polNo) is required");
+        require(contract.getMeritzQuoteGroupNumber(), "quotGrpNo is required");
+        require(contract.getMeritzQuoteRequestNumber(), "quotReqNo is required");
+        require(plan.getProductCode(), "pdCd(productCode) is required");
+
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("gnrAflcoCd", cfg.getGnrAflcoCd());
+        body.put("aflcoDivCd", cfg.getAflcoDivCd());
+        body.put("bizpeNo", cfg.getBizpeNo());
+        body.put("polNo", contract.getPolicyNumber());
+        body.put("pdCd", plan.getProductCode());
+        body.put("quotGrpNo", contract.getMeritzQuoteGroupNumber());
+        body.put("quotReqNo", contract.getMeritzQuoteRequestNumber());
+        body.put("otptDiv", div);
+        body.put("otptTpCd", tp);
+
+        logJson("[MERITZ][JOIN_CERT][REQ]", body);
+
+        MeritzBridgeResponse res = bridgeClient.call(
+                new MeritzBridgeRequest(cfg.getCompanyCode(), JOIN_CERT, "POST", headers(), body)
+        );
+
+        if (res.getStatus() != 200) {
+            throw new IllegalStateException(
+                    "Meritz sbcCtfOtpt failed. status=" + res.getStatus() + ", body=" + res.getBody());
+        }
+
+        MeritzCommonResponse meritz = readMeritz(res.getBody());
+        if (!isMeritzSuccess(meritz.getErrCd())) {
+            throw new IllegalStateException(
+                    "Meritz joinCertificate errCd=" + meritz.getErrCd() + ", errMsg=" + meritz.getErrMsg());
+        }
+
+        // 스냅샷 저장(유지)
+        TravelContractSnapshotEntity snapshot = new TravelContractSnapshotEntity();
+        snapshot.setContractId(contract.getId());
+        snapshot.setInsurerId(contract.getInsurerId());
+        snapshot.setMethod("api");
+        snapshot.setSnapshotType("CERTIFICATE");
+        snapshot.setJsonSnapshot(res.getBody());
+        snapshotRepository.save(snapshot);
+
+        // 링크만 리턴
+        return meritz.getRltLinkUrl();
+    }
+
 
     @Transactional
     public ContractCancelResponse cancel(String companyCode, ContractCancelRequest req) {

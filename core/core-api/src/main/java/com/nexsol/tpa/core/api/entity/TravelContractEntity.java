@@ -90,6 +90,9 @@ public class TravelContractEntity extends AuditEntity {
     @Column(name = "employee_id")
     private Long employeeId;
 
+    @Column(name = "policy_link", length = 255)
+    private String policyLink;
+
     @Column(name = "marketing_consent_used", nullable = false)
     private Boolean marketingConsentUsed = false;
 

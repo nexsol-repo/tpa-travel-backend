@@ -71,6 +71,10 @@ public class TravelContractQueryDto {
 
         private String contractPeopleMail;
 
+        private String termsUrl;
+
+        private String policyLink;
+
     }
 
     @Getter
@@ -104,6 +108,10 @@ public class TravelContractQueryDto {
         private Plan plan;
 
         private Payment payment;
+
+        private String termsUrl;
+
+        private String policyLink;
 
         private List<Person> people;
 

@@ -12,6 +12,7 @@ public interface TravelContractRepository extends JpaRepository<TravelContractEn
     @Query("""
                 select c
                 from TravelContractEntity c
+                where c.status <> com.nexsol.tpa.core.api.dto.v1.contract.TravelContractStatus.PENDING
                 order by
                   case when c.authUniqueKey is null then 1 else 0 end asc,
                   c.authUniqueKey desc,
@@ -23,6 +24,7 @@ public interface TravelContractRepository extends JpaRepository<TravelContractEn
                 select c
                 from TravelContractEntity c
                 where c.authUniqueKey = :authUniqueKey
+                  and c.status <> com.nexsol.tpa.core.api.dto.v1.contract.TravelContractStatus.PENDING
                 order by c.id desc
             """)
     Page<TravelContractEntity> findByAuthUniqueKey(String authUniqueKey, Pageable pageable);

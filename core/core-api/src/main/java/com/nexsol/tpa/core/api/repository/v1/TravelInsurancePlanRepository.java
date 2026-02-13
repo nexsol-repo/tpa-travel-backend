@@ -26,4 +26,8 @@ public interface TravelInsurancePlanRepository extends JpaRepository<TravelInsur
             """)
     List<TravelInsurancePlanEntity> findByIdIn(@Param("ids") Collection<Long> ids);
 
+    List<TravelInsurancePlanEntity> findByInsurerIdAndIsActiveTrueOrderBySortOrderAsc(Long insurerId);
+
+    List<TravelInsurancePlanEntity> findByIdInAndIsActiveTrue(Collection<Long> ids);
+
 }

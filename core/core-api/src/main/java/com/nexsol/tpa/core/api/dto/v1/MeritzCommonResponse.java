@@ -25,4 +25,6 @@ public class MeritzCommonResponse {
 
     private String quotReqNo; // 견적요청번호
 
+    // 가입증명서 출력 응답에서 내려오는 링크
+    private String rltLinkUrl;
 }

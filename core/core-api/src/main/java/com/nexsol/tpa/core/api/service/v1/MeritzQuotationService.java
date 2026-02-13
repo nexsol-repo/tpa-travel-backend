@@ -71,35 +71,75 @@ public class MeritzQuotationService {
             return QuoteResponse.fail("400", "insurerId is required", null);
 
         // =========================
-        // Step 2) DB 플랜 조회 (정렬/노출 기준)
+        // Step 2) DB 플랜 조회 (정렬/노출 기준) + 카드(패밀리) 그룹핑
         // =========================
         List<TravelInsurancePlanEntity> dbPlans = travelInsurancePlanRepository.findActiveByInsurerId(insurerId);
-        if (dbPlans.isEmpty())
+        if (dbPlans.isEmpty()) {
             return QuoteResponse.fail("NO_PLAN", "DB에 활성 플랜이 없습니다.", null);
+        }
+        
+        // 카드 단위(PlanFamilyKey)로 그룹핑
+        Map<PlanFamilyKey, List<TravelInsurancePlanEntity>> families = new LinkedHashMap<>();
+        for (TravelInsurancePlanEntity p : dbPlans) {
+            families.computeIfAbsent(PlanFamilyKey.from(p), k -> new ArrayList<>()).add(p);
+        }
+        
+        // 각 카드 내부에서 age_group_id 기준 정렬 (1,2,3 순)
+        for (List<TravelInsurancePlanEntity> rows : families.values()) {
+            rows.sort(Comparator.comparingInt(p -> {
+                Integer ageGroupId = p.getAgeGroupId(); // <-- 너 엔티티 필드명에 맞게 수정
+                return ageGroupId == null ? 999 : ageGroupId;
+            }));
+        }
+
+        if (families.isEmpty()) {
+            return QuoteResponse.fail("NO_PLAN", "DB에 카드(패밀리) 플랜이 없습니다.", null);
+        }
+
+        // 카드별 대표 플랜(PlanKey 매칭용) 선택: 2번(15~69) 우선, 없으면 첫 번째
+        Map<PlanFamilyKey, TravelInsurancePlanEntity> familyRepPlan = new LinkedHashMap<>();
+
+        for (var e : families.entrySet()) {
+            List<TravelInsurancePlanEntity> rows = e.getValue();
+
+            TravelInsurancePlanEntity rep = rows.stream()
+                    .filter(p -> Objects.equals(p.getAgeGroupId(), 2)) // <-- 엔티티 필드명 맞춰
+                    .findFirst()
+                    .orElse(rows.get(0));
+
+            familyRepPlan.put(e.getKey(), rep);
+        }
 
         // =========================
         // Step 3) API001 호출 (플랜조회: stdDt는 planInq 요청 값)
         // - stdDt는 우선 request.insBgnDt 써도 되고, 지금은 니가 준 예시처럼 고정일 수도 있음
         // - 추천: request.insBgnDt 를 stdDt로 사용 (yyyyMMdd 포맷 동일)
         // =========================
-        String stdDt = request.getInsBgnDt(); // ✅ 일단 이걸로 확정 추천
+        String stdDt = request.getInsBgnDt(); // 일단 이걸로 확정 추천
         MeritzPlanInqInner inq = callPlanInq("TPA", stdDt);
 
         // Step 3-1) API001 결과를 PlanKey(4키)로 그룹핑
         Map<PlanKey, Map<String, MeritzPlanInqInner.PlanCovRow>> api001ByPlanKey = groupPlanInq(inq);
 
         // =========================
-        // Step 4) DB 플랜과 API001 플랜 매핑(4키) → 대상 플랜 확정
+        // Step 4) 카드(패밀리) 중 API001에 존재하는 것만 필터링
         // =========================
-        List<TravelInsurancePlanEntity> targetPlans = new ArrayList<>();
-        for (TravelInsurancePlanEntity p : dbPlans) {
-            PlanKey k = PlanKey.from(p);
+        Map<PlanFamilyKey, List<TravelInsurancePlanEntity>> targetFamilies = new LinkedHashMap<>();
+
+        for (var e : families.entrySet()) {
+            PlanFamilyKey familyKey = e.getKey();
+            TravelInsurancePlanEntity repPlan = familyRepPlan.get(familyKey);
+
+            if (repPlan == null) continue;
+
+            PlanKey k = PlanKey.from(repPlan);
             if (api001ByPlanKey.containsKey(k)) {
-                targetPlans.add(p);
+                targetFamilies.put(familyKey, e.getValue());
             }
         }
-        if (targetPlans.isEmpty()) {
-            return QuoteResponse.fail("NO_PLAN", "API001 기준 제공되는 플랜이 없습니다.", null);
+
+        if (targetFamilies.isEmpty()) {
+            return QuoteResponse.fail("NO_PLAN", "API001 기준 제공되는 플랜(카드)이 없습니다.", null);
         }
 
         // =========================
@@ -107,62 +147,77 @@ public class MeritzQuotationService {
         // =========================
         // 여기서 premByPlanCd = Map<planCd, MeritzHndyPremInner> 로 받으면,
         // API003 응답이 planCd만 있어도 매칭 가능.
-        Map<String, MeritzHndyPremInner> premByPlanCd = callApi003Parallel("TPA", request, targetPlans);
+        Map<String, MeritzHndyPremInner> premByPlanCd = callApi003Parallel("TPA", request, targetFamilies);
 
         // =========================
-        // Step 6) 응답 조립
+        // Step 6) 응답 조립 (패밀리 카드 기준 3개)
         // - travel_plan_coverage 기준으로 담보 구성
         // - 단, API001에서 제공되는 covCd만 포함 (핵심!)
         // =========================
         List<QuoteResponse.PlanCard> cards = new ArrayList<>();
 
-        for (TravelInsurancePlanEntity plan : targetPlans) {
-            MeritzHndyPremInner prem = premByPlanCd.get(plan.getPlanCode());
-            if (prem == null || !"00001".equals(prem.getErrCd()))
+        for (var entry : targetFamilies.entrySet()) {
+            PlanFamilyKey familyKey = entry.getKey();
+            List<TravelInsurancePlanEntity> familyPlans = entry.getValue();
+            if (familyPlans == null || familyPlans.isEmpty()) continue;
+
+            // 대표 플랜: 2번(15~69) 우선, 없으면 첫 번째
+            TravelInsurancePlanEntity repPlan = familyPlans.stream()
+                    .filter(p -> Objects.equals(p.getAgeGroupId(), 2)) // 필드명 맞춰
+                    .findFirst()
+                    .orElse(familyPlans.get(0));
+
+            // Step5에서 premByPlanCd의 key를 "대표 planCd"로 넣었으니까 그대로 조회
+            MeritzHndyPremInner prem = premByPlanCd.get(repPlan.getPlanCode());
+            if (prem == null || !"00001".equals(prem.getErrCd())) {
                 continue;
+            }
 
-            // API001 covCd map (이 플랜이 제공하는 담보 목록)
-            Map<String, MeritzPlanInqInner.PlanCovRow> api001CovMap = api001ByPlanKey.get(PlanKey.from(plan));
+            // API001 covCd map: 패밀리에서는 대표 플랜 키로 조회(담보 구성은 family 공통이라고 가정)
+            Map<String, MeritzPlanInqInner.PlanCovRow> api001CovMap =
+                    api001ByPlanKey.get(PlanKey.from(repPlan));
 
-            Map<String, QuoteResponse.Coverage> api003CoverageMap = buildApiCoverageMapKeepingUnits(prem, request,
-                    repIdx);
+            Map<String, QuoteResponse.Coverage> api003CoverageMap =
+                    buildApiCoverageMapKeepingUnits(prem, request, repIdx);
 
-            List<TravelPlanCoverageRow> dbCoverages = travelPlanCoverageRepository.findRowsByPlanId(plan.getId());
+            // 담보는 대표 플랜의 plan_id 기준(패밀리 공통 담보셋)
+            List<TravelPlanCoverageRow> dbCoverages =
+                    travelPlanCoverageRepository.findRowsByPlanId(repPlan.getId());
+
             List<QuoteResponse.Coverage> merged = new ArrayList<>();
 
             for (TravelPlanCoverageRow row : dbCoverages) {
-                if (!row.isIncluded())
-                    continue;
+                if (!row.isIncluded()) continue;
 
                 String covCd = row.getCoverageCode();
 
                 // API001에 없는 담보는 제외
-                if (api001CovMap == null || !api001CovMap.containsKey(covCd))
-                    continue;
+                if (api001CovMap == null || !api001CovMap.containsKey(covCd)) continue;
 
-                String covNm = (row.getDisplayName() != null && !row.getDisplayName().isBlank()) ? row.getDisplayName()
+                String covNm = (row.getDisplayName() != null && !row.getDisplayName().isBlank())
+                        ? row.getDisplayName()
                         : row.getCoverageName();
 
                 QuoteResponse.Coverage apiCov = api003CoverageMap.get(covCd);
+
                 if (apiCov == null) {
                     merged.add(QuoteResponse.Coverage.builder()
-                        .covCd(covCd)
-                        .covNm(covNm)
-                        .cur("KRW")
-                        .insdAmt(0L)
-                        .categoryCode(row.getCategoryCode())
-                        .units(List.of())
-                        .build());
-                }
-                else {
+                            .covCd(covCd)
+                            .covNm(covNm)
+                            .cur("KRW")
+                            .insdAmt(0L)
+                            .categoryCode(row.getCategoryCode())
+                            .units(List.of())
+                            .build());
+                } else {
                     merged.add(QuoteResponse.Coverage.builder()
-                        .covCd(covCd)
-                        .covNm(covNm)
-                        .cur(apiCov.getCur())
-                        .insdAmt(apiCov.getInsdAmt())
-                        .categoryCode(row.getCategoryCode())
-                        .units(apiCov.getUnits())
-                        .build());
+                            .covCd(covCd)
+                            .covNm(covNm)
+                            .cur(apiCov.getCur())
+                            .insdAmt(apiCov.getInsdAmt())
+                            .categoryCode(row.getCategoryCode())
+                            .units(apiCov.getUnits())
+                            .build());
                 }
             }
 
@@ -170,16 +225,19 @@ public class MeritzQuotationService {
             String coverageTitle = buildCoverageTitle(dbCoverages, api003CoverageMap);
 
             cards.add(QuoteResponse.PlanCard.builder()
-                .planId(plan.getId())
-                .planGrpCd(plan.getPlanGroupCode())
-                .planCd(plan.getPlanCode())
-                .planNm(plan.getPlanName())
-                .planNmRaw(plan.getPlanFullName() == null ? plan.getPlanName() : plan.getPlanFullName())
-                .premium(QuoteResponse.Premium.builder().ttPrem(parseLong(prem.getTtPrem())).currency("KRW").build())
-                .insuredPremiums(insuredPremiums)
-                .coverageTitle(coverageTitle)
-                .coverages(merged)
-                .build());
+                    .planId(repPlan.getId())
+                    .planGrpCd(repPlan.getPlanGroupCode())
+                    .planCd(repPlan.getPlanCode())
+                    .planNm(repPlan.getPlanName())
+                    .planNmRaw(repPlan.getPlanFullName() == null ? repPlan.getPlanName() : repPlan.getPlanFullName())
+                    .premium(QuoteResponse.Premium.builder()
+                            .ttPrem(parseLong(prem.getTtPrem()))
+                            .currency("KRW")
+                            .build())
+                    .insuredPremiums(insuredPremiums)
+                    .coverageTitle(coverageTitle)
+                    .coverages(merged)
+                    .build());
         }
 
         if (cards.isEmpty()) {
@@ -187,8 +245,34 @@ public class MeritzQuotationService {
         }
 
         return QuoteResponse.success(
-                QuoteResponse.Period.builder().insBgnDt(request.getInsBgnDt()).insEdDt(request.getInsEdDt()).build(),
-                repIdx, request.getInsuredList().size(), cards);
+                QuoteResponse.Period.builder()
+                        .insBgnDt(request.getInsBgnDt())
+                        .insEdDt(request.getInsEdDt())
+                        .build(),
+                repIdx,
+                request.getInsuredList().size(),
+                cards
+        );
+
+    }
+
+    // 나이 체크
+    private Integer mapAgeToAgeGroupId(int age) {
+        if (age >= 0 && age <= 14) return 1;
+        if (age >= 15 && age <= 69) return 2;
+        if (age >= 70 && age <= 80) return 3;
+        return null; // 81+ 또는 음수 등은 미지원(메리츠 거절 케이스)
+    }
+
+    // 플랜 카드
+    private record PlanFamilyKey(String pdCd, String untPdCd, String planGrpCd) {
+        static PlanFamilyKey from(TravelInsurancePlanEntity p) {
+            return new PlanFamilyKey(
+                    p.getProductCode(),
+                    p.getUnitProductCode(),
+                    p.getPlanGroupCode()
+            );
+        }
     }
 
     public QuoteResponse.PlanCard quotePlanCoverages(Long planId, QuoteRequest request) {
@@ -331,7 +415,7 @@ public class MeritzQuotationService {
         body.put("gnrAflcoCd", FIXED_GNR_AFLCO_CD);
         body.put("aflcoDivCd", FIXED_AFLCO_DIV_CD);
         body.put("bizpeNo", FIXED_BIZPE_NO);
-        body.put("polNo", FIXED_POL_NO); // ✅ 상수 확정
+        body.put("polNo", FIXED_POL_NO); // 상수 확정
         body.put("stdDt", stdDt);
 
         logJson("[MERITZ][PLAN_INQ][REQ]", "stdDt=" + stdDt, body);
@@ -581,11 +665,32 @@ public class MeritzQuotationService {
     }
 
     // =========================
-    // bridge 연동 (핵심: body를 Object로 전달)
+    // 간편 보험료 산출 (패밀리 단위 1회 호출)
     // =========================
-
-    private MeritzHndyPremInner callHndyPremCmpt(String companyCode, QuoteRequest req, TravelInsurancePlanEntity plan) {
+    private MeritzHndyPremInner callHndyPremCmpt(
+            String companyCode,
+            QuoteRequest req,
+            List<TravelInsurancePlanEntity> familyPlans
+    ) {
         CompaniesConfigsProperties.CompanyConfig cfg = resolve(companyCode);
+
+        if (familyPlans == null || familyPlans.isEmpty()) {
+            throw new IllegalArgumentException("familyPlans is empty");
+        }
+
+        // ageGroupId -> plan
+        Map<Integer, TravelInsurancePlanEntity> planByAgeGroup = new HashMap<>();
+        for (TravelInsurancePlanEntity p : familyPlans) {
+            if (p.getAgeGroupId() != null) { // 필드명 맞춰
+                planByAgeGroup.put(p.getAgeGroupId(), p);
+            }
+        }
+
+        // 대표 플랜: ageGroupId=2 우선, 없으면 첫 번째
+        TravelInsurancePlanEntity repPlan = familyPlans.stream()
+                .filter(p -> Objects.equals(p.getAgeGroupId(), 2))
+                .findFirst()
+                .orElse(familyPlans.get(0));
 
         String sbcpDt = LocalDate.now().format(YYYYMMDD);
 
@@ -595,8 +700,9 @@ public class MeritzQuotationService {
         body.put("bizpeNo", FIXED_BIZPE_NO);
         body.put("polNo", FIXED_POL_NO);
 
-        body.put("pdCd", plan.getProductCode());
-        body.put("untPdCd", plan.getUnitProductCode());
+        // family 공통 값은 대표 플랜에서
+        body.put("pdCd", repPlan.getProductCode());
+        body.put("untPdCd", repPlan.getUnitProductCode());
 
         body.put("sbcpDt", sbcpDt);
         body.put("insBgnDt", req.getInsBgnDt());
@@ -604,23 +710,42 @@ public class MeritzQuotationService {
         body.put("trvArCd", req.getTrvArCd());
         body.put("inspeCnt", req.getInsuredList().size());
 
-        List<Map<String, Object>> insuredVos = req.getInsuredList().stream().map(i -> {
+        List<Map<String, Object>> insuredVos = new ArrayList<>();
+
+        for (int idx = 0; idx < req.getInsuredList().size(); idx++) {
+            QuoteRequest.Insured i = req.getInsuredList().get(idx);
+
+            int age = calcAgeAtStartDate(i.getBirth(), req.getInsBgnDt());
+            Integer ageGroupId = mapAgeToAgeGroupId(age); // 너가 만든 함수(1/2/3)
+            if (ageGroupId == null) {
+                throw new IllegalArgumentException("unsupported age. index=" + idx + ", age=" + age);
+            }
+
+            TravelInsurancePlanEntity planForAge = planByAgeGroup.get(ageGroupId);
+            if (planForAge == null) {
+                throw new IllegalStateException("family has no plan for ageGroupId=" + ageGroupId
+                        + ", familyRepPlanCd=" + repPlan.getPlanCode());
+            }
+
             Map<String, Object> m = new LinkedHashMap<>();
-            m.put("planGrpCd", plan.getPlanGroupCode());
-            m.put("planCd", plan.getPlanCode());
+            m.put("planGrpCd", planForAge.getPlanGroupCode());
+            m.put("planCd", planForAge.getPlanCode());
             m.put("inspeBdt", i.getBirth());
             m.put("gndrCd", i.getGender());
 
             // TODO: 실데이터로 교체
             m.put("inspeNm", "홍길동");
             m.put("engInspeNm", "HONG GIL DONG");
-            return m;
-        }).toList();
+
+            insuredVos.add(m);
+        }
+
         body.put("opapiTrvPremCmptInspeInfCbcVo", insuredVos);
 
-        logJson("[MERITZ][HNDY_PREM_CMPT][REQ]", plan.getPlanCode(), body);
+        logJson("[MERITZ][HNDY_PREM_CMPT][REQ]", repPlan.getPlanCode(), body);
+
         MeritzBridgeResponse res = bridgeClient
-            .call(new MeritzBridgeRequest(cfg.getCompanyCode(), HNDY_PREM_CMPT, "POST", headers(), body));
+                .call(new MeritzBridgeRequest(cfg.getCompanyCode(), HNDY_PREM_CMPT, "POST", headers(), body));
 
         if (res.getStatus() != 200) {
             throw new IllegalStateException(
@@ -685,75 +810,76 @@ public class MeritzQuotationService {
         return (raw == null || raw.isBlank()) ? "처리 중 오류가 발생했습니다." : raw;
     }
 
-    private Map<String, MeritzHndyPremInner> callApi003Parallel(String companyCode, QuoteRequest req,
-            List<TravelInsurancePlanEntity> plans) {
+    private Map<String, MeritzHndyPremInner> callApi003Parallel(
+            String companyCode,
+            QuoteRequest req,
+            Map<PlanFamilyKey, List<TravelInsurancePlanEntity>> targetFamilies
+    ) {
         // =========================
-        // Step 0) 동시 호출 제한 (플랜 3개)
-        // - fixed thread pool size = min(3, planCount)
+        // Step 0) 동시 호출 제한 (패밀리 카드 3개)
         // =========================
-        int poolSize = Math.min(3, Math.max(1, plans.size()));
+        int poolSize = Math.min(3, Math.max(1, targetFamilies.size()));
         ExecutorService executor = Executors.newFixedThreadPool(poolSize);
 
         try {
             // =========================
-            // Step 1) 플랜별 비동기 호출 작업 생성
+            // Step 1) 패밀리별 비동기 호출 작업 생성
             // =========================
-            List<CompletableFuture<Map.Entry<String, MeritzHndyPremInner>>> futures = plans.stream()
-                .map(plan -> CompletableFuture.supplyAsync(() -> {
-                    String planCd = plan.getPlanCode();
-                    try {
-                        // Step 1-1) API003 호출
-                        MeritzHndyPremInner prem = callHndyPremCmpt(companyCode, req, plan);
+            List<CompletableFuture<Map.Entry<String, MeritzHndyPremInner>>> futures =
+                    targetFamilies.entrySet().stream()
+                            .map(entry -> CompletableFuture.supplyAsync(() -> {
+                                PlanFamilyKey familyKey = entry.getKey();
+                                List<TravelInsurancePlanEntity> familyPlans = entry.getValue();
+                                if (familyPlans == null || familyPlans.isEmpty()) return null;
 
-                        // Step 1-2) 응답 errCd 확인 (00001 성공)
-                        if (prem == null) {
-                            log.warn("[MERITZ][HNDY_PREM_CMPT][FAIL] planCd={}, prem=null", planCd);
-                            return null;
-                        }
-                        if (!"00001".equals(prem.getErrCd())) {
-                            log.warn("[MERITZ][HNDY_PREM_CMPT][FAIL] planCd={}, errCd={}, errMsg={}", planCd,
-                                    prem.getErrCd(), prem.getErrMsg());
-                            return null;
-                        }
+                                // 대표 플랜: ageGroupId=2 우선, 없으면 첫 번째
+                                TravelInsurancePlanEntity repPlan = familyPlans.stream()
+                                        .filter(p -> Objects.equals(p.getAgeGroupId(), 2)) // 필드명 맞춰
+                                        .findFirst()
+                                        .orElse(familyPlans.get(0));
 
-                        // Step 1-3) 성공 결과 반환 (planCd -> prem)
-                        return Map.entry(planCd, prem);
+                                String repPlanCd = repPlan.getPlanCode();
 
-                    }
-                    catch (Exception e) {
-                        // Step 1-4) 예외는 해당 플랜만 실패 처리
-                        log.warn("[MERITZ][HNDY_PREM_CMPT][EXCEPTION] planCd={}, msg={}", planCd, e.getMessage(), e);
-                        return null;
-                    }
-                }, executor))
-                .toList();
+                                try {
+                                    // Step 1-1) API003 호출 (패밀리 단위)
+                                    MeritzHndyPremInner prem = callHndyPremCmpt(companyCode, req, familyPlans);
+
+                                    // Step 1-2) 응답 errCd 확인 (00001 성공)
+                                    if (prem == null) {
+                                        log.warn("[MERITZ][HNDY_PREM_CMPT][FAIL] family={}, repPlanCd={}, prem=null",
+                                                familyKey, repPlanCd);
+                                        return null;
+                                    }
+                                    if (!"00001".equals(prem.getErrCd())) {
+                                        log.warn("[MERITZ][HNDY_PREM_CMPT][FAIL] family={}, repPlanCd={}, errCd={}, errMsg={}",
+                                                familyKey, repPlanCd, prem.getErrCd(), prem.getErrMsg());
+                                        return null;
+                                    }
+
+                                    // Step 1-3) 성공 결과 반환 (대표 planCd -> prem)
+                                    return Map.entry(repPlanCd, prem);
+
+                                } catch (Exception e) {
+                                    log.warn("[MERITZ][HNDY_PREM_CMPT][EXCEPTION] family={}, repPlanCd={}, msg={}",
+                                            familyKey, repPlanCd, e.getMessage(), e);
+                                    return null;
+                                }
+                            }, executor))
+                            .toList();
 
             // =========================
-            // Step 2) 전체 타임아웃 설정 (예: 8초)
-            // - 플랜이 3개라 충분히 짧게 잡아도 됨
+            // Step 2) 전체 타임아웃
             // =========================
             CompletableFuture<Void> all = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
-
             try {
                 all.get(30, TimeUnit.SECONDS);
-            }
-            catch (TimeoutException te) {
-                log.warn("[MERITZ][HNDY_PREM_CMPT][TIMEOUT] timeout=8s, plans={}",
-                        plans.stream().map(TravelInsurancePlanEntity::getPlanCode).toList());
-                // 타임아웃이 나도 가능한 것만 취합 (부분 성공 허용)
-            }
-            catch (InterruptedException ie) {
-                // 인터럽트는 반드시 현재 스레드에 다시 표시해주는 게 정석
+            } catch (TimeoutException te) {
+                log.warn("[MERITZ][HNDY_PREM_CMPT][TIMEOUT] timeout=30s, families={}", targetFamilies.keySet());
+            } catch (InterruptedException ie) {
                 Thread.currentThread().interrupt();
-                log.warn("[MERITZ][HNDY_PREM_CMPT][INTERRUPTED] plans={}",
-                        plans.stream().map(TravelInsurancePlanEntity::getPlanCode).toList(), ie);
-                // 그래도 부분 성공 취합은 진행 가능
-            }
-            catch (ExecutionException ee) {
-                // allOf는 내부 future 중 하나라도 예외면 ExecutionException이 날 수 있음
-                log.warn("[MERITZ][HNDY_PREM_CMPT][EXECUTION_EXCEPTION] plans={}",
-                        plans.stream().map(TravelInsurancePlanEntity::getPlanCode).toList(), ee);
-                // 그래도 부분 성공 취합은 진행 가능
+                log.warn("[MERITZ][HNDY_PREM_CMPT][INTERRUPTED] families={}", targetFamilies.keySet(), ie);
+            } catch (ExecutionException ee) {
+                log.warn("[MERITZ][HNDY_PREM_CMPT][EXECUTION_EXCEPTION] families={}", targetFamilies.keySet(), ee);
             }
 
             // =========================
@@ -761,24 +887,14 @@ public class MeritzQuotationService {
             // =========================
             Map<String, MeritzHndyPremInner> out = new LinkedHashMap<>();
             for (CompletableFuture<Map.Entry<String, MeritzHndyPremInner>> f : futures) {
-                try {
-                    Map.Entry<String, MeritzHndyPremInner> e = f.getNow(null);
-                    if (e != null && e.getKey() != null && e.getValue() != null) {
-                        out.put(e.getKey(), e.getValue());
-                    }
-                }
-                catch (Exception ignore) {
-                    // getNow는 예외 거의 안 나지만 안전하게 무시
+                Map.Entry<String, MeritzHndyPremInner> e = f.getNow(null);
+                if (e != null && e.getKey() != null && e.getValue() != null) {
+                    out.put(e.getKey(), e.getValue());
                 }
             }
-
             return out;
 
-        }
-        finally {
-            // =========================
-            // Step 4) Executor 종료
-            // =========================
+        } finally {
             executor.shutdownNow();
         }
     }

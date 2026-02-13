@@ -55,6 +55,12 @@ public class MeritzReferenceService {
     public List<CityResponseDto> getCityNationCodes(String keyword, String type) {
         CompaniesConfigsProperties.CompanyConfig cfg = resolve("TPA");
 
+        if (cfg == null) {
+            throw new IllegalStateException("Company config is null. companyCode=" + "TPA"
+                    + ", companies.tpa=" + companies.getTpa()
+                    + ", companies.insboon=" + companies.getInsboon());
+        }
+
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("srchVal", keyword);
         body.put("srchCnd", type);
