@@ -41,7 +41,6 @@ public class FavoriteCityEntity extends AuditEntity {
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
-    @PrePersist
     private void prePersist() {
         if (sortOrder == null) {
             sortOrder = 0;

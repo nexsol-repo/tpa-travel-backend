@@ -11,8 +11,11 @@ build/
 *.ipr
 out/
 
+### Environment & Secrets ###
 .env
-.env
+.env.*
+**/application-secret*.properties
+
 .classpath
 .project
 **.class

@@ -84,6 +84,7 @@ public class TravelContractQueryService {
                 .applyDate(c.getApplyDate())
                 .insureStartDate(c.getInsureStartDate())
                 .insureEndDate(c.getInsureEndDate())
+                    // TODO: change to hard coding
                 .termsUrl("https://filer.bucket.nexsol.ai/buckets/tpa-travel-dev/insurance/term.pdf")
                 .policyLink(c.getPolicyLink())
 

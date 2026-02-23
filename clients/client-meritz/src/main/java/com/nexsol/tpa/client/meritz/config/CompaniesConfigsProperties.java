@@ -41,6 +41,8 @@ public class CompaniesConfigsProperties {
 
         private String bizpeNo;
 
+        private String polNo;
+
         public String getHostUrl() {
             return hostUrl;
         }
@@ -95,6 +97,14 @@ public class CompaniesConfigsProperties {
 
         public void setBizpeNo(String bizpeNo) {
             this.bizpeNo = bizpeNo;
+        }
+
+        public String getPolNo() {
+            return polNo;
+        }
+
+        public void setPolNo(String polNo) {
+            this.polNo = polNo;
         }
 
     }

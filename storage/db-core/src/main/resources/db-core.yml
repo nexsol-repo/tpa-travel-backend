@@ -59,7 +59,8 @@ storage:
 
 
 ---
-spring.config.activate.on-profile: dev
+# dev, staging, prod 공통 (local/local-dev 제외)
+spring.config.activate.on-profile: dev | staging | prod
 
 storage:
   datasource:
@@ -76,40 +77,3 @@ storage:
       pool-name: core-db-pool
       data-source-properties:
         rewriteBatchedStatements: true
----
-spring.config.activate.on-profile: staging
-
-storage:
-  datasource:
-    core:
-      driver-class-name: org.mariadb.jdbc.Driver
-      jdbc-url: ${DB_URL}
-      username: ${DB_USERNAME}
-      password: ${DB_PASSWORD}
-      maximum-pool-size: 5
-      connection-timeout: 1100
-      keepalive-time: 30000
-      validation-timeout: 1000
-      max-lifetime: 600000
-      pool-name: core-db-pool
-      data-source-properties:
-        rewriteBatchedStatements: true
-
----
-spring.config.activate.on-profile: prod
-
-storage:
-  datasource:
-    core:
-      driver-class-name: org.mariadb.jdbc.Driver
-      jdbc-url: ${DB_URL}
-      username: ${DB_USERNAME}
-      password: ${DB_PASSWORD}
-      maximum-pool-size: 5
-      connection-timeout: 1100
-      keepalive-time: 30000
-      validation-timeout: 1000
-      max-lifetime: 600000
-      pool-name: core-db-pool
-      data-source-properties:
-        rewriteBatchedStatements: tru

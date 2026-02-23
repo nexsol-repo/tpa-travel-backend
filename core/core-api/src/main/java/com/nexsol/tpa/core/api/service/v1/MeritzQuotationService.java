@@ -33,15 +33,6 @@ public class MeritzQuotationService {
     private static final String HNDY_PREM_CMPT = "/b2b/v1/organ/meritz/hndyPremCmpt"; // 간편보험료
                                                                                       // 산출
 
-    // 고정값
-    private static final String FIXED_GNR_AFLCO_CD = "020";
-
-    private static final String FIXED_AFLCO_DIV_CD = "TPA";
-
-    private static final String FIXED_BIZPE_NO = "2368801872";
-
-    private static final String FIXED_POL_NO = "15540-148539";
-
     private static final DateTimeFormatter YYYYMMDD = DateTimeFormatter.ofPattern("yyyyMMdd");
 
     private final MeritzBridgeClient bridgeClient;
@@ -412,10 +403,10 @@ public class MeritzQuotationService {
         CompaniesConfigsProperties.CompanyConfig cfg = resolve(companyCode);
 
         Map<String, Object> body = new LinkedHashMap<>();
-        body.put("gnrAflcoCd", FIXED_GNR_AFLCO_CD);
-        body.put("aflcoDivCd", FIXED_AFLCO_DIV_CD);
-        body.put("bizpeNo", FIXED_BIZPE_NO);
-        body.put("polNo", FIXED_POL_NO); // 상수 확정
+        body.put("gnrAflcoCd", cfg.getGnrAflcoCd());
+        body.put("aflcoDivCd", cfg.getAflcoDivCd());
+        body.put("bizpeNo", cfg.getBizpeNo());
+        body.put("polNo", cfg.getPolNo());
         body.put("stdDt", stdDt);
 
         logJson("[MERITZ][PLAN_INQ][REQ]", "stdDt=" + stdDt, body);
@@ -695,10 +686,10 @@ public class MeritzQuotationService {
         String sbcpDt = LocalDate.now().format(YYYYMMDD);
 
         Map<String, Object> body = new LinkedHashMap<>();
-        body.put("gnrAflcoCd", FIXED_GNR_AFLCO_CD);
-        body.put("aflcoDivCd", FIXED_AFLCO_DIV_CD);
-        body.put("bizpeNo", FIXED_BIZPE_NO);
-        body.put("polNo", FIXED_POL_NO);
+        body.put("gnrAflcoCd", cfg.getGnrAflcoCd());
+        body.put("aflcoDivCd", cfg.getAflcoDivCd());
+        body.put("bizpeNo", cfg.getBizpeNo());
+        body.put("polNo", cfg.getPolNo());
 
         // family 공통 값은 대표 플랜에서
         body.put("pdCd", repPlan.getProductCode());
