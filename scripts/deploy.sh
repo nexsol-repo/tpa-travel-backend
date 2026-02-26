@@ -26,7 +26,7 @@ fi
 # 배포 실패 시 신규 컨테이너 자동 롤백
 cleanup_on_failure() {
   echo "🛑 배포 실패! 신규 컨테이너를 정리합니다..."
-  docker compose -p "${NEW_PROJECT_NAME}" down 2>/dev/null || true
+  docker compose -f docker-compose.yml -p "${NEW_PROJECT_NAME}" down 2>/dev/null || true
 }
 
 echo "============================================"
@@ -128,7 +128,7 @@ fi
 
 # 6. 구 버전 컨테이너 제거
 echo "🛑 이전 버전 제거: ${OLD_PROJECT_NAME}"
-docker compose -p "${OLD_PROJECT_NAME}" down 2>/dev/null || true
+docker compose -f docker-compose.yml -p "${OLD_PROJECT_NAME}" down 2>/dev/null || true
 
 # 7. 미사용 리소스 정리
 echo "🧹 미사용 이미지 정리"
