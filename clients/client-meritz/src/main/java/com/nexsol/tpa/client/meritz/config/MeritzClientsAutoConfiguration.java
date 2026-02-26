@@ -38,7 +38,7 @@ public class MeritzClientsAutoConfiguration {
 
         // core-api에서 설정한 meritz.bridge.base-url 을 그대로 쓰고 싶으면
         // prefix를 맞추는게 제일 깔끔함.
-        private String baseUrl = "http://211.220.195.17:18080";
+        private String baseUrl = "http://211.220.195.16:18081";
 
         public String getBaseUrl() {
             return baseUrl;

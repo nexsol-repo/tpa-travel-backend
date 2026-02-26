@@ -4,6 +4,8 @@ public interface PlanFamilyPlanRow {
 
     Long getFamilyId();
 
+    String getFamilyName();
+
     Long getPlanId();
 
     Integer getAgeGroupId();     // plan.age_group_id
