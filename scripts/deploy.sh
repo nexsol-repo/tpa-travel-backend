@@ -26,7 +26,7 @@ fi
 # 배포 실패 시 신규 컨테이너 자동 롤백
 cleanup_on_failure() {
   echo "🛑 배포 실패! 신규 컨테이너를 정리합니다..."
-  docker compose -f docker-compose.yml -p "${NEW_PROJECT_NAME}" down 2>/dev/null || true
+  docker rm -f "${NEW_CONTAINER}" 2>/dev/null || true
 }
 
 echo "============================================"
@@ -58,30 +58,33 @@ else
     TARGET_PORT="$DEFAULT_PORT"
 fi
 
-OLD_PROJECT_NAME="${APP_NAME}-${TARGET_ENV}-${CURRENT_PORT}"
-NEW_PROJECT_NAME="${APP_NAME}-${TARGET_ENV}-${TARGET_PORT}"
+NEW_CONTAINER="${APP_NAME}-${TARGET_ENV}-${TARGET_PORT}"
 
 echo "🔄 포트 스위칭: ${CURRENT_PORT}(Blue) → ${TARGET_PORT}(Green)"
 
-# 3. 신규 컨테이너 실행
-export HOST_PORT=$TARGET_PORT
-export TARGET_ENV="${TARGET_ENV}"
+# 3. 신규 컨테이너 실행 (docker compose 대신 docker run 으로 단순화)
 export DOCKER_IMAGE="${APP_NAME}:${TARGET_ENV}"
-export COMPOSE_PROJECT_NAME="${NEW_PROJECT_NAME}"
 
-echo "📦 신규 컨테이너 기동: ${NEW_PROJECT_NAME} (Port: ${TARGET_PORT})"
+echo "📦 신규 컨테이너 기동: ${NEW_CONTAINER} (Port: ${TARGET_PORT})"
 cd "${BASE_PATH}"
 
-if ! docker compose -f docker-compose.yml -p "${NEW_PROJECT_NAME}" up -d; then
-  echo "❌ 컨테이너 기동 실패!"
-  cleanup_on_failure
-  exit 1
-fi
+# 혹시 같은 이름 컨테이너가 남아있으면 제거
+docker rm -f "${NEW_CONTAINER}" 2>/dev/null || true
+
+docker run -d \
+  --name "${NEW_CONTAINER}" \
+  --network host \
+  --restart always \
+  --env-file .env \
+  -e TZ=Asia/Seoul \
+  -e SERVER_PORT=${TARGET_PORT} \
+  -e SPRING_PROFILES_ACTIVE=${TARGET_ENV} \
+  "${DOCKER_IMAGE}"
 
 # 4. Health Check (최대 120초 대기)
 echo "🏥 헬스체크 시작... (http://127.0.0.1:${TARGET_PORT}/health)"
 HEALTH_OK=false
-for i in {1..24}; do
+for i in $(seq 1 24); do
   STATUS=$(curl -s -o /dev/null -w "%{http_code}" "http://127.0.0.1:${TARGET_PORT}/health" 2>/dev/null) || STATUS="000"
   if [ "$STATUS" == "200" ]; then
     echo "✅ 헬스체크 성공! (${i}번째 시도)"
@@ -93,9 +96,9 @@ for i in {1..24}; do
 done
 
 if [ "$HEALTH_OK" != "true" ]; then
-  echo "❌ 헬스체크 실패! 신규 컨테이너 로그:"
+  echo "❌ 헬스체크 실패! 컨테이너 로그:"
   echo "--------------------------------------------"
-  docker compose -p "${NEW_PROJECT_NAME}" logs --tail 100
+  docker logs --tail 100 "${NEW_CONTAINER}" 2>&1 || true
   echo "--------------------------------------------"
   cleanup_on_failure
   exit 1
@@ -107,13 +110,9 @@ echo "🔄 Nginx 트래픽 전환 중... (Config: ${NGINX_CONF})"
 if [ ! -f "$NGINX_CONF" ]; then
     echo "⚠️  Nginx 설정 파일(${NGINX_CONF})이 없어 트래픽 전환을 건너뜁니다."
 else
-    # Nginx 설정 백업
     sudo cp "$NGINX_CONF" "${NGINX_CONF}.bak"
-
-    # Nginx conf 내 proxy_pass 포트 변경
     sudo sed -i "s/127.0.0.1:[0-9]\{4\}/127.0.0.1:${TARGET_PORT}/g" "$NGINX_CONF"
 
-    # Nginx 설정 검증 및 리로드
     if sudo nginx -t 2>/dev/null; then
         sudo nginx -s reload
         echo "✅ Nginx 트래픽 전환 완료 → 포트 ${TARGET_PORT}"
@@ -126,26 +125,17 @@ else
     fi
 fi
 
-# 6. 구 버전 컨테이너 제거
-#    - docker build -t tpa-travel-api:dev 하면 이전 이미지 태그가 벗겨져 해시만 남음
-#    - 그래서 ancestor 필터로 못 찾음 → 컨테이너 이름 패턴으로 찾아서 제거
-echo "🛑 이전 버전 제거"
-
-# 6-1. compose down 시도 (프로젝트명 일치하면 정리됨)
-docker compose -f docker-compose.yml -p "${OLD_PROJECT_NAME}" down 2>/dev/null || true
-
-# 6-2. 이름 패턴으로 이전 컨테이너 강제 정리 (신규 컨테이너 제외)
-#      컨테이너 이름에 앱 이름이 포함된 것 중 신규가 아닌 것 제거
-NEW_CONTAINER_NAME="${NEW_PROJECT_NAME}"
-for cid in $(docker ps -aq --filter "name=${APP_NAME}-${TARGET_ENV}" 2>/dev/null); do
+# 6. 이전 컨테이너 모두 제거 (신규 컨테이너만 남김)
+echo "🛑 이전 컨테이너 제거"
+for cid in $(docker ps -aq --filter "name=${APP_NAME}-${TARGET_ENV}" 2>/dev/null || true); do
   CNAME=$(docker inspect --format='{{.Name}}' "$cid" 2>/dev/null | sed 's/^\///')
-  if [ "$CNAME" != "$NEW_CONTAINER_NAME" ]; then
-    echo "  🗑️ 이전 컨테이너 제거: ${CNAME} ($cid)"
+  if [ "$CNAME" != "${NEW_CONTAINER}" ]; then
+    echo "  🗑️ 제거: ${CNAME} ($cid)"
     docker rm -f "$cid" 2>/dev/null || true
   fi
 done
 
-# 7. 태그 없는(dangling) 이미지 + 미사용 이미지 정리
+# 7. 태그 없는(dangling) 이미지 정리
 echo "🧹 미사용 이미지 정리"
 docker image prune -f
 
@@ -155,5 +145,6 @@ echo "$TARGET_PORT" > "$CURRENT_PORT_FILE"
 echo "============================================"
 echo "🎉 ${TARGET_ENV} 배포 성공!"
 echo "📍 서비스 포트: ${TARGET_PORT}"
+echo "📦 컨테이너: ${NEW_CONTAINER}"
 echo "🕐 완료 시간: $(date '+%Y-%m-%d %H:%M:%S')"
 echo "============================================"
