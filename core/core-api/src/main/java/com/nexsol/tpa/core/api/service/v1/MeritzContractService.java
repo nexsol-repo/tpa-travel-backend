@@ -135,7 +135,7 @@ public class MeritzContractService {
         c.setContractPeopleMail(req.getContractPeopleMail());
 
         // c.setPolicyNumber(req.getPolicyNumber());
-        c.setPolicyNumber("15540-148539"); // 일단 하드코딩
+        c.setPolicyNumber("15540-207849"); // 일단 하드코딩
 
         c.setMeritzQuoteGroupNumber(req.getMeritzQuoteGroupNumber());
         c.setMeritzQuoteRequestNumber(req.getMeritzQuoteRequestNumber());

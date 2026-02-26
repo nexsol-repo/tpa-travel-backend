@@ -19,14 +19,14 @@ public class TravelInsuranceCoverageEntity extends AuditEntity {
     @Column(name = "insurer_id", nullable = false)
     private Long insurerId;
 
-    @Column(name = "group_code")
-    private String groupCode;
-
     @Column(name = "coverage_code", length = 50)
     private String coverageCode;
 
     @Column(name = "coverage_name", nullable = false, length = 100)
     private String coverageName;
+
+    @Column(name = "group_code")
+    private String groupCode;
 
     @Column(name = "claim_reason", length = 300)
     private String claimReason;

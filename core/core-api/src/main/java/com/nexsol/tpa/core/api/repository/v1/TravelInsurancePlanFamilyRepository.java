@@ -11,4 +11,7 @@ public interface TravelInsurancePlanFamilyRepository extends JpaRepository<Trave
     findByInsurerIdAndInsuranceProductNameAndIsActiveTrueAndDeletedAtIsNullOrderBySortOrderAsc(
             Long insurerId, String insuranceProductName
     );
+
+    List<TravelInsurancePlanFamilyEntity> findByInsurerIdAndIsActiveTrueAndDeletedAtIsNullOrderBySortOrderAsc(Long insurerId);
+
 }
