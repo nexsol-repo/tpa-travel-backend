@@ -10,6 +10,8 @@ spring:
       - db-core.yml
       - client-meritz.yml
   web.resources.add-mappings: false
+  jmx:
+    enabled: false
 
 server:
   tomcat:
@@ -17,6 +19,7 @@ server:
     threads:
       max: 600
       min-spare: 100
+
 
 ---
 spring.config.activate.on-profile: local

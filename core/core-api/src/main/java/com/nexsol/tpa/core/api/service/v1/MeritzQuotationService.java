@@ -186,14 +186,26 @@ public class MeritzQuotationService {
                 continue;
             }
 
-            // API001 covCd map: 대표 플랜 키로 조회 (담보 구성은 family 공통 가정)
-            Map<String, MeritzPlanInqInner.PlanCovRow> api001CovMap = api001ByPlanKey.get(PlanKey.from(repPlan));
+            // API001 covCd map: 패밀리 내 모든 planCd의 covCd를 합침 (ageGroup별 담보가 다를 수 있음)
+            Map<String, MeritzPlanInqInner.PlanCovRow> api001CovMap = new LinkedHashMap<>();
+            for (TravelInsurancePlanEntity fp : familyPlans) {
+                Map<String, MeritzPlanInqInner.PlanCovRow> perPlan = api001ByPlanKey.get(PlanKey.from(fp));
+                if (perPlan != null) {
+                    perPlan.forEach(api001CovMap::putIfAbsent);
+                }
+            }
 
             Map<String, QuoteResponse.Coverage> api003CoverageMap = buildApiCoverageMapKeepingUnits(prem, request,
                     repIdx);
 
             // 담보는 대표 플랜의 plan_id 기준 (패밀리 공통 담보셋)
             List<TravelPlanCoverageRow> dbCoverages = travelPlanCoverageRepository.findRowsByPlanId(repPlan.getId());
+
+            log.info("[COVERAGE][DEBUG] familyId={}, dbCovCds={}, api001CovCds={}",
+                    familyId,
+                    dbCoverages.stream().filter(TravelPlanCoverageRow::isIncluded)
+                        .map(r -> r.getCoverageCode() + "(" + r.getCategoryCode() + ")").toList(),
+                    api001CovMap.keySet());
 
             List<QuoteResponse.Coverage> merged = new ArrayList<>();
 
@@ -204,8 +216,10 @@ public class MeritzQuotationService {
                 String covCd = row.getCoverageCode();
 
                 // API001에 없는 담보는 제외
-                if (api001CovMap == null || !api001CovMap.containsKey(covCd))
+                if (api001CovMap == null || !api001CovMap.containsKey(covCd)) {
+                    log.info("[COVERAGE][SKIP] covCd={}, category={}, not in API001", covCd, row.getCategoryCode());
                     continue;
+                }
 
                 String covNm = (row.getDisplayName() != null && !row.getDisplayName().isBlank()) ? row.getDisplayName()
                         : row.getCoverageName();
@@ -626,20 +640,23 @@ public class MeritzQuotationService {
             Map<String, QuoteResponse.CoverageUnit> byBand = e.getValue();
             for (AgeBand band : requestedBands) {
                 if (!byBand.containsKey(band.code)) {
-                    byBand.put(band.code, QuoteResponse.CoverageUnit.builder()
-                        .ageBandCode(band.code)
-                        .ageBandLabel(band.label)
-                        .count(null)
-                        .insdAmt(null)
-                        .premSum(null)
-                        .build());
+                    byBand.put(band.code,
+                            QuoteResponse.CoverageUnit.builder()
+                                .ageBandCode(band.code)
+                                .ageBandLabel(band.label)
+                                .count(null)
+                                .insdAmt(null)
+                                .premSum(null)
+                                .build());
                 }
             }
         }
 
         Map<String, List<QuoteResponse.CoverageUnit>> out = new HashMap<>();
         for (var e : acc.entrySet()) {
-            List<QuoteResponse.CoverageUnit> sorted = e.getValue().values().stream()
+            List<QuoteResponse.CoverageUnit> sorted = e.getValue()
+                .values()
+                .stream()
                 .sorted(Comparator.comparingInt(u -> {
                     AgeBand b = AgeBand.fromCode(u.getAgeBandCode());
                     return b != null ? b.min : Integer.MAX_VALUE;
