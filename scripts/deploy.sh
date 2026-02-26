@@ -26,7 +26,7 @@ fi
 # 배포 실패 시 신규 컨테이너 자동 롤백
 cleanup_on_failure() {
   echo "🛑 배포 실패! 신규 컨테이너를 정리합니다..."
-  docker rm -f "${NEW_CONTAINER}" 2>/dev/null || true
+  docker compose -f docker-compose.yml -p "${NEW_PROJECT}" down 2>/dev/null || true
 }
 
 echo "============================================"
@@ -58,28 +58,26 @@ else
     TARGET_PORT="$DEFAULT_PORT"
 fi
 
-NEW_CONTAINER="${APP_NAME}-${TARGET_ENV}-${TARGET_PORT}"
+# compose 프로젝트명 = 컨테이너 이름 (docker-compose.yml의 container_name에서 사용)
+OLD_PROJECT="${APP_NAME}-${TARGET_ENV}-${CURRENT_PORT}"
+NEW_PROJECT="${APP_NAME}-${TARGET_ENV}-${TARGET_PORT}"
 
 echo "🔄 포트 스위칭: ${CURRENT_PORT}(Blue) → ${TARGET_PORT}(Green)"
 
-# 3. 신규 컨테이너 실행 (docker compose 대신 docker run 으로 단순화)
+# 3. 신규 컨테이너 실행
+export HOST_PORT="${TARGET_PORT}"
+export TARGET_ENV="${TARGET_ENV}"
 export DOCKER_IMAGE="${APP_NAME}:${TARGET_ENV}"
+export COMPOSE_PROJECT_NAME="${NEW_PROJECT}"
 
-echo "📦 신규 컨테이너 기동: ${NEW_CONTAINER} (Port: ${TARGET_PORT})"
+echo "📦 신규 컨테이너 기동: ${NEW_PROJECT} (Port: ${TARGET_PORT})"
 cd "${BASE_PATH}"
 
-# 혹시 같은 이름 컨테이너가 남아있으면 제거
-docker rm -f "${NEW_CONTAINER}" 2>/dev/null || true
-
-docker run -d \
-  --name "${NEW_CONTAINER}" \
-  --network host \
-  --restart always \
-  --env-file .env \
-  -e TZ=Asia/Seoul \
-  -e SERVER_PORT=${TARGET_PORT} \
-  -e SPRING_PROFILES_ACTIVE=${TARGET_ENV} \
-  "${DOCKER_IMAGE}"
+if ! docker compose -f docker-compose.yml -p "${NEW_PROJECT}" up -d; then
+  echo "❌ 컨테이너 기동 실패!"
+  cleanup_on_failure
+  exit 1
+fi
 
 # 4. Health Check (최대 120초 대기)
 echo "🏥 헬스체크 시작... (http://127.0.0.1:${TARGET_PORT}/health)"
@@ -98,7 +96,7 @@ done
 if [ "$HEALTH_OK" != "true" ]; then
   echo "❌ 헬스체크 실패! 컨테이너 로그:"
   echo "--------------------------------------------"
-  docker logs --tail 100 "${NEW_CONTAINER}" 2>&1 || true
+  docker compose -p "${NEW_PROJECT}" logs --tail 100
   echo "--------------------------------------------"
   cleanup_on_failure
   exit 1
@@ -125,17 +123,27 @@ else
     fi
 fi
 
-# 6. 이전 컨테이너 모두 제거 (신규 컨테이너만 남김)
+# 6. 이전 컨테이너 제거
 echo "🛑 이전 컨테이너 제거"
-for cid in $(docker ps -aq --filter "name=${APP_NAME}-${TARGET_ENV}" 2>/dev/null || true); do
-  CNAME=$(docker inspect --format='{{.Name}}' "$cid" 2>/dev/null | sed 's/^\///')
-  if [ "$CNAME" != "${NEW_CONTAINER}" ]; then
+
+# 6-1. compose down (프로젝트명 일치하면 정리됨)
+docker compose -f docker-compose.yml -p "${OLD_PROJECT}" down 2>/dev/null || true
+
+# 6-2. 위에서 못 잡은 잔여 컨테이너 강제 정리 (신규만 남기고 전부 제거)
+OLD_CIDS=$(docker ps -aq --filter "name=${APP_NAME}-${TARGET_ENV}" 2>/dev/null || true)
+if [ -n "$OLD_CIDS" ]; then
+  for cid in $OLD_CIDS; do
+    CNAME=$(docker inspect --format='{{.Name}}' "$cid" 2>/dev/null | sed 's/^\///')
+    # 신규 컨테이너는 건드리지 않음
+    if [ "$CNAME" = "${NEW_PROJECT}" ]; then
+      continue
+    fi
     echo "  🗑️ 제거: ${CNAME} ($cid)"
     docker rm -f "$cid" 2>/dev/null || true
-  fi
-done
+  done
+fi
 
-# 7. 태그 없는(dangling) 이미지 정리
+# 7. dangling 이미지 정리
 echo "🧹 미사용 이미지 정리"
 docker image prune -f
 
@@ -145,6 +153,6 @@ echo "$TARGET_PORT" > "$CURRENT_PORT_FILE"
 echo "============================================"
 echo "🎉 ${TARGET_ENV} 배포 성공!"
 echo "📍 서비스 포트: ${TARGET_PORT}"
-echo "📦 컨테이너: ${NEW_CONTAINER}"
+echo "📦 컨테이너: ${NEW_PROJECT}"
 echo "🕐 완료 시간: $(date '+%Y-%m-%d %H:%M:%S')"
 echo "============================================"
