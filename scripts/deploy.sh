@@ -127,21 +127,25 @@ else
 fi
 
 # 6. 구 버전 컨테이너 제거
-echo "🛑 이전 버전 제거: ${OLD_PROJECT_NAME}"
+#    - docker build -t tpa-travel-api:dev 하면 이전 이미지 태그가 벗겨져 해시만 남음
+#    - 그래서 ancestor 필터로 못 찾음 → 컨테이너 이름 패턴으로 찾아서 제거
+echo "🛑 이전 버전 제거"
+
+# 6-1. compose down 시도 (프로젝트명 일치하면 정리됨)
 docker compose -f docker-compose.yml -p "${OLD_PROJECT_NAME}" down 2>/dev/null || true
 
-# 6-1. 같은 이미지를 사용하는 이전 컨테이너 강제 정리 (프로젝트명 불일치 대비)
-echo "🧹 동일 이미지 사용 중인 이전 컨테이너 정리"
-for cid in $(docker ps -q --filter "ancestor=${DOCKER_IMAGE}" 2>/dev/null); do
-  # 신규 컨테이너(TARGET_PORT)는 제외하고 이전 컨테이너만 제거
-  CPORT=$(docker inspect --format='{{range .Config.Env}}{{println .}}{{end}}' "$cid" 2>/dev/null | grep "^SERVER_PORT=" | cut -d= -f2)
-  if [ "$CPORT" != "$TARGET_PORT" ]; then
-    echo "  🗑️ 이전 컨테이너 제거: $cid (PORT=$CPORT)"
+# 6-2. 이름 패턴으로 이전 컨테이너 강제 정리 (신규 컨테이너 제외)
+#      컨테이너 이름에 앱 이름이 포함된 것 중 신규가 아닌 것 제거
+NEW_CONTAINER_NAME="${NEW_PROJECT_NAME}"
+for cid in $(docker ps -aq --filter "name=${APP_NAME}-${TARGET_ENV}" 2>/dev/null); do
+  CNAME=$(docker inspect --format='{{.Name}}' "$cid" 2>/dev/null | sed 's/^\///')
+  if [ "$CNAME" != "$NEW_CONTAINER_NAME" ]; then
+    echo "  🗑️ 이전 컨테이너 제거: ${CNAME} ($cid)"
     docker rm -f "$cid" 2>/dev/null || true
   fi
 done
 
-# 7. 미사용 리소스 정리
+# 7. 태그 없는(dangling) 이미지 + 미사용 이미지 정리
 echo "🧹 미사용 이미지 정리"
 docker image prune -f
 
