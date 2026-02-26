@@ -130,6 +130,17 @@ fi
 echo "🛑 이전 버전 제거: ${OLD_PROJECT_NAME}"
 docker compose -f docker-compose.yml -p "${OLD_PROJECT_NAME}" down 2>/dev/null || true
 
+# 6-1. 같은 이미지를 사용하는 이전 컨테이너 강제 정리 (프로젝트명 불일치 대비)
+echo "🧹 동일 이미지 사용 중인 이전 컨테이너 정리"
+for cid in $(docker ps -q --filter "ancestor=${DOCKER_IMAGE}" 2>/dev/null); do
+  # 신규 컨테이너(TARGET_PORT)는 제외하고 이전 컨테이너만 제거
+  CPORT=$(docker inspect --format='{{range .Config.Env}}{{println .}}{{end}}' "$cid" 2>/dev/null | grep "^SERVER_PORT=" | cut -d= -f2)
+  if [ "$CPORT" != "$TARGET_PORT" ]; then
+    echo "  🗑️ 이전 컨테이너 제거: $cid (PORT=$CPORT)"
+    docker rm -f "$cid" 2>/dev/null || true
+  fi
+done
+
 # 7. 미사용 리소스 정리
 echo "🧹 미사용 이미지 정리"
 docker image prune -f
