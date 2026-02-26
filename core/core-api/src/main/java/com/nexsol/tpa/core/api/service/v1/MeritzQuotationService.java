@@ -332,7 +332,8 @@ public class MeritzQuotationService {
 
     private enum AgeBand {
 
-        AGE_0_14("AGE_0_14", "0~14세", 0, 14), AGE_15_69("AGE_15_69", "15~69세", 15, 69);
+        AGE_0_14("AGE_0_14", "0~14세", 0, 14), AGE_15_69("AGE_15_69", "15~69세", 15, 69),
+        AGE_70_80("AGE_70_80", "70~80세", 70, 80);
 
         private final String code;
 
@@ -552,7 +553,15 @@ public class MeritzQuotationService {
         if (insuredList == null || insuredList.isEmpty())
             return Map.of();
 
-        // insured index 기준으로 request insuredList와 매칭 (너 코드 전제 그대로)
+        // 요청에 포함된 모든 연령대 수집
+        Set<AgeBand> requestedBands = new LinkedHashSet<>();
+        for (QuoteRequest.Insured ri : req.getInsuredList()) {
+            int age = calcAgeAtStartDate(ri.getBirth(), req.getInsBgnDt());
+            AgeBand band = AgeBand.fromAge(age);
+            if (band != null)
+                requestedBands.add(band);
+        }
+
         for (int i = 0; i < insuredList.size(); i++) {
             var insured = insuredList.get(i);
 
@@ -560,12 +569,10 @@ public class MeritzQuotationService {
                 continue;
             var reqInsured = req.getInsuredList().get(i);
 
-            // birth는 너 QuoteRequest 구조에 맞게 가져와
-            String birth = reqInsured.getBirth(); // "YYYYMMDD"
+            String birth = reqInsured.getBirth();
             int age = calcAgeAtStartDate(birth, req.getInsBgnDt());
             AgeBand band = AgeBand.fromAge(age);
 
-            // 가입불가 밴드는 스킵 (또는 별도 처리)
             if (band == null)
                 continue;
 
@@ -579,8 +586,7 @@ public class MeritzQuotationService {
                     continue;
 
                 long insdAmt = parseLong(c.getInsdAmt());
-                long premAmt = parseLong(c.getPrem()); // prem이 "1699.325" 처럼 소수면
-                                                       // parseLong(BigDecimal)로 처리됨
+                long premAmt = parseLong(c.getPrem());
 
                 acc.computeIfAbsent(covCd, k -> new LinkedHashMap<>());
                 Map<String, QuoteResponse.CoverageUnit> byBand = acc.get(covCd);
@@ -597,21 +603,32 @@ public class MeritzQuotationService {
                     byBand.put(band.code, unit);
                 }
 
-                // 같은 연령대 인원 추가
                 unit.setCount(unit.getCount() + 1);
-
-                // 연령대 보험료 합 (원하면)
                 unit.setPremSum(unit.getPremSum() + premAmt);
 
-                // 보장금액은 같은 연령대면 일반적으로 동일하지만,
-                // 혹시라도 다르면 "최대값" 같은 정책으로 통일 가능
                 if (insdAmt > unit.getInsdAmt()) {
                     unit.setInsdAmt(insdAmt);
                 }
             }
         }
 
-        // 최종: covCd -> (연령대별 unit 리스트)
+        // 요청에 있는 연령대인데 해당 담보에 데이터가 없으면
+        // ageBandCode/ageBandLabel만 채우고 나머지 null (프론트: "보장없음")
+        for (var e : acc.entrySet()) {
+            Map<String, QuoteResponse.CoverageUnit> byBand = e.getValue();
+            for (AgeBand band : requestedBands) {
+                if (!byBand.containsKey(band.code)) {
+                    byBand.put(band.code, QuoteResponse.CoverageUnit.builder()
+                        .ageBandCode(band.code)
+                        .ageBandLabel(band.label)
+                        .count(null)
+                        .insdAmt(null)
+                        .premSum(null)
+                        .build());
+                }
+            }
+        }
+
         Map<String, List<QuoteResponse.CoverageUnit>> out = new HashMap<>();
         for (var e : acc.entrySet()) {
             out.put(e.getKey(), List.copyOf(e.getValue().values()));

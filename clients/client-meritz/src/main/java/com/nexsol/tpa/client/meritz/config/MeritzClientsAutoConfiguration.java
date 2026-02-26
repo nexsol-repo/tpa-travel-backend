@@ -6,7 +6,11 @@ import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.client.JdkClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
+
+import java.net.http.HttpClient;
+import java.time.Duration;
 
 @AutoConfiguration
 @EnableConfigurationProperties(MeritzTpaProperties.class)
@@ -20,7 +24,10 @@ public class MeritzClientsAutoConfiguration {
 
     @Bean
     public RestTemplate meritzRestTemplate() {
-        return new RestTemplate();
+        HttpClient httpClient = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5)).build();
+        JdkClientHttpRequestFactory factory = new JdkClientHttpRequestFactory(httpClient);
+        factory.setReadTimeout(Duration.ofSeconds(30));
+        return new RestTemplate(factory);
     }
 
     @Bean
