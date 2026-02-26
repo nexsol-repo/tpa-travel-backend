@@ -7,15 +7,11 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(
-        name = "travel_insurance_plan_family",
-        uniqueConstraints = {
-                @UniqueConstraint(name = "uk_plan_family", columnNames = {"insurer_id","insurance_product_name","family_name"})
-        },
-        indexes = {
-                @Index(name = "idx_plan_family_lookup", columnList = "insurer_id,insurance_product_name,is_active,sort_order")
-        }
-)
+@Table(name = "travel_insurance_plan_family",
+        uniqueConstraints = { @UniqueConstraint(name = "uk_plan_family",
+                columnNames = { "insurer_id", "insurance_product_name", "family_name" }) },
+        indexes = { @Index(name = "idx_plan_family_lookup",
+                columnList = "insurer_id,insurance_product_name,is_active,sort_order") })
 public class TravelInsurancePlanFamilyEntity extends AuditEntity {
 
     @Id
@@ -39,4 +35,5 @@ public class TravelInsurancePlanFamilyEntity extends AuditEntity {
 
     @Column(name = "deleted_at")
     private java.time.LocalDateTime deletedAt;
+
 }

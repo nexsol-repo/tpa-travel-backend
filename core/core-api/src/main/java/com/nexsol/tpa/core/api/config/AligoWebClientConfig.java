@@ -23,4 +23,5 @@ public class AligoWebClientConfig {
     public WebClient.Builder webClientBuilder() {
         return WebClient.builder();
     }
+
 }

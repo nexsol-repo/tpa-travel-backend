@@ -8,8 +8,9 @@ import lombok.Getter;
 public abstract class BaseResponse {
 
     private boolean ok;
+
     private String errCd;
+
     private String errMsg;
 
 }
-

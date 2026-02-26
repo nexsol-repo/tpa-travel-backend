@@ -34,8 +34,4 @@ logging:
     org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping: DEBUG
 
 ---
-spring.config.activate.on-profile: staging
-
-
----
-spring.config.activate.on-profile: live
+spring.config.activate.on-profile: prod

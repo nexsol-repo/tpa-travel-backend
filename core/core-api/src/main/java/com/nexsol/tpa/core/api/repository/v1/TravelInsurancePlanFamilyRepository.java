@@ -7,11 +7,10 @@ import java.util.List;
 
 public interface TravelInsurancePlanFamilyRepository extends JpaRepository<TravelInsurancePlanFamilyEntity, Long> {
 
-    List<TravelInsurancePlanFamilyEntity>
-    findByInsurerIdAndInsuranceProductNameAndIsActiveTrueAndDeletedAtIsNullOrderBySortOrderAsc(
-            Long insurerId, String insuranceProductName
-    );
+    List<TravelInsurancePlanFamilyEntity> findByInsurerIdAndInsuranceProductNameAndIsActiveTrueAndDeletedAtIsNullOrderBySortOrderAsc(
+            Long insurerId, String insuranceProductName);
 
-    List<TravelInsurancePlanFamilyEntity> findByInsurerIdAndIsActiveTrueAndDeletedAtIsNullOrderBySortOrderAsc(Long insurerId);
+    List<TravelInsurancePlanFamilyEntity> findByInsurerIdAndIsActiveTrueAndDeletedAtIsNullOrderBySortOrderAsc(
+            Long insurerId);
 
 }

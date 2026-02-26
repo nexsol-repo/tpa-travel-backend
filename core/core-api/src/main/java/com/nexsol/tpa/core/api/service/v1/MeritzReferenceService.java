@@ -56,9 +56,8 @@ public class MeritzReferenceService {
         CompaniesConfigsProperties.CompanyConfig cfg = resolve("TPA");
 
         if (cfg == null) {
-            throw new IllegalStateException("Company config is null. companyCode=" + "TPA"
-                    + ", companies.tpa=" + companies.getTpa()
-                    + ", companies.insboon=" + companies.getInsboon());
+            throw new IllegalStateException("Company config is null. companyCode=" + "TPA" + ", companies.tpa="
+                    + companies.getTpa() + ", companies.insboon=" + companies.getInsboon());
         }
 
         Map<String, Object> body = new LinkedHashMap<>();

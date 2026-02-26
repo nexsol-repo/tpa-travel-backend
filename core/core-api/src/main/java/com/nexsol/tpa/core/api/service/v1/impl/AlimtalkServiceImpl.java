@@ -15,6 +15,7 @@ import org.springframework.util.MultiValueMap;
 public class AlimtalkServiceImpl implements AlimtalkService {
 
     private final AligoProperties props;
+
     private final AligoSmsClient client;
 
     @Override
@@ -37,13 +38,11 @@ public class AlimtalkServiceImpl implements AlimtalkService {
                 ※문의처
                 (주)티피에이코리아 대표번호  02-3472-7925
                 (평일 9시~18시/점심시간 12시~13시, 공휴일 제외)
-                """.formatted(
-                nvl(cmd.getReceiverName()),
-                nvl(cmd.getProductName()),       // 없으면 "" 처리됨
-                nvl(cmd.getPolicyNumber()),
-                nvl(cmd.getCertificateUrl()),
-                nvl(cmd.getTermsUrl())
-        ).trim();
+                """.formatted(nvl(cmd.getReceiverName()), nvl(cmd.getProductName()), // 없으면
+                                                                                     // ""
+                                                                                     // 처리됨
+                nvl(cmd.getPolicyNumber()), nvl(cmd.getCertificateUrl()), nvl(cmd.getTermsUrl()))
+            .trim();
 
         MultiValueMap<String, String> form = AligoSmsClient.form();
         form.add("key", props.getApiKey());
@@ -70,9 +69,9 @@ public class AlimtalkServiceImpl implements AlimtalkService {
         try {
             String res = client.send(form);
             log.info("[ALIGO-SMS] send ok. receiver={}, res={}", normalizeHp(cmd.getReceiverHp()), res);
-        } catch (Exception e) {
-            log.warn("[ALIGO-SMS] send fail. receiver={}, err={}",
-                    normalizeHp(cmd.getReceiverHp()), e.getMessage(), e);
+        }
+        catch (Exception e) {
+            log.warn("[ALIGO-SMS] send fail. receiver={}, err={}", normalizeHp(cmd.getReceiverHp()), e.getMessage(), e);
         }
     }
 
@@ -83,4 +82,5 @@ public class AlimtalkServiceImpl implements AlimtalkService {
     private String nvl(String s) {
         return s == null ? "" : s;
     }
+
 }

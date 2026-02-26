@@ -8,13 +8,14 @@ public interface PlanFamilyPlanRow {
 
     Long getPlanId();
 
-    Integer getAgeGroupId();     // plan.age_group_id
+    Integer getAgeGroupId(); // plan.age_group_id
 
-    String getPlanCode();        // plan.plan_code
+    String getPlanCode(); // plan.plan_code
 
-    String getPlanGroupCode();   // plan.plan_group_code
+    String getPlanGroupCode(); // plan.plan_group_code
 
-    String getProductCode();     // plan.product_code (pdCd)
+    String getProductCode(); // plan.product_code (pdCd)
 
     String getUnitProductCode(); // plan.unit_product_code (untPdCd)
+
 }

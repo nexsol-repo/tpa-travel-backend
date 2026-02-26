@@ -49,7 +49,7 @@ public class MeritzContractController {
     /** 여행자보험 가입(결제) */
     @PostMapping("/travel/contract/completed")
     public ContractCompletedResponse completed(@RequestParam(defaultValue = "TPA") String companyCode,
-                                               @RequestBody ContractCompletedRequest request) {
+            @RequestBody ContractCompletedRequest request) {
         return service.completed(companyCode, request);
     }
 

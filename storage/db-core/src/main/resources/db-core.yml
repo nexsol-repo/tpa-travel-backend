@@ -60,7 +60,7 @@ storage:
 
 ---
 # dev, staging, prod 공통 (local/local-dev 제외)
-spring.config.activate.on-profile: dev | staging | prod
+spring.config.activate.on-profile: dev | prod
 
 storage:
   datasource:

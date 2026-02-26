@@ -17,15 +17,16 @@ public class AligoSmsClient {
 
     public String send(MultiValueMap<String, String> form) {
         return webClient.post()
-                .uri(SEND_URL)
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .bodyValue(form)
-                .retrieve()
-                .bodyToMono(String.class)
-                .block();
+            .uri(SEND_URL)
+            .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+            .bodyValue(form)
+            .retrieve()
+            .bodyToMono(String.class)
+            .block();
     }
 
     public static MultiValueMap<String, String> form() {
         return new LinkedMultiValueMap<>();
     }
+
 }

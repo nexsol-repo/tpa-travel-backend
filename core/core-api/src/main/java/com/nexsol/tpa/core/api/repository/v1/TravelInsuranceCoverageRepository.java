@@ -5,12 +5,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface TravelInsuranceCoverageRepository
-        extends JpaRepository<TravelInsuranceCoverageEntity, Long> {
+public interface TravelInsuranceCoverageRepository extends JpaRepository<TravelInsuranceCoverageEntity, Long> {
 
-    Optional<TravelInsuranceCoverageEntity>
-    findByInsurerIdAndCoverageCodeAndDeletedAtIsNull(
-            Long insurerId,
-            String coverageCode
-    );
+    Optional<TravelInsuranceCoverageEntity> findByInsurerIdAndCoverageCodeAndDeletedAtIsNull(Long insurerId,
+            String coverageCode);
+
 }

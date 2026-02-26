@@ -7,16 +7,10 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(
-        name = "travel_insurance_plan_family_map",
-        uniqueConstraints = {
-                @UniqueConstraint(name = "uq_family_plan", columnNames = {"family_id","plan_id"})
-        },
-        indexes = {
-                @Index(name = "idx_map_family", columnList = "family_id"),
-                @Index(name = "idx_map_plan", columnList = "plan_id")
-        }
-)
+@Table(name = "travel_insurance_plan_family_map",
+        uniqueConstraints = { @UniqueConstraint(name = "uq_family_plan", columnNames = { "family_id", "plan_id" }) },
+        indexes = { @Index(name = "idx_map_family", columnList = "family_id"),
+                @Index(name = "idx_map_plan", columnList = "plan_id") })
 public class TravelInsurancePlanFamilyMapEntity {
 
     @Id
@@ -31,4 +25,5 @@ public class TravelInsurancePlanFamilyMapEntity {
 
     @Column(name = "created_at", nullable = false, updatable = false, insertable = false)
     private java.time.LocalDateTime createdAt;
+
 }

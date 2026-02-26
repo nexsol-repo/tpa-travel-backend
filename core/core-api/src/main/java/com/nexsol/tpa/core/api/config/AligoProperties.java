@@ -9,8 +9,11 @@ import org.springframework.validation.annotation.Validated;
 @Validated
 @ConfigurationProperties(prefix = "aligo")
 public class AligoProperties {
-    private String apiKey;   // ALIGO_API_KEY
-    private String userId;   // ALIGO_USER_ID
-    private String sender;   // ALIGO_SENDER (발신번호)
-}
 
+    private String apiKey; // ALIGO_API_KEY
+
+    private String userId; // ALIGO_USER_ID
+
+    private String sender; // ALIGO_SENDER (발신번호)
+
+}
