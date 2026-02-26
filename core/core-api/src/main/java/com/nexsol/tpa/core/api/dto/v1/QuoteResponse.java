@@ -134,11 +134,11 @@ public class QuoteResponse {
 
         private String ageBandLabel; // "15~69세"
 
-        private int count; // 해당 연령대 인원수
+        private Integer count; // 해당 연령대 인원수 (null = 보장없음)
 
-        private long insdAmt; // 해당 연령대 보장금액
+        private Long insdAmt; // 해당 연령대 보장금액 (null = 보장없음)
 
-        private long premSum; // 해당 연령대 보험료 합 (optional)
+        private Long premSum; // 해당 연령대 보험료 합 (null = 보장없음)
 
     }
 
