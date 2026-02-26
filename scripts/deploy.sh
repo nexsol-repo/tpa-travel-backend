@@ -73,6 +73,9 @@ export COMPOSE_PROJECT_NAME="${NEW_PROJECT}"
 echo "📦 신규 컨테이너 기동: ${NEW_PROJECT} (Port: ${TARGET_PORT})"
 cd "${BASE_PATH}"
 
+# 같은 이름의 잔여 컨테이너가 있으면 제거 (이전 배포 실패 등으로 남아있을 수 있음)
+docker rm -f "${NEW_PROJECT}" 2>/dev/null || true
+
 if ! docker compose -f docker-compose.yml -p "${NEW_PROJECT}" up -d; then
   echo "❌ 컨테이너 기동 실패!"
   cleanup_on_failure
