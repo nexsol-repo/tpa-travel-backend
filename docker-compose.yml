@@ -1,5 +1,6 @@
 services:
   app:
+    container_name: ${COMPOSE_PROJECT_NAME}
     image: ${DOCKER_IMAGE}
     restart: always
     network_mode: host
