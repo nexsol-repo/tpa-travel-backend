@@ -355,7 +355,15 @@ public class MeritzQuotationService {
                 if (age >= b.min && age <= b.max)
                     return b;
             }
-            return null; // 가입불가(예: 70+) 처리용
+            return null;
+        }
+
+        static AgeBand fromCode(String code) {
+            for (AgeBand b : values()) {
+                if (b.code.equals(code))
+                    return b;
+            }
+            return null;
         }
 
     }
@@ -631,7 +639,13 @@ public class MeritzQuotationService {
 
         Map<String, List<QuoteResponse.CoverageUnit>> out = new HashMap<>();
         for (var e : acc.entrySet()) {
-            out.put(e.getKey(), List.copyOf(e.getValue().values()));
+            List<QuoteResponse.CoverageUnit> sorted = e.getValue().values().stream()
+                .sorted(Comparator.comparingInt(u -> {
+                    AgeBand b = AgeBand.fromCode(u.getAgeBandCode());
+                    return b != null ? b.min : Integer.MAX_VALUE;
+                }))
+                .toList();
+            out.put(e.getKey(), sorted);
         }
         return out;
     }
