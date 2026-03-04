@@ -5,6 +5,7 @@ spring:
       ddl-auto: validate
     properties:
       hibernate.default_batch_fetch_size: 100
+      hibernate.jdbc.time_zone: Asia/Seoul
 
 ---
 spring.config.activate.on-profile: local
