@@ -220,6 +220,7 @@ public class MeritzContractService {
                 contract.getInsureStartDate().format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd")));
         body.put("insEdDt",
                 contract.getInsureEndDate().format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd")));
+        log.info("[MERITZ][EST_SAVE] insureStartDate={}, insureEndDate={}", contract.getInsureStartDate(), contract.getInsureEndDate());
         body.put("trvArCd", contract.getCountryCode());
 
         body.put("inspeCnt", contract.getPeople().size());

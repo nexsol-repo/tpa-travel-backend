@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -70,10 +71,10 @@ public class TravelContractEntity extends AuditEntity {
     private LocalDateTime applyDate;
 
     @Column(name = "insure_start_date")
-    private LocalDateTime insureStartDate;
+    private LocalDate insureStartDate;
 
     @Column(name = "insure_end_date")
-    private LocalDateTime insureEndDate;
+    private LocalDate insureEndDate;
 
     @Column(name = "contract_people_name")
     private String contractPeopleName;

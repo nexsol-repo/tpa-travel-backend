@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Getter
 public class ContractCompletedResponse extends BaseResponse {
@@ -64,9 +64,9 @@ public class ContractCompletedResponse extends BaseResponse {
 
         private String status; // PENDING/COMPLETED/ERROR
 
-        private LocalDateTime insureBeginDate;
+        private LocalDate insureBeginDate;
 
-        private LocalDateTime insureEndDate;
+        private LocalDate insureEndDate;
 
         private String contractPeopleName;
 

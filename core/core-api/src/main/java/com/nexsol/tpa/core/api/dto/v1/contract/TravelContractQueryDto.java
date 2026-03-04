@@ -3,6 +3,7 @@ package com.nexsol.tpa.core.api.dto.v1.contract;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -53,9 +54,9 @@ public class TravelContractQueryDto {
 
         private LocalDateTime applyDate;
 
-        private LocalDateTime insureStartDate;
+        private LocalDate insureStartDate;
 
-        private LocalDateTime insureEndDate;
+        private LocalDate insureEndDate;
 
         // 결제 요약(목록에도 보통 필요)
         private Payment payment;
@@ -160,9 +161,9 @@ public class TravelContractQueryDto {
 
         private LocalDateTime applyDate;
 
-        private LocalDateTime insureStartDate;
+        private LocalDate insureStartDate;
 
-        private LocalDateTime insureEndDate;
+        private LocalDate insureEndDate;
 
         private String contractPeopleName;
 
