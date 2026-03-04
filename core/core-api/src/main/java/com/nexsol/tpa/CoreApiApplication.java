@@ -1,6 +1,5 @@
 package com.nexsol.tpa;
 
-import jakarta.annotation.PostConstruct;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
@@ -14,11 +13,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @ConfigurationPropertiesScan(basePackages = "com.nexsol.tpa.core.api")
 @EnableConfigurationProperties(com.nexsol.tpa.core.api.meritz.config.CompaniesConfigsProperties.class)
 public class CoreApiApplication {
-
-    @PostConstruct
-    void setTimeZone() {
-        java.util.TimeZone.setDefault(java.util.TimeZone.getTimeZone("Asia/Seoul"));
-    }
 
     public static void main(String[] args) {
         SpringApplication.run(CoreApiApplication.class, args);
