@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
@@ -34,9 +35,9 @@ public class ContractCancelResponse {
 
         private BigDecimal totalFee;
 
-        private LocalDateTime insureBeginDate;
+        private LocalDate insureBeginDate;
 
-        private LocalDateTime insureEndDate;
+        private LocalDate insureEndDate;
 
         private Insurer insurer;
 

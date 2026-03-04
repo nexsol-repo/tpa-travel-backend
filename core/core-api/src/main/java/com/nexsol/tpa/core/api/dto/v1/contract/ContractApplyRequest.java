@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
 @Getter
@@ -35,9 +35,9 @@ public class ContractApplyRequest {
 
     private String countryName;
 
-    private LocalDateTime insureBeginDate;
+    private LocalDate insureBeginDate;
 
-    private LocalDateTime insureEndDate;
+    private LocalDate insureEndDate;
 
     private String contractPeopleName;
 
