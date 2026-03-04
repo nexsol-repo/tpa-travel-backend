@@ -111,19 +111,9 @@ echo "🔄 Nginx 트래픽 전환 중... (Config: ${NGINX_CONF})"
 if [ ! -f "$NGINX_CONF" ]; then
     echo "⚠️  Nginx 설정 파일(${NGINX_CONF})이 없어 트래픽 전환을 건너뜁니다."
 else
-    sudo cp "$NGINX_CONF" "${NGINX_CONF}.bak"
     sudo sed -i "s/127.0.0.1:[0-9]\{4\}/127.0.0.1:${TARGET_PORT}/g" "$NGINX_CONF"
-
-    if sudo nginx -t 2>/dev/null; then
-        sudo nginx -s reload
-        echo "✅ Nginx 트래픽 전환 완료 → 포트 ${TARGET_PORT}"
-    else
-        echo "❌ Nginx 설정 오류! 백업에서 복원합니다."
-        sudo cp "${NGINX_CONF}.bak" "$NGINX_CONF"
-        sudo nginx -s reload 2>/dev/null || true
-        cleanup_on_failure
-        exit 1
-    fi
+    sudo nginx -t && sudo nginx -s reload
+    echo "✅ Nginx 트래픽 전환 완료 → 포트 ${TARGET_PORT}"
 fi
 
 # 6. 이전 컨테이너 제거
