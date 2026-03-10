@@ -1,0 +1,12 @@
+services:
+  app:
+    container_name: ${COMPOSE_PROJECT_NAME}
+    image: ${DOCKER_IMAGE}
+    restart: always
+    network_mode: host
+    env_file:
+      - .env
+    environment:
+      - TZ=Asia/Seoul
+      - SERVER_PORT=${HOST_PORT}
+      - SPRING_PROFILES_ACTIVE=${TARGET_ENV}

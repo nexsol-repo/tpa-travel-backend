@@ -11,5 +11,13 @@ build/
 *.ipr
 out/
 
+### Environment & Secrets ###
 .env
-.env.**
+.env.*
+**/application-secret*.properties
+
+.classpath
+.project
+**.class
+org.eclipse.**
+org.springframework.ide.eclipse.**

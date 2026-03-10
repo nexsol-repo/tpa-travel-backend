@@ -1,2 +1,9 @@
 .githooks/** linguist-vendored
 gradlew linguist-vendored
+
+# ===== line ending normalization =====
+*.java       text eol=lf
+*.gradle     text eol=lf
+*.properties text eol=lf
+*.yml        text eol=lf
+*.yaml       text eol=lf
