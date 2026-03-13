@@ -11,28 +11,264 @@
 
 This is the Core API documentation.
 
-== Example API
+== 플랜 (Plan)
 
-=== Example GET API
+=== 플랜 리스트 조회
 ==== Curl Request
-include::{snippets}/exampleGet/curl-request.adoc[]
-==== Path Parameters
-include::{snippets}/exampleGet/path-parameters.adoc[]
-==== Query Parameters
-include::{snippets}/exampleGet/query-parameters.adoc[]
+include::{snippets}/meritz-travel-plans/curl-request.adoc[]
+==== Request Fields
+include::{snippets}/meritz-travel-plans/request-fields.adoc[]
 ==== Http Response
-include::{snippets}/exampleGet/http-response.adoc[]
+include::{snippets}/meritz-travel-plans/http-response.adoc[]
 ==== Response Fields
-include::{snippets}/exampleGet/response-fields.adoc[]
+include::{snippets}/meritz-travel-plans/response-fields.adoc[]
 
 '''
 
-=== Example POST API
+=== 플랜 보험료·보장내용 상세
 ==== Curl Request
-include::{snippets}/examplePost/curl-request.adoc[]
+include::{snippets}/meritz-travel-plan-premium/curl-request.adoc[]
 ==== Request Fields
-include::{snippets}/examplePost/request-fields.adoc[]
+include::{snippets}/meritz-travel-plan-premium/request-fields.adoc[]
 ==== Http Response
-include::{snippets}/examplePost/http-response.adoc[]
+include::{snippets}/meritz-travel-plan-premium/http-response.adoc[]
 ==== Response Fields
-include::{snippets}/examplePost/response-fields.adoc[]
+include::{snippets}/meritz-travel-plan-premium/response-fields.adoc[]
+
+'''
+
+== 견적 (Quote) [deprecated]
+
+=== 여행보험 보험료 산출
+==== Curl Request
+include::{snippets}/meritz-travel-quote/curl-request.adoc[]
+==== Request Fields
+include::{snippets}/meritz-travel-quote/request-fields.adoc[]
+==== Http Response
+include::{snippets}/meritz-travel-quote/http-response.adoc[]
+==== Response Fields
+include::{snippets}/meritz-travel-quote/response-fields.adoc[]
+
+'''
+
+=== 플랜별 담보 상세 조회
+==== Curl Request
+include::{snippets}/meritz-travel-plan-coverages/curl-request.adoc[]
+==== Request Fields
+include::{snippets}/meritz-travel-plan-coverages/request-fields.adoc[]
+==== Http Response
+include::{snippets}/meritz-travel-plan-coverages/http-response.adoc[]
+==== Response Fields
+include::{snippets}/meritz-travel-plan-coverages/response-fields.adoc[]
+
+'''
+
+=== 실손제외 보험료 산출
+==== Curl Request
+include::{snippets}/meritz-travel-silson-exclude/curl-request.adoc[]
+==== Request Fields
+include::{snippets}/meritz-travel-silson-exclude/request-fields.adoc[]
+==== Http Response
+include::{snippets}/meritz-travel-silson-exclude/http-response.adoc[]
+==== Response Fields
+include::{snippets}/meritz-travel-silson-exclude/response-fields.adoc[]
+
+'''
+
+== 담보 (Coverage)
+
+=== 담보 단건 조회
+==== Curl Request
+include::{snippets}/meritz-coverage/curl-request.adoc[]
+==== Query Parameters
+include::{snippets}/meritz-coverage/query-parameters.adoc[]
+==== Http Response
+include::{snippets}/meritz-coverage/http-response.adoc[]
+==== Response Fields
+include::{snippets}/meritz-coverage/response-fields.adoc[]
+
+'''
+
+== 국가/도시 (City)
+
+=== 자주 가는 도시 목록
+==== Curl Request
+include::{snippets}/meritz-favorite-cities/curl-request.adoc[]
+==== Http Response
+include::{snippets}/meritz-favorite-cities/http-response.adoc[]
+==== Response Fields
+include::{snippets}/meritz-favorite-cities/response-fields.adoc[]
+
+'''
+
+=== 국가/도시 검색
+==== Curl Request
+include::{snippets}/meritz-cities/curl-request.adoc[]
+==== Query Parameters
+include::{snippets}/meritz-cities/query-parameters.adoc[]
+==== Http Response
+include::{snippets}/meritz-cities/http-response.adoc[]
+==== Response Fields
+include::{snippets}/meritz-cities/response-fields.adoc[]
+
+'''
+
+== 본인인증 (Auth Cert)
+
+=== 인증 완료
+==== Curl Request
+include::{snippets}/auth-cert-complete/curl-request.adoc[]
+==== Request Fields
+include::{snippets}/auth-cert-complete/request-fields.adoc[]
+==== Http Response
+include::{snippets}/auth-cert-complete/http-response.adoc[]
+==== Response Fields
+include::{snippets}/auth-cert-complete/response-fields.adoc[]
+
+'''
+
+=== 인증 이력 완료
+==== Curl Request
+include::{snippets}/auth-cert-history-complete/curl-request.adoc[]
+==== Request Fields
+include::{snippets}/auth-cert-history-complete/request-fields.adoc[]
+==== Http Response
+include::{snippets}/auth-cert-history-complete/http-response.adoc[]
+==== Response Fields
+include::{snippets}/auth-cert-history-complete/response-fields.adoc[]
+
+'''
+
+== 계약 (Contract)
+
+=== 여행자보험 접수
+==== Curl Request
+include::{snippets}/meritz-contract-apply/curl-request.adoc[]
+==== Request Fields
+include::{snippets}/meritz-contract-apply/request-fields.adoc[]
+==== Http Response
+include::{snippets}/meritz-contract-apply/http-response.adoc[]
+==== Response Fields
+include::{snippets}/meritz-contract-apply/response-fields.adoc[]
+
+'''
+
+=== 여행자보험 가입(결제)
+==== Curl Request
+include::{snippets}/meritz-contract-completed/curl-request.adoc[]
+==== Query Parameters
+include::{snippets}/meritz-contract-completed/query-parameters.adoc[]
+==== Request Fields
+include::{snippets}/meritz-contract-completed/request-fields.adoc[]
+==== Http Response
+include::{snippets}/meritz-contract-completed/http-response.adoc[]
+==== Response Fields
+include::{snippets}/meritz-contract-completed/response-fields.adoc[]
+
+'''
+
+=== 여행자보험 취소
+==== Curl Request
+include::{snippets}/meritz-contract-cancel/curl-request.adoc[]
+==== Query Parameters
+include::{snippets}/meritz-contract-cancel/query-parameters.adoc[]
+==== Request Fields
+include::{snippets}/meritz-contract-cancel/request-fields.adoc[]
+==== Http Response
+include::{snippets}/meritz-contract-cancel/http-response.adoc[]
+==== Response Fields
+include::{snippets}/meritz-contract-cancel/response-fields.adoc[]
+
+'''
+
+=== 계약 목록 조회 (내부)
+==== Curl Request
+include::{snippets}/travel-contracts/curl-request.adoc[]
+==== Query Parameters
+include::{snippets}/travel-contracts/query-parameters.adoc[]
+==== Http Response
+include::{snippets}/travel-contracts/http-response.adoc[]
+==== Response Fields
+include::{snippets}/travel-contracts/response-fields.adoc[]
+
+'''
+
+=== 계약 단건 조회 (내부)
+==== Curl Request
+include::{snippets}/travel-contract-detail/curl-request.adoc[]
+==== Path Parameters
+include::{snippets}/travel-contract-detail/path-parameters.adoc[]
+==== Http Response
+include::{snippets}/travel-contract-detail/http-response.adoc[]
+==== Response Fields
+include::{snippets}/travel-contract-detail/response-fields.adoc[]
+
+'''
+
+== 메리츠 계약조회 (Inquiry)
+
+=== 계약 목록 조회
+==== Curl Request
+include::{snippets}/meritz-contract-list/curl-request.adoc[]
+==== Query Parameters
+include::{snippets}/meritz-contract-list/query-parameters.adoc[]
+==== Http Response
+include::{snippets}/meritz-contract-list/http-response.adoc[]
+==== Response Fields
+include::{snippets}/meritz-contract-list/response-fields.adoc[]
+
+'''
+
+=== 계약 조회
+==== Curl Request
+include::{snippets}/meritz-contract-inquiry/curl-request.adoc[]
+==== Query Parameters
+include::{snippets}/meritz-contract-inquiry/query-parameters.adoc[]
+==== Http Response
+include::{snippets}/meritz-contract-inquiry/http-response.adoc[]
+==== Response Fields
+include::{snippets}/meritz-contract-inquiry/response-fields.adoc[]
+
+'''
+
+=== 가입증명서 출력
+==== Curl Request
+include::{snippets}/meritz-contract-certificate/curl-request.adoc[]
+==== Query Parameters
+include::{snippets}/meritz-contract-certificate/query-parameters.adoc[]
+==== Request Fields
+include::{snippets}/meritz-contract-certificate/request-fields.adoc[]
+==== Http Response
+include::{snippets}/meritz-contract-certificate/http-response.adoc[]
+==== Response Fields
+include::{snippets}/meritz-contract-certificate/response-fields.adoc[]
+
+'''
+
+== 결제 (Payment)
+
+=== 카드 승인
+==== Curl Request
+include::{snippets}/meritz-payment-card-approve/curl-request.adoc[]
+==== Query Parameters
+include::{snippets}/meritz-payment-card-approve/query-parameters.adoc[]
+==== Request Fields
+include::{snippets}/meritz-payment-card-approve/request-fields.adoc[]
+==== Http Response
+include::{snippets}/meritz-payment-card-approve/http-response.adoc[]
+==== Response Fields
+include::{snippets}/meritz-payment-card-approve/response-fields.adoc[]
+
+'''
+
+=== 카드 취소
+==== Curl Request
+include::{snippets}/meritz-payment-card-cancel/curl-request.adoc[]
+==== Query Parameters
+include::{snippets}/meritz-payment-card-cancel/query-parameters.adoc[]
+==== Request Fields
+include::{snippets}/meritz-payment-card-cancel/request-fields.adoc[]
+==== Http Response
+include::{snippets}/meritz-payment-card-cancel/http-response.adoc[]
+==== Response Fields
+include::{snippets}/meritz-payment-card-cancel/response-fields.adoc[]

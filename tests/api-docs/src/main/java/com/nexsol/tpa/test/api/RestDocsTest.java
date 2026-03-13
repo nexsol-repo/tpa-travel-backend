@@ -24,8 +24,7 @@ public abstract class RestDocsTest {
 
     protected MockMvc mockController(Object controller) {
         return MockMvcBuilders.standaloneSetup(controller)
-            .apply(MockMvcRestDocumentation.documentationConfiguration(restDocumentation))
-            .build();
+                .apply(MockMvcRestDocumentation.documentationConfiguration(restDocumentation))
+                .build();
     }
-
 }

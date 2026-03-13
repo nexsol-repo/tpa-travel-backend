@@ -2,7 +2,7 @@ plugins {
     id 'java-library'
     id 'org.springframework.boot' apply(false)
     id 'io.spring.dependency-management'
-    id 'io.spring.javaformat' apply(false)
+    id 'com.diffplug.spotless' version '7.0.2' apply(false)
     id 'org.asciidoctor.jvm.convert' apply(false)
 }
 
@@ -103,7 +103,26 @@ subprojects {
         }
     }
 
-    tasks.named('asciidoctor').configure {
+    // --- 문서화 관련 설정 (수정 및 보강된 로직) ---
+    tasks.named('asciidoctor') {
         dependsOn restDocsTest
+        inputs.dir file('build/generated-snippets')
+    }
+    bootJar {
+        dependsOn asciidoctor
+
+        from("${asciidoctor.outputDir}"){
+            into 'static/docs'
+        }
+    }
+
+    tasks.register('copyDocsToResources', Copy) {
+        dependsOn asciidoctor
+        from asciidoctor.outputDir
+        into file("build/resources/main/static/docs") // 실행되는 클래스패스 위치
+    }
+
+    tasks.named('bootRun') {
+        dependsOn 'copyDocsToResources'
     }
 }
