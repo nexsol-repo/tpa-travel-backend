@@ -82,6 +82,7 @@ public class TpaAuthCertResultEntity extends BaseEntity {
     private String certPhone;
 
     /** 대표가입자 정보와 매칭 여부(Y/N) */
+    @Builder.Default
     @Column(name = "matched_yn", nullable = false, length = 1)
     private String matchedYn = "N";
 

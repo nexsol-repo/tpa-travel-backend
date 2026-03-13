@@ -41,6 +41,7 @@ public class TravelInsurePeopleEntity extends BaseEntity {
     @Column(name = "policy_number", length = 50)
     private String policyNumber;
 
+    @Builder.Default
     @Column(name = "insure_premium", nullable = false, precision = 15, scale = 2)
     private BigDecimal insurePremium = BigDecimal.ZERO;
 }

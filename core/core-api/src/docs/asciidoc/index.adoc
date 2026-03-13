@@ -25,32 +25,6 @@ include::{snippets}/meritz-travel-plans/response-fields.adoc[]
 
 '''
 
-=== 플랜 보험료·보장내용 상세
-==== Curl Request
-include::{snippets}/meritz-travel-plan-premium/curl-request.adoc[]
-==== Request Fields
-include::{snippets}/meritz-travel-plan-premium/request-fields.adoc[]
-==== Http Response
-include::{snippets}/meritz-travel-plan-premium/http-response.adoc[]
-==== Response Fields
-include::{snippets}/meritz-travel-plan-premium/response-fields.adoc[]
-
-'''
-
-== 견적 (Quote) [deprecated]
-
-=== 여행보험 보험료 산출
-==== Curl Request
-include::{snippets}/meritz-travel-quote/curl-request.adoc[]
-==== Request Fields
-include::{snippets}/meritz-travel-quote/request-fields.adoc[]
-==== Http Response
-include::{snippets}/meritz-travel-quote/http-response.adoc[]
-==== Response Fields
-include::{snippets}/meritz-travel-quote/response-fields.adoc[]
-
-'''
-
 === 플랜별 담보 상세 조회
 ==== Curl Request
 include::{snippets}/meritz-travel-plan-coverages/curl-request.adoc[]

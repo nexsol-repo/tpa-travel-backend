@@ -76,74 +76,12 @@ class MeritzQuotationControllerDocsTest extends RestDocsTest {
     }
 
     @Test
-    void planPremium() throws Exception {
+    void planCoverages() throws Exception {
         var family = sampleFamilies().get(0);
         when(planService.findFamilyByPlanId(any(PlanCondition.class), eq(10L))).thenReturn(family);
         when(premiumService.calculateSingle(any(), any(), eq(0)))
                 .thenReturn(samplePremiumMap().get(10L));
         when(coverageService.findCoverages(eq(10L))).thenReturn(sampleCoverageMap().get(10L));
-
-        mockMvc.perform(
-                        post("/v1/meritz/travel/plans/{planId}/premium", 10L)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(
-                                        """
-                {
-                  "insurerId": 1,
-                  "insBgnDt": "20260315",
-                  "insEdDt": "20260320",
-                  "trvArCd": "JP",
-                  "representativeIndex": 0,
-                  "insuredList": [
-                    { "birth": "19900101", "gender": "1" },
-                    { "birth": "19920515", "gender": "2" }
-                  ]
-                }
-                """))
-                .andDo(print())
-                .andDo(
-                        document(
-                                "meritz-travel-plan-premium",
-                                requestFields(quoteRequestFields()),
-                                responseFields(planDetailResponseFields())));
-    }
-
-    @Test
-    void quote() throws Exception {
-        when(planService.findQuoteFamilies(any(PlanCondition.class))).thenReturn(sampleFamilies());
-        when(premiumService.calculateAll(any(), any())).thenReturn(samplePremiumMap());
-        when(coverageService.findCoveragesForFamilies(any())).thenReturn(sampleCoverageMap());
-
-        mockMvc.perform(
-                        post("/v1/meritz/travel/quote")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(
-                                        """
-                {
-                  "insurerId": 1,
-                  "insBgnDt": "20260315",
-                  "insEdDt": "20260320",
-                  "trvArCd": "JP",
-                  "representativeIndex": 0,
-                  "insuredList": [
-                    { "birth": "19900101", "gender": "1" },
-                    { "birth": "19920515", "gender": "2" }
-                  ]
-                }
-                """))
-                .andDo(print())
-                .andDo(
-                        document(
-                                "meritz-travel-quote",
-                                requestFields(quoteRequestFields()),
-                                responseFields(quoteResponseFields())));
-    }
-
-    @Test
-    void planCoverages() throws Exception {
-        when(planService.findQuoteFamilies(any(PlanCondition.class))).thenReturn(sampleFamilies());
-        when(premiumService.calculateAll(any(), any())).thenReturn(samplePremiumMap());
-        when(coverageService.findCoveragesForFamilies(any())).thenReturn(sampleCoverageMap());
 
         mockMvc.perform(
                         post("/v1/meritz/travel/plans/{planId}/coverages", 10L)
@@ -246,46 +184,6 @@ class MeritzQuotationControllerDocsTest extends RestDocsTest {
             fieldWithPath("plans[].representativeCoverages[].insdAmt")
                     .type(NUMBER)
                     .description("대표 보장금액"),
-        };
-    }
-
-    // ── Plan Detail Response Fields ──
-
-    private static org.springframework.restdocs.payload.FieldDescriptor[]
-            planDetailResponseFields() {
-        return new org.springframework.restdocs.payload.FieldDescriptor[] {
-            fieldWithPath("ok").type(BOOLEAN).description("성공 여부"),
-            fieldWithPath("insuranceInfo.planId").type(NUMBER).description("플랜 ID"),
-            fieldWithPath("insuranceInfo.planNm").type(STRING).description("플랜명"),
-            fieldWithPath("insuranceInfo.planNmRaw").type(STRING).description("플랜명 원본"),
-            fieldWithPath("insuranceInfo.insBgnDt").type(STRING).description("보험시작일자"),
-            fieldWithPath("insuranceInfo.insEdDt").type(STRING).description("보험종료일자"),
-            fieldWithPath("insuranceInfo.totalPremium").type(NUMBER).description("총 보험료"),
-            fieldWithPath("insuranceInfo.currency").type(STRING).description("통화 (KRW)"),
-            fieldWithPath("insuranceInfo.insuredPremiums[].index")
-                    .type(NUMBER)
-                    .description("피보험자 인덱스"),
-            fieldWithPath("insuranceInfo.insuredPremiums[].ppsPrem")
-                    .type(NUMBER)
-                    .description("인당 보험료"),
-            fieldWithPath("insuranceInfo.insuredPremiums[].birth").type(STRING).description("생년월일"),
-            fieldWithPath("insuranceInfo.insuredPremiums[].gndrCd")
-                    .type(STRING)
-                    .description("성별코드"),
-            fieldWithPath("insuranceInfo.insuredPremiums[].ageBandCode")
-                    .type(STRING)
-                    .description("연령대 코드")
-                    .optional(),
-            fieldWithPath("insuranceInfo.insuredPremiums[].ageBandLabel")
-                    .type(STRING)
-                    .description("연령대 라벨")
-                    .optional(),
-            fieldWithPath("coverages[].categoryCode").type(STRING).description("담보 카테고리 코드"),
-            fieldWithPath("coverages[].items[].covCd").type(STRING).description("담보코드"),
-            fieldWithPath("coverages[].items[].covNm").type(STRING).description("담보명"),
-            fieldWithPath("coverages[].items[].insdAmt").type(NUMBER).description("보장금액"),
-            fieldWithPath("coverages[].items[].cur").type(STRING).description("통화"),
-            fieldWithPath("coverages[].items[].titleYn").type(BOOLEAN).description("대표 담보 여부"),
         };
     }
 
