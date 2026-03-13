@@ -1,13 +1,14 @@
 package com.nexsol.tpa.core.api.config;
 
-import com.nexsol.tpa.core.error.CoreErrorLevel;
-import com.nexsol.tpa.core.error.CoreException;
+import java.lang.reflect.Method;
+
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
+import org.springframework.boot.logging.LogLevel;
 
-import java.lang.reflect.Method;
+import com.nexsol.tpa.core.support.error.CoreApiException;
 
 public class AsyncExceptionHandler implements AsyncUncaughtExceptionHandler {
 
@@ -15,25 +16,18 @@ public class AsyncExceptionHandler implements AsyncUncaughtExceptionHandler {
 
     @Override
     public void handleUncaughtException(Throwable e, Method method, @Nullable Object... params) {
-        if (e instanceof CoreException) {
-            CoreException coreException = (CoreException) e;
-            CoreErrorLevel level = coreException.getErrorType().getLevel();
+        if (e instanceof CoreApiException coreApiException) {
+            LogLevel level = coreApiException.getCoreApiErrorType().getLogLevel();
 
-            switch (level) {
-                case ERROR:
-                    log.error("CoreException : {}", e.getMessage(), e);
-                    break;
-                case WARN:
-                    log.warn("CoreException : {}", e.getMessage(), e);
-                    break;
-                default:
-                    log.info("CoreException : {}", e.getMessage(), e);
-                    break;
+            if (level == LogLevel.ERROR) {
+                log.error("CoreApiException : {}", e.getMessage(), e);
+            } else if (level == LogLevel.WARN) {
+                log.warn("CoreApiException : {}", e.getMessage(), e);
+            } else {
+                log.info("CoreApiException : {}", e.getMessage(), e);
             }
-        }
-        else {
+        } else {
             log.error("Exception : {}", e.getMessage(), e);
         }
     }
-
 }

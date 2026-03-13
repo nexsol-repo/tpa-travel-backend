@@ -12,5 +12,4 @@ public class HealthController {
     public ResponseEntity<Object> health() {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
-
 }

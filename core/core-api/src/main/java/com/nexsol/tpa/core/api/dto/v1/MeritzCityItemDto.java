@@ -18,5 +18,4 @@ public class MeritzCityItemDto {
     private String engCityNm;
 
     private String trvRskGrdeCd;
-
 }
