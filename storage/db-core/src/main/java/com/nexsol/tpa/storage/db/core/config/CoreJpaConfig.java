@@ -9,6 +9,4 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableTransactionManagement
 @EntityScan(basePackages = "com.nexsol.tpa.storage.db.core")
 @EnableJpaRepositories(basePackages = "com.nexsol.tpa.storage.db.core")
-class CoreJpaConfig {
-
-}
+class CoreJpaConfig {}
