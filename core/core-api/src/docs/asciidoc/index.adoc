@@ -28,6 +28,8 @@ include::{snippets}/meritz-travel-plans/response-fields.adoc[]
 === 플랜별 담보 상세 조회
 ==== Curl Request
 include::{snippets}/meritz-travel-plan-coverages/curl-request.adoc[]
+==== Path Parameters
+include::{snippets}/meritz-travel-plan-coverages/path-parameters.adoc[]
 ==== Request Fields
 include::{snippets}/meritz-travel-plan-coverages/request-fields.adoc[]
 ==== Http Response
@@ -40,6 +42,8 @@ include::{snippets}/meritz-travel-plan-coverages/response-fields.adoc[]
 === 실손제외 보험료 산출
 ==== Curl Request
 include::{snippets}/meritz-travel-silson-exclude/curl-request.adoc[]
+==== Path Parameters
+include::{snippets}/meritz-travel-silson-exclude/path-parameters.adoc[]
 ==== Request Fields
 include::{snippets}/meritz-travel-silson-exclude/request-fields.adoc[]
 ==== Http Response

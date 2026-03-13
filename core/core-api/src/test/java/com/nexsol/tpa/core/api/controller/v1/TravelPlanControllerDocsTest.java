@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.payload.JsonFieldType.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
@@ -30,7 +31,7 @@ import com.nexsol.tpa.storage.db.core.entity.TravelInsurancePlanEntity;
 import com.nexsol.tpa.test.api.RestDocsTest;
 
 @Tag("restdocs")
-class MeritzQuotationControllerDocsTest extends RestDocsTest {
+class TravelPlanControllerDocsTest extends RestDocsTest {
 
     private final TravelPlanService planService = mock(TravelPlanService.class);
     private final TravelCoverageService coverageService = mock(TravelCoverageService.class);
@@ -103,6 +104,7 @@ class MeritzQuotationControllerDocsTest extends RestDocsTest {
                 .andDo(
                         document(
                                 "meritz-travel-plan-coverages",
+                                pathParameters(parameterWithName("planId").description("플랜 ID")),
                                 requestFields(quoteRequestFields()),
                                 responseFields(planCardResponseFields())));
     }
@@ -136,6 +138,7 @@ class MeritzQuotationControllerDocsTest extends RestDocsTest {
                 .andDo(
                         document(
                                 "meritz-travel-silson-exclude",
+                                pathParameters(parameterWithName("planId").description("플랜 ID")),
                                 requestFields(quoteRequestFields()),
                                 responseFields(planCardResponseFields())));
     }
@@ -184,88 +187,6 @@ class MeritzQuotationControllerDocsTest extends RestDocsTest {
             fieldWithPath("plans[].representativeCoverages[].insdAmt")
                     .type(NUMBER)
                     .description("대표 보장금액"),
-        };
-    }
-
-    // ── Quote Response Fields ──
-
-    private static org.springframework.restdocs.payload.FieldDescriptor[] quoteResponseFields() {
-        return new org.springframework.restdocs.payload.FieldDescriptor[] {
-            fieldWithPath("ok").type(BOOLEAN).description("성공 여부"),
-            fieldWithPath("errCd").type(STRING).description("에러 코드").optional(),
-            fieldWithPath("errMsg").type(STRING).description("에러 메시지").optional(),
-            fieldWithPath("rawErrMsg").type(STRING).description("원본 에러 메시지").optional(),
-            fieldWithPath("period.insBgnDt").type(STRING).description("보험시작일자"),
-            fieldWithPath("period.insEdDt").type(STRING).description("보험종료일자"),
-            fieldWithPath("insuredCount").type(NUMBER).description("피보험자 수"),
-            fieldWithPath("representativeIndex").type(NUMBER).description("대표 피보험자 인덱스"),
-
-            // plans[]
-            fieldWithPath("plans[].planId").type(NUMBER).description("플랜 ID"),
-            fieldWithPath("plans[].planGrpCd").type(STRING).description("플랜그룹코드"),
-            fieldWithPath("plans[].planCd").type(STRING).description("플랜코드"),
-            fieldWithPath("plans[].planNm").type(STRING).description("플랜명"),
-            fieldWithPath("plans[].planNmRaw").type(STRING).description("플랜명 원본"),
-
-            // plans[].premium
-            fieldWithPath("plans[].premium.ttPrem").type(NUMBER).description("총 보험료"),
-            fieldWithPath("plans[].premium.currency").type(STRING).description("통화 (KRW)"),
-
-            // plans[].insuredPremiums[]
-            fieldWithPath("plans[].insuredPremiums[].index").type(NUMBER).description("피보험자 인덱스"),
-            fieldWithPath("plans[].insuredPremiums[].currency").type(STRING).description("통화"),
-            fieldWithPath("plans[].insuredPremiums[].ppsPrem").type(NUMBER).description("인당 보험료"),
-            fieldWithPath("plans[].insuredPremiums[].birth").type(STRING).description("생년월일"),
-            fieldWithPath("plans[].insuredPremiums[].gndrCd").type(STRING).description("성별코드"),
-            fieldWithPath("plans[].insuredPremiums[].cusNm")
-                    .type(STRING)
-                    .description("고객명")
-                    .optional(),
-            fieldWithPath("plans[].insuredPremiums[].cusEngNm")
-                    .type(STRING)
-                    .description("고객영문명")
-                    .optional(),
-            fieldWithPath("plans[].insuredPremiums[].ageBandCode")
-                    .type(STRING)
-                    .description("연령대 코드")
-                    .optional(),
-            fieldWithPath("plans[].insuredPremiums[].ageBandLabel")
-                    .type(STRING)
-                    .description("연령대 라벨")
-                    .optional(),
-
-            // plans[].coverageTitle
-            fieldWithPath("plans[].coverageTitle").type(STRING).description("보장 타이틀").optional(),
-
-            // plans[].coverages[]
-            fieldWithPath("plans[].coverages[].covCd").type(STRING).description("담보코드"),
-            fieldWithPath("plans[].coverages[].covNm").type(STRING).description("담보명"),
-            fieldWithPath("plans[].coverages[].insdAmt").type(NUMBER).description("보장금액"),
-            fieldWithPath("plans[].coverages[].cur").type(STRING).description("통화"),
-            fieldWithPath("plans[].coverages[].categoryCode")
-                    .type(STRING)
-                    .description("카테고리 코드")
-                    .optional(),
-
-            // plans[].coverages[].units[]
-            fieldWithPath("plans[].coverages[].units[].ageBandCode")
-                    .type(STRING)
-                    .description("연령대 코드"),
-            fieldWithPath("plans[].coverages[].units[].ageBandLabel")
-                    .type(STRING)
-                    .description("연령대 라벨"),
-            fieldWithPath("plans[].coverages[].units[].count")
-                    .type(NUMBER)
-                    .description("인원수")
-                    .optional(),
-            fieldWithPath("plans[].coverages[].units[].insdAmt")
-                    .type(NUMBER)
-                    .description("보장금액")
-                    .optional(),
-            fieldWithPath("plans[].coverages[].units[].premSum")
-                    .type(NUMBER)
-                    .description("보험료 합")
-                    .optional(),
         };
     }
 

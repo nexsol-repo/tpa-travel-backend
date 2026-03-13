@@ -7,8 +7,8 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import com.nexsol.tpa.core.api.controller.v1.request.PlanRequest;
+import com.nexsol.tpa.core.api.controller.v1.response.PlanCoverageResponse;
 import com.nexsol.tpa.core.api.controller.v1.response.PlanListResponse;
-import com.nexsol.tpa.core.api.controller.v1.response.QuoteResponse;
 import com.nexsol.tpa.core.domain.coverage.TravelCoverageService;
 import com.nexsol.tpa.core.domain.plan.TravelPlanReader.PlanFamily;
 import com.nexsol.tpa.core.domain.plan.TravelPlanService;
@@ -39,7 +39,7 @@ public class TravelPlanController {
     }
 
     @PostMapping(value = "/plans/{planId}/coverages", produces = MediaType.APPLICATION_JSON_VALUE)
-    public QuoteResponse.PlanCard planCoverages(
+    public PlanCoverageResponse planCoverages(
             @PathVariable Long planId, @Valid @RequestBody PlanRequest request) {
         PlanFamily family = planService.findFamilyByPlanId(request.toPlanCondition(), planId);
         PremiumResult premium =
@@ -47,13 +47,13 @@ public class TravelPlanController {
                         request.toPlanCondition(), family, request.getRepresentativeIndex());
         List<QuoteResult.DbCoverage> coverages =
                 coverageService.findCoverages(family.repPlan().getId());
-        return QuoteResponse.toPlanCard(family, premium, coverages);
+        return PlanCoverageResponse.of(family, premium, coverages);
     }
 
     @PostMapping(
             value = "/plans/{planId}/silson-exclude",
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public QuoteResponse.PlanCard silsonExclude(
+    public PlanCoverageResponse silsonExclude(
             @PathVariable Long planId, @Valid @RequestBody PlanRequest request) {
         PlanFamily silsonFamily =
                 planService.findSilsonExcludeFamily(request.toPlanCondition(), planId);
@@ -62,6 +62,6 @@ public class TravelPlanController {
                         request.toPlanCondition(), silsonFamily, request.getRepresentativeIndex());
         List<QuoteResult.DbCoverage> coverages =
                 coverageService.findCoverages(silsonFamily.repPlan().getId());
-        return QuoteResponse.toPlanCard(silsonFamily, premium, coverages);
+        return PlanCoverageResponse.of(silsonFamily, premium, coverages);
     }
 }
