@@ -3,7 +3,6 @@ package com.nexsol.tpa.core.domain.certificate;
 import org.springframework.stereotype.Service;
 
 import com.nexsol.tpa.client.meritz.bridge.dto.MeritzBridgeApiResponse;
-import com.nexsol.tpa.client.meritz.contract.CertificateApiResult;
 import com.nexsol.tpa.client.meritz.contract.MeritzContractClient;
 import com.nexsol.tpa.core.domain.contract.ContractReader;
 import com.nexsol.tpa.core.domain.contract.ContractValidator;
@@ -28,6 +27,7 @@ public class CertificateService {
     private final PlanReader planReader;
     private final SnapshotAppender snapshotAppender;
     private final ObjectMapper objectMapper;
+    private final CertificateLinkIssuer certificateLinkIssuer;
 
     /** 증명서 원본 응답 반환 */
     public MeritzBridgeApiResponse issue(String company, CertificateCommand cmd) {
@@ -59,25 +59,7 @@ public class CertificateService {
 
     /** 증명서 링크 URL만 반환 */
     public String issueLink(String company, Long contractId, String otptDiv, String otptTpCd) {
-        String div = normalizeOrDefault(otptDiv, "A");
-        String tp = normalizeOrDefault(otptTpCd, "V");
-
-        CertificateParams params = resolveParams(contractId);
-        validateParams(params);
-
-        CertificateApiResult result =
-                meritzClient.issueCertificate(
-                        company,
-                        params.polNo,
-                        params.pdCd,
-                        params.quotGrpNo,
-                        params.quotReqNo,
-                        div,
-                        tp);
-
-        snapshotAppender.append(contractId, params.insurerId, "CERTIFICATE", toJson(result));
-
-        return result.linkUrl();
+        return certificateLinkIssuer.issue(company, contractId, otptDiv, otptTpCd);
     }
 
     private CertificateParams resolveParams(Long contractId) {

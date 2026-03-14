@@ -1,6 +1,7 @@
 package com.nexsol.tpa.client.meritz.payment;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.stereotype.Component;
@@ -24,12 +25,13 @@ public class MeritzPaymentClient {
     public MeritzBridgeApiResponse approveCard(
             String company,
             String polNo,
-            String estNo,
+            String quotGrpNo,
+            String quotReqNo,
             String crdNo,
             String efctPrd,
             String dporNm,
             String dporCd,
-            String apvAmt) {
+            String rcptPrem) {
 
         CompanyConfig cfg = companies.resolve(company);
 
@@ -39,12 +41,20 @@ public class MeritzPaymentClient {
         body.put("aflcoDivCd", cfg.getAflcoDivCd());
         body.put("bizpeNo", cfg.getBizpeNo());
         body.put("polNo", polNo);
-        body.put("estNo", estNo);
-        body.put("crdNo", crdNo);
-        body.put("efctPrd", efctPrd);
-        body.put("dporNm", dporNm);
-        body.put("dporCd", dporCd);
-        body.put("apvAmt", apvAmt);
+        body.put("rcptPrem", rcptPrem);
+
+        Map<String, Object> card = new LinkedHashMap<>();
+        card.put("crdNo", crdNo);
+        card.put("efctPrd", efctPrd);
+        card.put("dporNm", dporNm);
+        card.put("dporCd", dporCd);
+        body.put("ctrTrsInfBcVo", card);
+
+        Map<String, Object> quot = new LinkedHashMap<>();
+        quot.put("quotGrpNo", quotGrpNo);
+        quot.put("quotReqNo", quotReqNo);
+        quot.put("gnrAflcoCd", cfg.getGnrAflcoCd());
+        body.put("coprGrupTrvCtrQuotInfCbcVo", List.of(quot));
 
         MeritzBridgeApiResponse res = bridgeClient.cardApprove(body);
         log.info("[PAYMENT][CARD_APPROVE] success={}, errCd={}", res.isSuccess(), res.getErrCd());

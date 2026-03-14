@@ -9,7 +9,9 @@ public class MeritzCardApproveRequest {
 
     private String polNo;
 
-    private String estNo;
+    private String quotGrpNo;
+
+    private String quotReqNo;
 
     private String crdNo;
 
@@ -19,5 +21,5 @@ public class MeritzCardApproveRequest {
 
     private String dporCd;
 
-    private String apvAmt;
+    private String rcptPrem;
 }

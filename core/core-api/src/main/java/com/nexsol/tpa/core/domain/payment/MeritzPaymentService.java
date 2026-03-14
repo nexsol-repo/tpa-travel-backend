@@ -22,17 +22,26 @@ public class MeritzPaymentService {
     public MeritzBridgeApiResponse approveCard(
             String company,
             String polNo,
-            String estNo,
+            String quotGrpNo,
+            String quotReqNo,
             String crdNo,
             String efctPrd,
             String dporNm,
             String dporCd,
-            String apvAmt) {
+            String rcptPrem) {
 
         String resolvedCompany = resolveCompany(company);
         MeritzBridgeApiResponse res =
                 paymentClient.approveCard(
-                        resolvedCompany, polNo, estNo, crdNo, efctPrd, dporNm, dporCd, apvAmt);
+                        resolvedCompany,
+                        polNo,
+                        quotGrpNo,
+                        quotReqNo,
+                        crdNo,
+                        efctPrd,
+                        dporNm,
+                        dporCd,
+                        rcptPrem);
 
         if (!res.isSuccess()) {
             throw new CoreApiException(

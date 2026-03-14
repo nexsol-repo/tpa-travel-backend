@@ -40,7 +40,7 @@ class MeritzPaymentControllerDocsTest extends RestDocsTest {
         response.setSuccess(true);
         response.setData(Map.of("apvNo", "APV20260312001", "apvDt", "20260312"));
 
-        when(service.approveCard(eq("TPA"), any(), any(), any(), any(), any(), any(), any()))
+        when(service.approveCard(eq("TPA"), any(), any(), any(), any(), any(), any(), any(), any()))
                 .thenReturn(response);
 
         mockMvc.perform(
@@ -51,12 +51,13 @@ class MeritzPaymentControllerDocsTest extends RestDocsTest {
                                         """
                 {
                   "polNo": "POL202603120001",
-                  "estNo": "EST001",
+                  "quotGrpNo": "QG001",
+                  "quotReqNo": "QR001",
                   "crdNo": "1234567890123456",
                   "efctPrd": "202803",
                   "dporNm": "홍길동",
                   "dporCd": "01",
-                  "apvAmt": "27000"
+                  "rcptPrem": "27000"
                 }
                 """))
                 .andDo(print())
@@ -69,14 +70,21 @@ class MeritzPaymentControllerDocsTest extends RestDocsTest {
                                                 .optional()),
                                 requestFields(
                                         fieldWithPath("polNo").type(STRING).description("증권번호"),
-                                        fieldWithPath("estNo").type(STRING).description("견적번호"),
+                                        fieldWithPath("quotGrpNo")
+                                                .type(STRING)
+                                                .description("견적그룹번호"),
+                                        fieldWithPath("quotReqNo")
+                                                .type(STRING)
+                                                .description("견적요청번호"),
                                         fieldWithPath("crdNo").type(STRING).description("카드번호"),
                                         fieldWithPath("efctPrd")
                                                 .type(STRING)
                                                 .description("유효기간 (YYYYMM)"),
                                         fieldWithPath("dporNm").type(STRING).description("예금주명"),
                                         fieldWithPath("dporCd").type(STRING).description("예금주코드"),
-                                        fieldWithPath("apvAmt").type(STRING).description("승인금액")),
+                                        fieldWithPath("rcptPrem")
+                                                .type(STRING)
+                                                .description("영수보험료")),
                                 responseFields(bridgeResponseFields())));
     }
 

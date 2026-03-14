@@ -2,17 +2,23 @@ package com.nexsol.tpa.core.domain.subscription;
 
 import org.springframework.stereotype.Component;
 
+import com.nexsol.tpa.core.domain.plan.PlanReader;
 import com.nexsol.tpa.storage.db.core.entity.TravelContractEntity;
 import com.nexsol.tpa.storage.db.core.entity.TravelInsurancePlanEntity;
 import com.nexsol.tpa.storage.db.core.entity.TravelInsurerEntity;
 
+import lombok.RequiredArgsConstructor;
+
 @Component
+@RequiredArgsConstructor
 public class SubscriptionResultReader {
 
-    public SubscriptionResult read(
-            TravelContractEntity contract,
-            TravelInsurancePlanEntity plan,
-            TravelInsurerEntity insurer) {
+    private final PlanReader planReader;
+
+    public SubscriptionResult read(TravelContractEntity contract) {
+        TravelInsurancePlanEntity plan = planReader.getById(contract.getPlanId());
+        TravelInsurerEntity insurer = planReader.getInsurerById(plan.getInsurerId());
+
         return SubscriptionResult.success(
                 new SubscriptionResult.ContractInfo(
                         contract.getId(),

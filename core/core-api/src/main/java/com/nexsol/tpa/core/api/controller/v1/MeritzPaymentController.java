@@ -23,12 +23,13 @@ public class MeritzPaymentController {
         return service.approveCard(
                 company,
                 request.getPolNo(),
-                request.getEstNo(),
+                request.getQuotGrpNo(),
+                request.getQuotReqNo(),
                 request.getCrdNo(),
                 request.getEfctPrd(),
                 request.getDporNm(),
                 request.getDporCd(),
-                request.getApvAmt());
+                request.getRcptPrem());
     }
 
     @PostMapping("/payments/cards/cancel")

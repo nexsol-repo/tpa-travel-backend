@@ -58,12 +58,18 @@ public class MeritzContractClient {
                         .toList();
         body.put("opapiTrvPremCmptInspeInfCbcVo", insuredVos);
 
-        Map<String, Object> card = new LinkedHashMap<>();
-        card.put("crdNo", req.cardNo());
-        card.put("efctPrd", req.efctPrd());
-        card.put("dporNm", req.dporNm());
-        card.put("dporCd", req.dporCd());
-        body.put("ctrTrsInfBcVo", card);
+        if (req.grupSalChnDivCd() != null && !req.grupSalChnDivCd().isBlank()) {
+            body.put("grupSalChnDivCd", req.grupSalChnDivCd());
+        }
+
+        if (req.cardNo() != null && !req.cardNo().isBlank()) {
+            Map<String, Object> card = new LinkedHashMap<>();
+            card.put("crdNo", req.cardNo());
+            card.put("efctPrd", req.efctPrd());
+            card.put("dporNm", req.dporNm());
+            card.put("dporCd", req.dporCd());
+            body.put("ctrTrsInfBcVo", card);
+        }
 
         MeritzBridgeApiResponse res = bridgeClient.estimateSave(body);
         log.info("[MERITZ][EST_SAVE] success={}, errCd={}", res.isSuccess(), res.getErrCd());
@@ -239,6 +245,7 @@ public class MeritzContractClient {
             String insBgnDt,
             String insEdDt,
             String trvArCd,
+            String grupSalChnDivCd,
             String cardNo,
             String efctPrd,
             String dporNm,
