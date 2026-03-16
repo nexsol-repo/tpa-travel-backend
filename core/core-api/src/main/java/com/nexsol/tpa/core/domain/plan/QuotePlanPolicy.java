@@ -8,13 +8,11 @@ import org.springframework.stereotype.Component;
 
 import com.nexsol.tpa.core.domain.plan.TravelPlanReader.PlanFamily;
 import com.nexsol.tpa.core.domain.premium.PlanCondition;
-import com.nexsol.tpa.core.support.error.CoreApiErrorType;
-import com.nexsol.tpa.core.support.error.CoreApiException;
 import com.nexsol.tpa.storage.db.core.entity.TravelInsurancePlanEntity;
 
 /**
  * 견적 플랜 선택 정책 도구 (Tool Layer).
- * planType 결정, 패밀리 필터링, 연령대 매핑, 실손제외 매핑 등의 규칙을 담당한다.
+ * planType 결정, 패밀리 필터링, 연령대 매핑 등의 규칙을 담당한다.
  */
 @Component
 public class QuotePlanPolicy {
@@ -49,50 +47,6 @@ public class QuotePlanPolicy {
             result.add(f);
         }
         return result;
-    }
-
-    /**
-     * 선택된 planId의 패밀리 → 대응하는 실손제외 패밀리를 찾는다.
-     * isLoss 플래그 기반: 같은 planType의 실손제외(isLoss=false) 패밀리를 찾는다.
-     */
-    public PlanFamily resolveSilsonExcludeFamily(
-            List<PlanFamily> allFamilies, Long planId, String planType) {
-        PlanFamily sourceFamily = findFamilyByPlanId(allFamilies, planId);
-        String typeMarker = "플랜" + planType;
-
-        return allFamilies.stream()
-                .filter(f -> f.familyName() != null)
-                .filter(f -> f.familyName().contains(typeMarker))
-                .filter(f -> !f.isLoss())
-                .filter(f -> matchesFamilyBase(sourceFamily.familyName(), f.familyName()))
-                .findFirst()
-                .orElseThrow(
-                        () ->
-                                new CoreApiException(
-                                        CoreApiErrorType.QUOTE_PLAN_NOT_FOUND,
-                                        "실손제외 패밀리 없음. source=" + sourceFamily.familyName()));
-    }
-
-    /**
-     * 패밀리 이름의 기본 부분이 일치하는지 확인한다.
-     * 예: "가뿐한플랜A"와 "가뿐한플랜A 실손제외"는 같은 기본 패밀리.
-     */
-    private boolean matchesFamilyBase(String sourceName, String targetName) {
-        if (sourceName == null || targetName == null) return false;
-        String sourceBase = sourceName.replace(" 실손제외", "").trim();
-        String targetBase = targetName.replace(" 실손제외", "").trim();
-        return sourceBase.equals(targetBase);
-    }
-
-    private PlanFamily findFamilyByPlanId(List<PlanFamily> allFamilies, Long planId) {
-        for (PlanFamily f : allFamilies) {
-            for (TravelInsurancePlanEntity p : f.plans()) {
-                if (Objects.equals(p.getId(), planId)) {
-                    return f;
-                }
-            }
-        }
-        throw new CoreApiException(CoreApiErrorType.QUOTE_PLAN_NOT_FOUND, "planId=" + planId);
     }
 
     /**

@@ -51,6 +51,8 @@ public class PlanListResponse {
 
         private String planNmRaw;
 
+        private Long silsonExcludePlanId;
+
         private long totalPremium;
 
         private String currency;
@@ -75,7 +77,8 @@ public class PlanListResponse {
             PlanCondition cmd,
             List<PlanFamily> families,
             Map<Long, PremiumResult> premiumMap,
-            Map<Long, List<QuoteResult.DbCoverage>> coverageMap) {
+            Map<Long, List<QuoteResult.DbCoverage>> coverageMap,
+            Map<Long, Long> silsonExcludeMap) {
 
         List<PlanSummary> plans = new ArrayList<>();
         for (PlanFamily family : families) {
@@ -97,6 +100,8 @@ public class PlanListResponse {
                                     family.repPlan().getPlanFullName() != null
                                             ? family.repPlan().getPlanFullName()
                                             : family.repPlan().getPlanName())
+                            .silsonExcludePlanId(
+                                    silsonExcludeMap != null ? silsonExcludeMap.get(planId) : null)
                             .totalPremium(premium.totalPremium())
                             .currency("KRW")
                             .representativeCoverages(repCoverages)

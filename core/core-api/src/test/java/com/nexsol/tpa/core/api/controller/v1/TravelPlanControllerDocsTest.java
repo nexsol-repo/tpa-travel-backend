@@ -50,6 +50,8 @@ class TravelPlanControllerDocsTest extends RestDocsTest {
         when(planService.findQuoteFamilies(any(PlanCondition.class))).thenReturn(sampleFamilies());
         when(premiumService.calculateAll(any(), any())).thenReturn(samplePremiumMap());
         when(coverageService.findCoveragesForFamilies(any())).thenReturn(sampleCoverageMap());
+        when(planService.findSilsonExcludePlanIdMap(any(PlanCondition.class)))
+                .thenReturn(Map.of(10L, 20L));
 
         mockMvc.perform(
                         post("/v1/meritz/travel/plans")
@@ -105,41 +107,7 @@ class TravelPlanControllerDocsTest extends RestDocsTest {
                         document(
                                 "meritz-travel-plan-coverages",
                                 pathParameters(parameterWithName("planId").description("플랜 ID")),
-                                requestFields(quoteRequestFields()),
-                                responseFields(planCardResponseFields())));
-    }
-
-    @Test
-    void silsonExclude() throws Exception {
-        var silsonFamily = sampleFamilies().get(0);
-        when(planService.findSilsonExcludeFamily(any(PlanCondition.class), eq(10L)))
-                .thenReturn(silsonFamily);
-        when(premiumService.calculateSingle(any(), any(), eq(0)))
-                .thenReturn(samplePremiumMap().get(10L));
-        when(coverageService.findCoverages(eq(10L))).thenReturn(sampleCoverageMap().get(10L));
-
-        mockMvc.perform(
-                        post("/v1/meritz/travel/plans/{planId}/silson-exclude", 10L)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(
-                                        """
-                        {
-                          "insurerId": 1,
-                          "insBgnDt": "20260315",
-                          "insEdDt": "20260320",
-                          "trvArCd": "JP",
-                          "representativeIndex": 0,
-                          "insuredList": [
-                            { "birth": "19900101", "gender": "1" }
-                          ]
-                        }
-                        """))
-                .andDo(print())
-                .andDo(
-                        document(
-                                "meritz-travel-silson-exclude",
-                                pathParameters(parameterWithName("planId").description("플랜 ID")),
-                                requestFields(quoteRequestFields()),
+                                requestFields(coverageRequestFields()),
                                 responseFields(planCardResponseFields())));
     }
 
@@ -161,6 +129,20 @@ class TravelPlanControllerDocsTest extends RestDocsTest {
         };
     }
 
+    private static org.springframework.restdocs.payload.FieldDescriptor[] coverageRequestFields() {
+        return new org.springframework.restdocs.payload.FieldDescriptor[] {
+            fieldWithPath("insurerId").type(NUMBER).description("보험사 ID"),
+            fieldWithPath("insBgnDt").type(STRING).description("보험시작일자 (YYYYMMDD)"),
+            fieldWithPath("insEdDt").type(STRING).description("보험종료일자 (YYYYMMDD)"),
+            fieldWithPath("trvArCd").type(STRING).description("여행지역코드"),
+            fieldWithPath("representativeIndex").type(NUMBER).description("대표 피보험자 인덱스"),
+            fieldWithPath("insuredList[].birth")
+                    .type(STRING)
+                    .description("피보험자 생년월일 (YYYYMMDD)"),
+            fieldWithPath("insuredList[].gender").type(STRING).description("성별 (1: 남, 2: 여)"),
+        };
+    }
+
     // ── Plan List Response Fields ──
 
     private static org.springframework.restdocs.payload.FieldDescriptor[] planListResponseFields() {
@@ -176,6 +158,10 @@ class TravelPlanControllerDocsTest extends RestDocsTest {
             fieldWithPath("plans[].planCd").type(STRING).description("플랜코드"),
             fieldWithPath("plans[].planNm").type(STRING).description("플랜명"),
             fieldWithPath("plans[].planNmRaw").type(STRING).description("플랜명 원본"),
+            fieldWithPath("plans[].silsonExcludePlanId")
+                    .type(NUMBER)
+                    .description("대응하는 실손제외 플랜 ID")
+                    .optional(),
             fieldWithPath("plans[].totalPremium").type(NUMBER).description("총 보험료"),
             fieldWithPath("plans[].currency").type(STRING).description("통화 (KRW)"),
             fieldWithPath("plans[].representativeCoverages[].covCd")
