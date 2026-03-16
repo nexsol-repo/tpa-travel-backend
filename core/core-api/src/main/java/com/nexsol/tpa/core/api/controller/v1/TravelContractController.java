@@ -29,4 +29,11 @@ public class TravelContractController {
     public TravelContractQueryDto.ContractDetail get(@PathVariable Long id) {
         return queryService.get(id);
     }
+
+    private String decodeKey(String key) {
+        if (key == null || key.isBlank()) {
+            return key;
+        }
+        return key.replace(" ", "+");
+    }
 }
