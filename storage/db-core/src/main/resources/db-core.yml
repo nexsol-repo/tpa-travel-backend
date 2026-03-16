@@ -70,10 +70,19 @@ storage:
       username: ${DB_USERNAME}
       password: ${DB_PASSWORD}
       maximum-pool-size: 5
-      connection-timeout: 1100
+      # DB 타임아웃(600초 가정)보다 30초 짧게 설정 (9분 30초)
+      max-lifetime: 570000
+
+      # 풀에 남는 유휴(Idle) 커넥션을 5분 뒤에 정리 (선택 사항)
+      idle-timeout: 300000
+
+      # 커넥션 획득 대기 시간 (5초로 완화)
+      connection-timeout: 5000
+
+      # 커넥션 유효성 검사 시간 (3초)
+      validation-timeout: 3000
+
       keepalive-time: 30000
-      validation-timeout: 1000
-      max-lifetime: 600000
-      pool-name: core-db-pool
+
       data-source-properties:
         rewriteBatchedStatements: true

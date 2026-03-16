@@ -33,8 +33,7 @@ public class SubscriptionService {
         contractValidator.requirePending(contract);
         subscriptionValidator.validate(cmd, contract);
 
-        SubscriptionApiResult apiResult =
-                subscriptionEstimateSaver.save(company, contract, cmd);
+        SubscriptionApiResult apiResult = subscriptionEstimateSaver.save(company, contract, cmd);
 
         if (!apiResult.success()) {
             subscriptionSnapshotAppender.appendFail(contract, apiResult.rawData());
