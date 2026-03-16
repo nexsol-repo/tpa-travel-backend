@@ -26,6 +26,7 @@ public class TravelPlanReader {
     public record PlanFamily(
             Long familyId,
             String familyName,
+            boolean isLoss,
             TravelInsurancePlanEntity repPlan,
             List<TravelInsurancePlanEntity> plans) {}
 
@@ -42,12 +43,14 @@ public class TravelPlanReader {
 
         Map<Long, List<TravelInsurancePlanEntity>> familyPlans = new LinkedHashMap<>();
         Map<Long, String> familyNames = new LinkedHashMap<>();
+        Map<Long, Boolean> familyLossFlags = new LinkedHashMap<>();
 
         for (PlanFamilyPlanRow r : rows) {
             TravelInsurancePlanEntity p = planById.get(r.getPlanId());
             if (p == null) continue;
             familyPlans.computeIfAbsent(r.getFamilyId(), k -> new ArrayList<>()).add(p);
             familyNames.putIfAbsent(r.getFamilyId(), r.getFamilyName());
+            familyLossFlags.putIfAbsent(r.getFamilyId(), r.getIsLoss() != null && r.getIsLoss());
         }
 
         List<PlanFamily> result = new ArrayList<>();
@@ -57,7 +60,8 @@ public class TravelPlanReader {
 
             List<TravelInsurancePlanEntity> plans = e.getValue();
             TravelInsurancePlanEntity repPlan = pickRepPlan(plans);
-            result.add(new PlanFamily(e.getKey(), name, repPlan, plans));
+            boolean isLoss = familyLossFlags.getOrDefault(e.getKey(), false);
+            result.add(new PlanFamily(e.getKey(), name, isLoss, repPlan, plans));
         }
         return result;
     }

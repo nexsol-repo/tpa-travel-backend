@@ -17,4 +17,6 @@ public interface PlanFamilyPlanRow {
     String getProductCode(); // plan.product_code (pdCd)
 
     String getUnitProductCode(); // plan.unit_product_code (untPdCd)
+
+    Boolean getIsLoss(); // family.is_loss (실손여부)
 }

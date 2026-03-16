@@ -256,7 +256,7 @@ class TravelPlanControllerDocsTest extends RestDocsTest {
                         .unitProductCode("UPD001")
                         .ageGroupId(2)
                         .build();
-        return List.of(new PlanFamily(1L, "가뿐한플랜B", plan, List.of(plan)));
+        return List.of(new PlanFamily(1L, "가뿐한플랜B", true, plan, List.of(plan)));
     }
 
     private Map<Long, PremiumResult> samplePremiumMap() {

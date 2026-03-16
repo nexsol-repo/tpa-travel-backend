@@ -369,7 +369,11 @@ public class QuoteResponse {
 
     private static String toDisplayName(String familyName) {
         if (familyName == null) return null;
-        return familyName.replace("플랜A", "플랜").replace("플랜B", "플랜").replace(" 실손제외", "").trim();
+        return familyName
+                .replace("플랜A", "플랜")
+                .replace("플랜B", "플랜")
+                .replace(" 실손제외", "(실손제외)")
+                .trim();
     }
 
     // ── Static Builders ──

@@ -34,16 +34,18 @@ public class QuotePlanPolicy {
     }
 
     /**
-     * 일반 견적용 패밀리 필터링.
-     * planType(A/B)에 해당하고, 실손제외 패밀리는 제외한다.
+     * 견적용 패밀리 필터링.
+     * planType(A/B)에 해당하고, silsonExclude 여부에 따라 실손포함/제외 패밀리를 반환한다.
      */
-    public List<PlanFamily> filterFamilies(List<PlanFamily> allFamilies, String planType) {
+    public List<PlanFamily> filterFamilies(
+            List<PlanFamily> allFamilies, String planType, boolean silsonExclude) {
         String typeMarker = "플랜" + planType;
         List<PlanFamily> result = new ArrayList<>();
         for (PlanFamily f : allFamilies) {
             if (f.familyName() == null) continue;
             if (!f.familyName().contains(typeMarker)) continue;
-            if (f.familyName().contains("실손제외")) continue;
+            if (silsonExclude && f.isLoss()) continue;
+            if (!silsonExclude && !f.isLoss()) continue;
             result.add(f);
         }
         return result;
@@ -51,22 +53,35 @@ public class QuotePlanPolicy {
 
     /**
      * 선택된 planId의 패밀리 → 대응하는 실손제외 패밀리를 찾는다.
-     * familyName 기반 매칭: "가뿐한플랜A" → "가뿐한플랜A 실손제외"
+     * isLoss 플래그 기반: 같은 planType의 실손제외(isLoss=false) 패밀리를 찾는다.
      */
-    public PlanFamily resolveSilsonExcludeFamily(List<PlanFamily> allFamilies, Long planId) {
-        // 1. planId가 속한 원본 패밀리 찾기
+    public PlanFamily resolveSilsonExcludeFamily(
+            List<PlanFamily> allFamilies, Long planId, String planType) {
         PlanFamily sourceFamily = findFamilyByPlanId(allFamilies, planId);
+        String typeMarker = "플랜" + planType;
 
-        // 2. 대응하는 실손제외 패밀리 찾기
-        String targetName = sourceFamily.familyName() + " 실손제외";
         return allFamilies.stream()
-                .filter(f -> targetName.equals(f.familyName()))
+                .filter(f -> f.familyName() != null)
+                .filter(f -> f.familyName().contains(typeMarker))
+                .filter(f -> !f.isLoss())
+                .filter(f -> matchesFamilyBase(sourceFamily.familyName(), f.familyName()))
                 .findFirst()
                 .orElseThrow(
                         () ->
                                 new CoreApiException(
                                         CoreApiErrorType.QUOTE_PLAN_NOT_FOUND,
                                         "실손제외 패밀리 없음. source=" + sourceFamily.familyName()));
+    }
+
+    /**
+     * 패밀리 이름의 기본 부분이 일치하는지 확인한다.
+     * 예: "가뿐한플랜A"와 "가뿐한플랜A 실손제외"는 같은 기본 패밀리.
+     */
+    private boolean matchesFamilyBase(String sourceName, String targetName) {
+        if (sourceName == null || targetName == null) return false;
+        String sourceBase = sourceName.replace(" 실손제외", "").trim();
+        String targetBase = targetName.replace(" 실손제외", "").trim();
+        return sourceBase.equals(targetBase);
     }
 
     private PlanFamily findFamilyByPlanId(List<PlanFamily> allFamilies, Long planId) {
