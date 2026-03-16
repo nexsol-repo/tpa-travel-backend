@@ -1,5 +1,3 @@
 package com.nexsol.tpa.core.enums;
 
-public enum ExampleEnum {
-
-}
+public enum ExampleEnum {}

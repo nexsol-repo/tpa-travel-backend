@@ -1,16 +1,18 @@
 package com.nexsol.tpa.core.api.controller.v1;
 
-import com.nexsol.tpa.core.api.dto.v1.CityResponseDto;
-import com.nexsol.tpa.core.api.service.v1.FavoriteCityService;
-import com.nexsol.tpa.core.api.service.v1.MeritzReferenceService;
-import com.nexsol.tpa.core.support.response.ApiResponse;
-import lombok.RequiredArgsConstructor;
+import java.util.List;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
+import com.nexsol.tpa.core.api.controller.v1.response.CityResponse;
+import com.nexsol.tpa.core.domain.city.CitySearchService;
+import com.nexsol.tpa.core.domain.city.FavoriteCityService;
+import com.nexsol.tpa.core.support.response.ApiResponse;
+
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/v1/meritz")
@@ -19,17 +21,20 @@ public class MeritzCityController {
 
     private final FavoriteCityService favoriteCityService;
 
-    private final MeritzReferenceService referenceService;
+    private final CitySearchService citySearchService;
 
     @GetMapping("/favorite-cities")
-    public ApiResponse<List<CityResponseDto>> getFavoriteCities() {
-        return ApiResponse.success(favoriteCityService.getFavoriteCities());
+    public ApiResponse<List<CityResponse>> getFavoriteCities() {
+        var cities =
+                favoriteCityService.getFavoriteCities().stream().map(CityResponse::of).toList();
+        return ApiResponse.success(cities);
     }
 
     @GetMapping("/meritz-cities")
-    public ApiResponse<List<CityResponseDto>> getMeritzCities(@RequestParam String keyword,
-            @RequestParam(defaultValue = "2") String type) {
-        return ApiResponse.success(referenceService.getCityNationCodes(keyword, type));
+    public ApiResponse<List<CityResponse>> getMeritzCities(
+            @RequestParam String keyword, @RequestParam(defaultValue = "2") String type) {
+        var cities =
+                citySearchService.search(keyword, type).stream().map(CityResponse::of).toList();
+        return ApiResponse.success(cities);
     }
-
 }

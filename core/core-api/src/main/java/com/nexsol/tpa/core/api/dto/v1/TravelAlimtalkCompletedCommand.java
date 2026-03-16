@@ -18,5 +18,4 @@ public class TravelAlimtalkCompletedCommand {
     private String certificateUrl; // 가입확인서 링크
 
     private String termsUrl; // 약관 링크
-
 }

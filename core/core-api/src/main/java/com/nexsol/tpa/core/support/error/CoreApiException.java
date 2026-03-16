@@ -19,5 +19,4 @@ public class CoreApiException extends RuntimeException {
         // data가 없는 경우 null로 기본 설정
         this(coreApiErrorType, null);
     }
-
 }
