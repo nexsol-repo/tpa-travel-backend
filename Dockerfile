@@ -12,10 +12,11 @@ COPY lint.gradle .
 
 # 멀티 모듈 의존성 캐싱 (변경 빈도가 낮은 설정 파일들)
 COPY core/core-api/build.gradle ./core/core-api/
-COPY core/core-domain/build.gradle ./core/core-domain/
 COPY core/core-enum/build.gradle ./core/core-enum/
 
 COPY clients/client-meritz/build.gradle ./clients/client-meritz/
+COPY clients/client-aligo/build.gradle ./clients/client-aligo/
+COPY clients/client-portone/build.gradle ./clients/client-portone/
 COPY storage/db-core/build.gradle ./storage/db-core/
 COPY support/logging/build.gradle ./support/logging/
 COPY support/monitoring/build.gradle ./support/monitoring/
