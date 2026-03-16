@@ -41,6 +41,7 @@ public interface TravelInsurancePlanRepository
             select
                 fam.id as familyId,
                 fam.familyName as familyName,
+                fam.isLoss as isLoss,
                 p.id as planId,
                 p.ageGroupId as ageGroupId,
                 p.planCode as planCode,

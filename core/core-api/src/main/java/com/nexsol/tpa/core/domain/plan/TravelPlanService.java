@@ -31,7 +31,9 @@ public class TravelPlanService {
 
         List<PlanFamily> allFamilies = planReader.loadAllFamilies(cmd.insurerId());
         String planType = policy.resolvePlanType(cmd.insuredList(), cmd.insBgnDt());
-        List<PlanFamily> families = policy.filterFamilies(allFamilies, planType);
+        boolean silsonExclude =
+                cmd.silsonExclude() != null && cmd.silsonExclude();
+        List<PlanFamily> families = policy.filterFamilies(allFamilies, planType, silsonExclude);
 
         if (families.isEmpty()) {
             throw new CoreApiException(
@@ -57,13 +59,14 @@ public class TravelPlanService {
 
     /**
      * 실손제외 대상 패밀리를 조회한다.
-     * 선택된 planId → 대응하는 실손제외 패밀리 1개 반환.
+     * 선택된 planId → 대응하는 실손제외(isLoss=false) 패밀리 1개 반환.
      */
     public PlanFamily findSilsonExcludeFamily(PlanCondition cmd, Long planId) {
         validateQuoteCommand(cmd);
 
         List<PlanFamily> allFamilies = planReader.loadAllFamilies(cmd.insurerId());
-        return policy.resolveSilsonExcludeFamily(allFamilies, planId);
+        String planType = policy.resolvePlanType(cmd.insuredList(), cmd.insBgnDt());
+        return policy.resolveSilsonExcludeFamily(allFamilies, planId, planType);
     }
 
     // ── 내부 로직 ──
