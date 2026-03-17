@@ -1,16 +1,16 @@
 package com.nexsol.tpa.storage.db.core.entity;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Getter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @Entity
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(
         name = "tpa_channel",
         indexes = {@Index(name = "idx_channel_name", columnList = "channel_name")},
@@ -33,9 +33,8 @@ public class TpaChannelEntity extends BaseEntity {
     @Column(name = "channel_name", nullable = false, length = 100)
     private String channelName;
 
-    @Builder.Default
     @Column(name = "is_active", nullable = false)
-    private Boolean isActive = true;
+    private Boolean isActive;
 
     /**
      * JSON string (MySQL JSON valid check) ex) ["PUNGSU","TRAVEL","SOLAR"]
@@ -46,5 +45,19 @@ public class TpaChannelEntity extends BaseEntity {
 
     /** soft delete */
     @Column(name = "deleted_at")
-    private java.time.LocalDateTime deletedAt;
+    private LocalDateTime deletedAt;
+
+    @Builder
+    public TpaChannelEntity(
+            Long partnerId,
+            String channelCode,
+            String channelName,
+            Boolean isActive,
+            String serviceType) {
+        this.partnerId = partnerId;
+        this.channelCode = channelCode;
+        this.channelName = channelName;
+        this.isActive = isActive == null ? true : isActive;
+        this.serviceType = serviceType;
+    }
 }

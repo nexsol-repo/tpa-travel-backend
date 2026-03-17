@@ -4,16 +4,14 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Getter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @Entity
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(
         name = "tpa_auth_cert_log",
         indexes = {
@@ -56,9 +54,8 @@ public class TpaAuthCertLogEntity extends BaseEntity {
     private String pg;
 
     /** 인증사업자 */
-    @Builder.Default
     @Column(name = "provider", nullable = false, length = 20)
-    private String provider = "DANAL_PASS";
+    private String provider;
 
     /** User-Agent */
     @Column(name = "user_agent", length = 500)
@@ -78,6 +75,36 @@ public class TpaAuthCertLogEntity extends BaseEntity {
     @JdbcTypeCode(SqlTypes.LONGVARCHAR)
     @Column(name = "raw_req_json", columnDefinition = "longtext")
     private String rawReqJson;
+
+    public static TpaAuthCertLogEntity createEmpty() {
+        return new TpaAuthCertLogEntity();
+    }
+
+    @Builder
+    public TpaAuthCertLogEntity(
+            String bizNum,
+            String impUid,
+            String requestId,
+            String pathRoot,
+            String moid,
+            String pg,
+            String provider,
+            String userAgent,
+            String clientIp,
+            String referer,
+            String rawReqJson) {
+        this.bizNum = bizNum;
+        this.impUid = impUid;
+        this.requestId = requestId;
+        this.pathRoot = pathRoot;
+        this.moid = moid;
+        this.pg = pg;
+        this.provider = provider == null ? "DANAL_PASS" : provider;
+        this.userAgent = userAgent;
+        this.clientIp = clientIp;
+        this.referer = referer;
+        this.rawReqJson = rawReqJson;
+    }
 
     public void update(
             String bizNum,

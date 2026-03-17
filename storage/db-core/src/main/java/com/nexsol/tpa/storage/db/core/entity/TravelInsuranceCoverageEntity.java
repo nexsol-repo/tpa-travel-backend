@@ -3,16 +3,14 @@ package com.nexsol.tpa.storage.db.core.entity;
 import java.time.LocalDateTime;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Getter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @Entity
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "travel_insurance_coverage")
 public class TravelInsuranceCoverageEntity extends BaseEntity {
 
@@ -48,4 +46,24 @@ public class TravelInsuranceCoverageEntity extends BaseEntity {
 
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
+
+    @Builder
+    public TravelInsuranceCoverageEntity(
+            Long insurerId,
+            String coverageCode,
+            String coverageName,
+            String groupCode,
+            String claimReason,
+            String claimContent,
+            String subTitle,
+            String subContent) {
+        this.insurerId = insurerId;
+        this.coverageCode = coverageCode;
+        this.coverageName = coverageName;
+        this.groupCode = groupCode;
+        this.claimReason = claimReason;
+        this.claimContent = claimContent;
+        this.subTitle = subTitle;
+        this.subContent = subContent;
+    }
 }

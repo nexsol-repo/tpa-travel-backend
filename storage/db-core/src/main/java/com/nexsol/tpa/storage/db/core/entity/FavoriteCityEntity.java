@@ -3,14 +3,15 @@ package com.nexsol.tpa.storage.db.core.entity;
 import java.time.LocalDateTime;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "travel_favorite_city")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Builder
+@Table(name = "travel_favorite_city")
 public class FavoriteCityEntity extends BaseEntity {
 
     @Id
@@ -41,10 +42,22 @@ public class FavoriteCityEntity extends BaseEntity {
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
-    private void prePersist() {
-        if (sortOrder == null) {
-            sortOrder = 0;
-        }
+    @Builder
+    public FavoriteCityEntity(
+            String countryCode,
+            String countryNameKorean,
+            String countryNameEnglish,
+            String cityNameKorean,
+            String cityNameEnglish,
+            String travelRiskGradeCode,
+            Integer sortOrder) {
+        this.countryCode = countryCode;
+        this.countryNameKorean = countryNameKorean;
+        this.countryNameEnglish = countryNameEnglish;
+        this.cityNameKorean = cityNameKorean;
+        this.cityNameEnglish = cityNameEnglish;
+        this.travelRiskGradeCode = travelRiskGradeCode;
+        this.sortOrder = sortOrder == null ? 0 : sortOrder;
     }
 
     public void changeSortOrder(int sortOrder, String actor) {

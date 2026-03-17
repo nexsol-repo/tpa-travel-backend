@@ -3,16 +3,14 @@ package com.nexsol.tpa.storage.db.core.entity;
 import java.time.LocalDateTime;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Getter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @Entity
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(
         name = "tpa_insurer",
         uniqueConstraints = {
@@ -43,11 +41,24 @@ public class TravelInsurerEntity extends BaseEntity {
     private String serviceType;
 
     /** 사용 여부 */
-    @Builder.Default
     @Column(name = "is_active", nullable = false)
-    private Boolean isActive = true;
+    private Boolean isActive;
 
     /** 삭제일시 (soft delete) */
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
+
+    @Builder
+    public TravelInsurerEntity(
+            String insurerCode,
+            String insurerName,
+            String apiBaseUrl,
+            String serviceType,
+            Boolean isActive) {
+        this.insurerCode = insurerCode;
+        this.insurerName = insurerName;
+        this.apiBaseUrl = apiBaseUrl;
+        this.serviceType = serviceType;
+        this.isActive = isActive == null ? true : isActive;
+    }
 }

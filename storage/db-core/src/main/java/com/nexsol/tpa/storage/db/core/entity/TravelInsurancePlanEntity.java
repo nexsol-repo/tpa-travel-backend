@@ -3,16 +3,14 @@ package com.nexsol.tpa.storage.db.core.entity;
 import java.time.LocalDate;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Getter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @Entity
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "travel_insurance_plan")
 public class TravelInsurancePlanEntity extends BaseEntity {
 
@@ -53,11 +51,41 @@ public class TravelInsurancePlanEntity extends BaseEntity {
     @Column(name = "effective_to")
     private LocalDate effectiveTo;
 
-    @Builder.Default
     @Column(name = "is_active", nullable = false)
-    private Boolean isActive = true;
+    private Boolean isActive;
 
-    @Builder.Default
     @Column(name = "sort_order", nullable = false)
-    private Integer sortOrder = 0;
+    private Integer sortOrder;
+
+    @Builder
+    public TravelInsurancePlanEntity(
+            Long id,
+            Long insurerId,
+            String insuranceProductName,
+            String planName,
+            String productCode,
+            String unitProductCode,
+            String planGroupCode,
+            String planCode,
+            Integer ageGroupId,
+            String planFullName,
+            LocalDate effectiveFrom,
+            LocalDate effectiveTo,
+            Boolean isActive,
+            Integer sortOrder) {
+        this.id = id;
+        this.insurerId = insurerId;
+        this.insuranceProductName = insuranceProductName;
+        this.planName = planName;
+        this.productCode = productCode;
+        this.unitProductCode = unitProductCode;
+        this.planGroupCode = planGroupCode;
+        this.planCode = planCode;
+        this.ageGroupId = ageGroupId;
+        this.planFullName = planFullName;
+        this.effectiveFrom = effectiveFrom;
+        this.effectiveTo = effectiveTo;
+        this.isActive = isActive == null ? true : isActive;
+        this.sortOrder = sortOrder == null ? 0 : sortOrder;
+    }
 }

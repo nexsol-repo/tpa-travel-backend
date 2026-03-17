@@ -1,9 +1,13 @@
-package com.nexsol.tpa.core.api.controller.v1.request;
+package com.nexsol.tpa.core.domain.refund;
+
+import java.math.BigDecimal;
 
 import com.nexsol.tpa.core.enums.TravelPaymentMethod;
 
-public record ContractCancelRequest(
+public record RefundCommand(
         Long contractId,
+        Long paymentId,
+        BigDecimal refundAmount,
         TravelPaymentMethod refundMethod,
         String bankName,
         String accountNumber,
