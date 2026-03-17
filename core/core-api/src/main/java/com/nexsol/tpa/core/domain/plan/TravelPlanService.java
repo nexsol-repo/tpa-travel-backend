@@ -1,6 +1,8 @@
 package com.nexsol.tpa.core.domain.plan;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
@@ -31,8 +33,7 @@ public class TravelPlanService {
 
         List<PlanFamily> allFamilies = planReader.loadAllFamilies(cmd.insurerId());
         String planType = policy.resolvePlanType(cmd.insuredList(), cmd.insBgnDt());
-        boolean silsonExclude =
-                cmd.silsonExclude() != null && cmd.silsonExclude();
+        boolean silsonExclude = cmd.silsonExclude() != null && cmd.silsonExclude();
         List<PlanFamily> families = policy.filterFamilies(allFamilies, planType, silsonExclude);
 
         if (families.isEmpty()) {
@@ -43,12 +44,18 @@ public class TravelPlanService {
     }
 
     /**
-     * planId가 속한 일반 견적 패밀리 1개를 조회한다.
-     * 플랜 상세(보험료·보장내용) 조회에 사용.
+     * planId가 속한 패밀리 1개를 조회한다.
+     * 실손포함/제외 구분 없이 전체 패밀리에서 검색한다.
      */
     public PlanFamily findFamilyByPlanId(PlanCondition cmd, Long planId) {
-        List<PlanFamily> families = findQuoteFamilies(cmd);
-        return families.stream()
+        validateQuoteCommand(cmd);
+
+        List<PlanFamily> allFamilies = planReader.loadAllFamilies(cmd.insurerId());
+        String planType = policy.resolvePlanType(cmd.insuredList(), cmd.insBgnDt());
+        String typeMarker = "플랜" + planType;
+
+        return allFamilies.stream()
+                .filter(f -> f.familyName() != null && f.familyName().contains(typeMarker))
                 .filter(f -> f.plans().stream().anyMatch(p -> p.getId().equals(planId)))
                 .findFirst()
                 .orElseThrow(
@@ -58,15 +65,34 @@ public class TravelPlanService {
     }
 
     /**
-     * 실손제외 대상 패밀리를 조회한다.
-     * 선택된 planId → 대응하는 실손제외(isLoss=false) 패밀리 1개 반환.
+     * 실손포함 대표 planId → 대응하는 실손제외 대표 planId 매핑을 반환한다.
+     * planCode 기반 매칭: "TA21" (실손포함) → "TA21P" (실손제외)
      */
-    public PlanFamily findSilsonExcludeFamily(PlanCondition cmd, Long planId) {
+    public Map<Long, Long> findSilsonExcludePlanIdMap(PlanCondition cmd) {
         validateQuoteCommand(cmd);
 
         List<PlanFamily> allFamilies = planReader.loadAllFamilies(cmd.insurerId());
         String planType = policy.resolvePlanType(cmd.insuredList(), cmd.insBgnDt());
-        return policy.resolveSilsonExcludeFamily(allFamilies, planId, planType);
+
+        List<PlanFamily> lossFamilies = policy.filterFamilies(allFamilies, planType, false);
+        List<PlanFamily> excludeFamilies = policy.filterFamilies(allFamilies, planType, true);
+
+        // 실손제외 planCode → repPlanId 인덱싱
+        Map<String, Long> excludeByCode = new HashMap<>();
+        for (PlanFamily f : excludeFamilies) {
+            excludeByCode.put(f.repPlan().getPlanCode(), f.repPlan().getId());
+        }
+
+        // 실손포함 repPlanId → 실손제외 repPlanId 매핑 (planCode + "P")
+        Map<Long, Long> result = new HashMap<>();
+        for (PlanFamily f : lossFamilies) {
+            String excludeCode = f.repPlan().getPlanCode() + "P";
+            Long excludePlanId = excludeByCode.get(excludeCode);
+            if (excludePlanId != null) {
+                result.put(f.repPlan().getId(), excludePlanId);
+            }
+        }
+        return result;
     }
 
     // ── 내부 로직 ──

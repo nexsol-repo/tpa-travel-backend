@@ -1,5 +1,6 @@
 package com.nexsol.tpa.core.api.controller.v1;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -12,6 +13,7 @@ import com.nexsol.tpa.core.api.controller.v1.response.PlanListResponse;
 import com.nexsol.tpa.core.domain.coverage.TravelCoverageService;
 import com.nexsol.tpa.core.domain.plan.TravelPlanReader.PlanFamily;
 import com.nexsol.tpa.core.domain.plan.TravelPlanService;
+import com.nexsol.tpa.core.domain.premium.PlanCondition;
 import com.nexsol.tpa.core.domain.premium.PremiumResult;
 import com.nexsol.tpa.core.domain.premium.PremiumService;
 import com.nexsol.tpa.core.domain.premium.QuoteResult;
@@ -30,12 +32,19 @@ public class TravelPlanController {
 
     @PostMapping(value = "/plans", produces = MediaType.APPLICATION_JSON_VALUE)
     public PlanListResponse plans(@Valid @RequestBody PlanRequest request) {
-        List<PlanFamily> families = planService.findQuoteFamilies(request.toPlanCondition());
-        Map<Long, PremiumResult> premiums =
-                premiumService.calculateAll(request.toPlanCondition(), families);
+        PlanCondition cmd = request.toPlanCondition();
+        List<PlanFamily> families = planService.findQuoteFamilies(cmd);
+        Map<Long, PremiumResult> premiums = premiumService.calculateAll(cmd, families);
         Map<Long, List<QuoteResult.DbCoverage>> coverages =
                 coverageService.findCoveragesForFamilies(families);
-        return PlanListResponse.of(request.toPlanCondition(), families, premiums, coverages);
+
+        boolean silsonExclude = cmd.silsonExclude() != null && cmd.silsonExclude();
+        Map<Long, Long> silsonExcludeMap =
+                silsonExclude
+                        ? Collections.emptyMap()
+                        : planService.findSilsonExcludePlanIdMap(cmd);
+
+        return PlanListResponse.of(cmd, families, premiums, coverages, silsonExcludeMap);
     }
 
     @PostMapping(value = "/plans/{planId}/coverages", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -48,20 +57,5 @@ public class TravelPlanController {
         List<QuoteResult.DbCoverage> coverages =
                 coverageService.findCoverages(family.repPlan().getId());
         return PlanCoverageResponse.of(family, premium, coverages);
-    }
-
-    @PostMapping(
-            value = "/plans/{planId}/silson-exclude",
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    public PlanCoverageResponse silsonExclude(
-            @PathVariable Long planId, @Valid @RequestBody PlanRequest request) {
-        PlanFamily silsonFamily =
-                planService.findSilsonExcludeFamily(request.toPlanCondition(), planId);
-        PremiumResult premium =
-                premiumService.calculateSingle(
-                        request.toPlanCondition(), silsonFamily, request.getRepresentativeIndex());
-        List<QuoteResult.DbCoverage> coverages =
-                coverageService.findCoverages(silsonFamily.repPlan().getId());
-        return PlanCoverageResponse.of(silsonFamily, premium, coverages);
     }
 }
