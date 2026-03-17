@@ -93,7 +93,10 @@ public class TravelContractQueryDto {
                     .channelId(c.getChannelId())
                     .channelName(c.getChannelName())
                     .planId(c.getPlanId())
-                    .planName(plan != null ? plan.getPlanName() : null)
+                    .planName(
+                            plan != null
+                                    ? toDisplayName(plan.getPlanFullName(), plan.getPlanName())
+                                    : null)
                     .policyNumber(c.getPolicyNumber())
                     .countryName(c.getCountryName())
                     .countryCode(c.getCountryCode())
@@ -467,7 +470,7 @@ public class TravelContractQueryDto {
             return Plan.builder()
                     .id(e.getId())
                     .insuranceProductName(e.getInsuranceProductName())
-                    .planName(e.getPlanName())
+                    .planName(toDisplayName(e.getPlanFullName(), e.getPlanName()))
                     .planFullName(e.getPlanFullName())
                     .productCode(e.getProductCode())
                     .unitProductCode(e.getUnitProductCode())
@@ -475,6 +478,18 @@ public class TravelContractQueryDto {
                     .planCode(e.getPlanCode())
                     .build();
         }
+    }
+
+    // ── Display Name ──
+
+    private static String toDisplayName(String planFullName, String planName) {
+        String name = planFullName != null ? planFullName : planName;
+        if (name == null) return null;
+        return name.replace("플랜A", "플랜")
+                .replace("플랜B", "플랜")
+                .replace(" 실손제외", "(실손제외)")
+                .replaceAll("_\\d+~\\d+세$", "")
+                .trim();
     }
 
     // ── Masking Utilities ──
