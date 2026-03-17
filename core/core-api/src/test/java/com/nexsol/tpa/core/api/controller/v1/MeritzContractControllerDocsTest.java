@@ -24,10 +24,11 @@ import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 
 import com.nexsol.tpa.client.meritz.bridge.dto.MeritzBridgeApiResponse;
+import com.nexsol.tpa.core.api.controller.v1.request.ContractInquiryRequest;
+import com.nexsol.tpa.core.api.controller.v1.request.ContractListRequest;
 import com.nexsol.tpa.core.domain.apply.ApplyCommand;
 import com.nexsol.tpa.core.domain.apply.ApplyResult;
 import com.nexsol.tpa.core.domain.apply.ApplyService;
-import com.nexsol.tpa.core.domain.cancel.CancelCommand;
 import com.nexsol.tpa.core.domain.cancel.CancelResult;
 import com.nexsol.tpa.core.domain.cancel.CancelService;
 import com.nexsol.tpa.core.domain.certificate.CertificateCommand;
@@ -73,7 +74,8 @@ class MeritzContractControllerDocsTest extends RestDocsTest {
                                 "ctrStDt", "20260301",
                                 "ctrEdDt", "20260310")));
 
-        when(inquiryService.contractList(eq("TPA"), anyMap())).thenReturn(response);
+        when(inquiryService.contractList(eq("TPA"), any(ContractListRequest.class)))
+                .thenReturn(response);
 
         mockMvc.perform(
                         get("/v1/meritz/contracts/list")
@@ -107,7 +109,8 @@ class MeritzContractControllerDocsTest extends RestDocsTest {
         response.setSuccess(true);
         response.setData(Map.of("polNo", "POL001", "ctrNo", "CTR001"));
 
-        when(inquiryService.contractDetail(eq("TPA"), anyMap())).thenReturn(response);
+        when(inquiryService.contractDetail(eq("TPA"), any(ContractInquiryRequest.class)))
+                .thenReturn(response);
 
         mockMvc.perform(
                         post("/v1/meritz/contracts/inquiry")
@@ -337,7 +340,7 @@ class MeritzContractControllerDocsTest extends RestDocsTest {
                                         "삼성카드"),
                                 new BigDecimal("27000")));
 
-        when(cancelService.cancel(eq("TPA"), any(CancelCommand.class))).thenReturn(result);
+        when(cancelService.cancel(eq("TPA"), any(Long.class))).thenReturn(result);
 
         mockMvc.perform(
                         post("/v1/meritz/travel/contract/cancel")

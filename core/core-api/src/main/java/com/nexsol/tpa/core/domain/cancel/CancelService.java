@@ -37,8 +37,8 @@ public class CancelService {
     private final ObjectMapper objectMapper;
 
     @Transactional
-    public CancelResult cancel(String company, CancelCommand cmd) {
-        TravelContractEntity contract = contractReader.getById(cmd.contractId());
+    public CancelResult cancel(String company, Long contractId) {
+        TravelContractEntity contract = contractReader.getById(contractId);
         TravelInsurePaymentEntity payment = paymentReader.getByContractId(contract.getId());
         TravelInsurancePlanEntity plan = planReader.getById(contract.getPlanId());
         TravelInsurerEntity insurer = planReader.getInsurerById(plan.getInsurerId());
