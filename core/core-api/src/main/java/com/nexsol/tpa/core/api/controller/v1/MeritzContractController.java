@@ -75,6 +75,6 @@ public class MeritzContractController {
     public ContractCancelResponse cancel(
             @RequestParam(defaultValue = "TPA") String company,
             @RequestBody ContractCancelRequest request) {
-        return ContractCancelResponse.of(cancelService.cancel(company, request.getContractId()));
+        return ContractCancelResponse.of(cancelService.cancel(company, request.contractId()));
     }
 }
