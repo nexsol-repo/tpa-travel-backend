@@ -136,9 +136,7 @@ class TravelPlanControllerDocsTest extends RestDocsTest {
             fieldWithPath("insEdDt").type(STRING).description("보험종료일자 (YYYYMMDD)"),
             fieldWithPath("trvArCd").type(STRING).description("여행지역코드"),
             fieldWithPath("representativeIndex").type(NUMBER).description("대표 피보험자 인덱스"),
-            fieldWithPath("insuredList[].birth")
-                    .type(STRING)
-                    .description("피보험자 생년월일 (YYYYMMDD)"),
+            fieldWithPath("insuredList[].birth").type(STRING).description("피보험자 생년월일 (YYYYMMDD)"),
             fieldWithPath("insuredList[].gender").type(STRING).description("성별 (1: 남, 2: 여)"),
         };
     }

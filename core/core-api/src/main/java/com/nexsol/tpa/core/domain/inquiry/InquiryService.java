@@ -20,17 +20,17 @@ public class InquiryService {
 
     public MeritzBridgeApiResponse contractList(String company, ContractListRequest request) {
         Map<String, Object> bodyFields = new LinkedHashMap<>();
-        if (request.getPolNo() != null) bodyFields.put("polNo", request.getPolNo());
-        if (request.getQuotReqNo() != null) bodyFields.put("quotReqNo", request.getQuotReqNo());
-        if (request.getCtrStDt() != null) bodyFields.put("ctrStDt", request.getCtrStDt());
-        if (request.getCtrEdDt() != null) bodyFields.put("ctrEdDt", request.getCtrEdDt());
+        if (request.polNo() != null) bodyFields.put("polNo", request.polNo());
+        if (request.quotReqNo() != null) bodyFields.put("quotReqNo", request.quotReqNo());
+        if (request.ctrStDt() != null) bodyFields.put("ctrStDt", request.ctrStDt());
+        if (request.ctrEdDt() != null) bodyFields.put("ctrEdDt", request.ctrEdDt());
         return meritzClient.contractList(company, bodyFields);
     }
 
     public MeritzBridgeApiResponse contractDetail(String company, ContractInquiryRequest request) {
         Map<String, Object> bodyFields = new LinkedHashMap<>();
-        if (request.getPolNo() != null) bodyFields.put("polNo", request.getPolNo());
-        if (request.getCtrNo() != null) bodyFields.put("ctrNo", request.getCtrNo());
+        if (request.polNo() != null) bodyFields.put("polNo", request.polNo());
+        if (request.ctrNo() != null) bodyFields.put("ctrNo", request.ctrNo());
         return meritzClient.contractDetail(company, bodyFields);
     }
 }
