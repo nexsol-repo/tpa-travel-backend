@@ -1,16 +1,14 @@
 package com.nexsol.tpa.storage.db.core.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Getter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @Entity
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(
         name = "travel_insurance_plan_family_map",
         uniqueConstraints = {
@@ -36,4 +34,10 @@ public class TravelInsurancePlanFamilyMapEntity {
 
     @Column(name = "created_at", nullable = false, updatable = false, insertable = false)
     private java.time.LocalDateTime createdAt;
+
+    @Builder
+    public TravelInsurancePlanFamilyMapEntity(Long familyId, Long planId) {
+        this.familyId = familyId;
+        this.planId = planId;
+    }
 }

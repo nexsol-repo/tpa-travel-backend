@@ -4,16 +4,14 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Getter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @Entity
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(
         name = "tpa_auth_cert_result",
         indexes = {
@@ -82,9 +80,8 @@ public class TpaAuthCertResultEntity extends BaseEntity {
     private String certPhone;
 
     /** 대표가입자 정보와 매칭 여부(Y/N) */
-    @Builder.Default
     @Column(name = "matched_yn", nullable = false, length = 1)
-    private String matchedYn = "N";
+    private String matchedYn;
 
     /** 불일치 사유(옵션) */
     @Column(name = "match_fail_reason", length = 200)
@@ -94,6 +91,44 @@ public class TpaAuthCertResultEntity extends BaseEntity {
     @JdbcTypeCode(SqlTypes.LONGVARCHAR)
     @Column(name = "raw_res_json", columnDefinition = "json")
     private String rawResJson;
+
+    public static TpaAuthCertResultEntity createEmpty() {
+        return new TpaAuthCertResultEntity();
+    }
+
+    @Builder
+    public TpaAuthCertResultEntity(
+            Long logId,
+            String impUid,
+            String requestId,
+            String moid,
+            String uniqueKey,
+            String resultStatus,
+            String resultCode,
+            String resultMsg,
+            String certName,
+            String certBirthday,
+            String certGender,
+            String certPhone,
+            String matchedYn,
+            String matchFailReason,
+            String rawResJson) {
+        this.logId = logId;
+        this.impUid = impUid;
+        this.requestId = requestId;
+        this.moid = moid;
+        this.uniqueKey = uniqueKey;
+        this.resultStatus = resultStatus;
+        this.resultCode = resultCode;
+        this.resultMsg = resultMsg;
+        this.certName = certName;
+        this.certBirthday = certBirthday;
+        this.certGender = certGender;
+        this.certPhone = certPhone;
+        this.matchedYn = matchedYn == null ? "N" : matchedYn;
+        this.matchFailReason = matchFailReason;
+        this.rawResJson = rawResJson;
+    }
 
     public void update(
             Long logId,

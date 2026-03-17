@@ -3,16 +3,14 @@ package com.nexsol.tpa.storage.db.core.entity;
 import java.time.LocalDateTime;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Getter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @Entity
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(
         name = "travel_plan_coverage",
         uniqueConstraints = {
@@ -39,28 +37,24 @@ public class TravelPlanCoverageEntity extends BaseEntity {
     private Long coverageId;
 
     /** 포함 여부 (0: 미포함, 1: 포함) */
-    @Builder.Default
     @Column(name = "is_included", nullable = false)
-    private Boolean isIncluded = true;
+    private Boolean isIncluded;
 
     /** 플랜별 노출 담보명 (null이면 coverage_name 사용) */
     @Column(name = "display_name", length = 255)
     private String displayName;
 
     /** 정렬 순서 */
-    @Builder.Default
     @Column(name = "sort_order", nullable = false)
-    private Integer sortOrder = 0;
+    private Integer sortOrder;
 
     /** 주요 보장 여부 */
-    @Builder.Default
     @Column(name = "is_major_coverage", nullable = false)
-    private Boolean isMajorCoverage = false;
+    private Boolean isMajorCoverage;
 
     /** 보장금액 타이틀 여부 (0:N,1:Y) */
-    @Builder.Default
     @Column(name = "title_yn", nullable = false)
-    private Boolean titleYn = false;
+    private Boolean titleYn;
 
     /** 담보 UI 카테고리 코드 */
     @Column(name = "category_code", length = 50)
@@ -85,4 +79,32 @@ public class TravelPlanCoverageEntity extends BaseEntity {
     /** 삭제일시 (soft delete) */
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
+
+    @Builder
+    public TravelPlanCoverageEntity(
+            Long planId,
+            Long coverageId,
+            Boolean isIncluded,
+            String displayName,
+            Integer sortOrder,
+            Boolean isMajorCoverage,
+            Boolean titleYn,
+            String categoryCode,
+            String claimReasonOverride,
+            String claimContentOverride,
+            String subTitleOverride,
+            String subContentOverride) {
+        this.planId = planId;
+        this.coverageId = coverageId;
+        this.isIncluded = isIncluded == null ? true : isIncluded;
+        this.displayName = displayName;
+        this.sortOrder = sortOrder == null ? 0 : sortOrder;
+        this.isMajorCoverage = isMajorCoverage == null ? false : isMajorCoverage;
+        this.titleYn = titleYn == null ? false : titleYn;
+        this.categoryCode = categoryCode;
+        this.claimReasonOverride = claimReasonOverride;
+        this.claimContentOverride = claimContentOverride;
+        this.subTitleOverride = subTitleOverride;
+        this.subContentOverride = subContentOverride;
+    }
 }

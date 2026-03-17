@@ -34,6 +34,7 @@ import com.nexsol.tpa.core.domain.cancel.CancelService;
 import com.nexsol.tpa.core.domain.certificate.CertificateCommand;
 import com.nexsol.tpa.core.domain.certificate.CertificateService;
 import com.nexsol.tpa.core.domain.inquiry.InquiryService;
+import com.nexsol.tpa.core.domain.refund.RefundCommand;
 import com.nexsol.tpa.core.domain.subscription.SubscriptionCommand;
 import com.nexsol.tpa.core.domain.subscription.SubscriptionResult;
 import com.nexsol.tpa.core.domain.subscription.SubscriptionService;
@@ -340,7 +341,7 @@ class MeritzContractControllerDocsTest extends RestDocsTest {
                                         "삼성카드"),
                                 new BigDecimal("27000")));
 
-        when(cancelService.cancel(eq("TPA"), any(Long.class))).thenReturn(result);
+        when(cancelService.cancel(eq("TPA"), any(RefundCommand.class))).thenReturn(result);
 
         mockMvc.perform(
                         post("/v1/meritz/travel/contract/cancel")
@@ -349,7 +350,12 @@ class MeritzContractControllerDocsTest extends RestDocsTest {
                                 .content(
                                         """
                 {
-                  "contractId": 100
+                  "contractId": 100,
+                  "refundMethod": "BANK",
+                  "bankName": "국민은행",
+                  "accountNumber": "123-456-789012",
+                  "depositorName": "홍길동",
+                  "refundReason": "단순 변심"
                 }
                 """))
                 .andDo(print())
@@ -360,10 +366,7 @@ class MeritzContractControllerDocsTest extends RestDocsTest {
                                         parameterWithName("company")
                                                 .description("회사코드 (기본값: TPA)")
                                                 .optional()),
-                                requestFields(
-                                        fieldWithPath("contractId")
-                                                .type(NUMBER)
-                                                .description("계약 ID")),
+                                requestFields(cancelRequestFields()),
                                 responseFields(cancelResponseFields())));
     }
 
@@ -397,6 +400,17 @@ class MeritzContractControllerDocsTest extends RestDocsTest {
             fieldWithPath("people[].insureNumber").type(STRING).description("보험자번호"),
             fieldWithPath("people[].insurePremium").type(NUMBER).description("피보험자 보험료"),
             fieldWithPath("marketingConsentUsed").type(BOOLEAN).description("마케팅 동의 여부"),
+        };
+    }
+
+    private static org.springframework.restdocs.payload.FieldDescriptor[] cancelRequestFields() {
+        return new org.springframework.restdocs.payload.FieldDescriptor[] {
+            fieldWithPath("contractId").type(NUMBER).description("계약 ID"),
+            fieldWithPath("refundMethod").type(STRING).description("환불방법 (CARD, BANK, VBANK)"),
+            fieldWithPath("bankName").type(STRING).description("은행명").optional(),
+            fieldWithPath("accountNumber").type(STRING).description("계좌번호").optional(),
+            fieldWithPath("depositorName").type(STRING).description("예금주명").optional(),
+            fieldWithPath("refundReason").type(STRING).description("환불 사유").optional(),
         };
     }
 

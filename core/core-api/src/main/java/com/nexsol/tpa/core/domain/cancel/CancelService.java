@@ -10,7 +10,10 @@ import com.nexsol.tpa.core.domain.contract.ContractValidator;
 import com.nexsol.tpa.core.domain.payment.PaymentReader;
 import com.nexsol.tpa.core.domain.payment.PaymentWriter;
 import com.nexsol.tpa.core.domain.plan.PlanReader;
+import com.nexsol.tpa.core.domain.refund.RefundCommand;
+import com.nexsol.tpa.core.domain.refund.RefundWriter;
 import com.nexsol.tpa.core.domain.snapshot.SnapshotAppender;
+import com.nexsol.tpa.core.enums.TravelPaymentMethod;
 import com.nexsol.tpa.core.enums.TravelPaymentStatus;
 import com.nexsol.tpa.storage.db.core.entity.TravelContractEntity;
 import com.nexsol.tpa.storage.db.core.entity.TravelInsurancePlanEntity;
@@ -32,12 +35,14 @@ public class CancelService {
     private final ContractValidator contractValidator;
     private final PaymentReader paymentReader;
     private final PaymentWriter paymentWriter;
+    private final RefundWriter refundWriter;
     private final PlanReader planReader;
     private final SnapshotAppender snapshotAppender;
     private final ObjectMapper objectMapper;
 
     @Transactional
-    public CancelResult cancel(String company, Long contractId) {
+    public CancelResult cancel(String company, RefundCommand refundCommand) {
+        Long contractId = refundCommand.contractId();
         TravelContractEntity contract = contractReader.getById(contractId);
         TravelInsurePaymentEntity payment = paymentReader.getByContractId(contract.getId());
         TravelInsurancePlanEntity plan = planReader.getById(contract.getPlanId());
@@ -61,6 +66,18 @@ public class CancelService {
                 contract.getMeritzQuoteRequestNumber());
 
         paymentWriter.markCanceled(payment);
+
+        // 환불 레코드 생성
+        refundWriter.create(
+                new RefundCommand(
+                        contract.getId(),
+                        payment.getId(),
+                        contract.getTotalPremium(),
+                        TravelPaymentMethod.CARD,
+                        refundCommand.bankName(),
+                        refundCommand.accountNumber(),
+                        refundCommand.depositorName(),
+                        refundCommand.refundReason()));
 
         snapshotAppender.append(
                 contract.getId(), contract.getInsurerId(), "CANCEL", toJson("CANCELED"));

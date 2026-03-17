@@ -28,7 +28,9 @@ public class AuthCertWriter {
     @Transactional
     public Long createOrUpdateLog(AuthCertLogInfo info) {
         TpaAuthCertLogEntity log =
-                logRepository.findByImpUid(info.impUid()).orElseGet(TpaAuthCertLogEntity::new);
+                logRepository
+                        .findByImpUid(info.impUid())
+                        .orElseGet(TpaAuthCertLogEntity::createEmpty);
         log.update(
                 info.bizNum(),
                 info.impUid(),
@@ -72,7 +74,7 @@ public class AuthCertWriter {
         TpaAuthCertResultEntity result =
                 resultRepository
                         .findByImpUid(info.impUid())
-                        .orElseGet(TpaAuthCertResultEntity::new);
+                        .orElseGet(TpaAuthCertResultEntity::createEmpty);
         result.update(
                 logId,
                 info.impUid(),
@@ -112,7 +114,7 @@ public class AuthCertWriter {
         TpaAuthCertResultEntity result =
                 resultRepository
                         .findByImpUid(info.impUid())
-                        .orElseGet(TpaAuthCertResultEntity::new);
+                        .orElseGet(TpaAuthCertResultEntity::createEmpty);
         result.update(
                 logId,
                 info.impUid(),

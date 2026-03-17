@@ -3,16 +3,14 @@ package com.nexsol.tpa.storage.db.core.entity;
 import java.time.LocalDateTime;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Getter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @Entity
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "travel_contract_snapshot")
 public class TravelContractSnapshotEntity {
 
@@ -39,6 +37,20 @@ public class TravelContractSnapshotEntity {
 
     @Column(name = "created_at", insertable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    @Builder
+    public TravelContractSnapshotEntity(
+            Long contractId,
+            Long insurerId,
+            String method,
+            String snapshotType,
+            String jsonSnapshot) {
+        this.contractId = contractId;
+        this.insurerId = insurerId;
+        this.method = method;
+        this.snapshotType = snapshotType;
+        this.jsonSnapshot = jsonSnapshot;
+    }
 
     public void updateSnapshot(String jsonSnapshot) {
         this.jsonSnapshot = jsonSnapshot;

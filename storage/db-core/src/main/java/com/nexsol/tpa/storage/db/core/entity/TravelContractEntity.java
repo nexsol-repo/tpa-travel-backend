@@ -7,16 +7,14 @@ import java.time.LocalDateTime;
 import com.nexsol.tpa.core.enums.TravelContractStatus;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Getter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @Entity
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "travel_contract")
 public class TravelContractEntity extends BaseEntity {
 
@@ -60,18 +58,15 @@ public class TravelContractEntity extends BaseEntity {
     @Column(name = "country_code")
     private String countryCode;
 
-    @Builder.Default
     @Column(name = "insured_people_number", nullable = false)
-    private Integer insuredPeopleNumber = 1;
+    private Integer insuredPeopleNumber;
 
-    @Builder.Default
     @Column(name = "total_premium", nullable = false, precision = 15, scale = 2)
-    private BigDecimal totalPremium = BigDecimal.ZERO;
+    private BigDecimal totalPremium;
 
-    @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 20)
-    private TravelContractStatus status = TravelContractStatus.PENDING;
+    private TravelContractStatus status;
 
     @Column(name = "apply_date", insertable = false, updatable = false)
     private LocalDateTime applyDate;
@@ -100,9 +95,8 @@ public class TravelContractEntity extends BaseEntity {
     @Column(name = "policy_link", length = 255)
     private String policyLink;
 
-    @Builder.Default
     @Column(name = "marketing_consent_used", nullable = false)
-    private Boolean marketingConsentUsed = false;
+    private Boolean marketingConsentUsed;
 
     @Column(name = "auth_provider", length = 20)
     private String authProvider; // ex) DANAL_PASS
@@ -116,12 +110,71 @@ public class TravelContractEntity extends BaseEntity {
     @Column(name = "auth_unique_key", length = 200)
     private String authUniqueKey;
 
-    @Builder.Default
     @Column(name = "auth_status", length = 20)
-    private String authStatus = "NONE"; // NONE / SUCCESS / FAIL
+    private String authStatus; // NONE / SUCCESS / FAIL
 
     @Column(name = "auth_date")
     private LocalDateTime authDate;
+
+    @Builder
+    public TravelContractEntity(
+            Long insurerId,
+            String insurerName,
+            Long partnerId,
+            String partnerName,
+            Long channelId,
+            String channelName,
+            Long planId,
+            String policyNumber,
+            String meritzQuoteGroupNumber,
+            String meritzQuoteRequestNumber,
+            String countryName,
+            String countryCode,
+            Integer insuredPeopleNumber,
+            BigDecimal totalPremium,
+            TravelContractStatus status,
+            LocalDate insureStartDate,
+            LocalDate insureEndDate,
+            String contractPeopleName,
+            String contractPeopleResidentNumber,
+            String contractPeopleHp,
+            String contractPeopleMail,
+            Long employeeId,
+            Boolean marketingConsentUsed,
+            String authProvider,
+            String authImpUid,
+            String authRequestId,
+            String authUniqueKey,
+            String authStatus) {
+        this.insurerId = insurerId;
+        this.insurerName = insurerName;
+        this.partnerId = partnerId;
+        this.partnerName = partnerName;
+        this.channelId = channelId;
+        this.channelName = channelName;
+        this.planId = planId;
+        this.policyNumber = policyNumber;
+        this.meritzQuoteGroupNumber = meritzQuoteGroupNumber;
+        this.meritzQuoteRequestNumber = meritzQuoteRequestNumber;
+        this.countryName = countryName;
+        this.countryCode = countryCode;
+        this.insuredPeopleNumber = insuredPeopleNumber == null ? 1 : insuredPeopleNumber;
+        this.totalPremium = totalPremium == null ? BigDecimal.ZERO : totalPremium;
+        this.status = status == null ? TravelContractStatus.PENDING : status;
+        this.insureStartDate = insureStartDate;
+        this.insureEndDate = insureEndDate;
+        this.contractPeopleName = contractPeopleName;
+        this.contractPeopleResidentNumber = contractPeopleResidentNumber;
+        this.contractPeopleHp = contractPeopleHp;
+        this.contractPeopleMail = contractPeopleMail;
+        this.employeeId = employeeId;
+        this.marketingConsentUsed = marketingConsentUsed == null ? false : marketingConsentUsed;
+        this.authProvider = authProvider;
+        this.authImpUid = authImpUid;
+        this.authRequestId = authRequestId;
+        this.authUniqueKey = authUniqueKey;
+        this.authStatus = authStatus == null ? "NONE" : authStatus;
+    }
 
     public void markCompleted() {
         this.status = TravelContractStatus.COMPLETED;

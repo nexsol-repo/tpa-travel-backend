@@ -1,16 +1,16 @@
 package com.nexsol.tpa.storage.db.core.entity;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Getter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @Entity
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(
         name = "travel_insurance_plan_family",
         uniqueConstraints = {
@@ -38,18 +38,31 @@ public class TravelInsurancePlanFamilyEntity extends BaseEntity {
     @Column(name = "family_name", nullable = false, length = 100)
     private String familyName;
 
-    @Builder.Default
     @Column(name = "sort_order", nullable = false)
-    private Integer sortOrder = 0;
+    private Integer sortOrder;
 
-    @Builder.Default
     @Column(name = "is_active", nullable = false)
-    private Boolean isActive = true;
+    private Boolean isActive;
 
-    @Builder.Default
     @Column(name = "is_loss")
-    private Boolean isLoss = false;
+    private Boolean isLoss;
 
     @Column(name = "deleted_at")
-    private java.time.LocalDateTime deletedAt;
+    private LocalDateTime deletedAt;
+
+    @Builder
+    public TravelInsurancePlanFamilyEntity(
+            Long insurerId,
+            String insuranceProductName,
+            String familyName,
+            Integer sortOrder,
+            Boolean isActive,
+            Boolean isLoss) {
+        this.insurerId = insurerId;
+        this.insuranceProductName = insuranceProductName;
+        this.familyName = familyName;
+        this.sortOrder = sortOrder == null ? 0 : sortOrder;
+        this.isActive = isActive == null ? true : isActive;
+        this.isLoss = isLoss == null ? false : isLoss;
+    }
 }

@@ -16,6 +16,7 @@ import com.nexsol.tpa.core.domain.apply.ApplyService;
 import com.nexsol.tpa.core.domain.cancel.CancelService;
 import com.nexsol.tpa.core.domain.certificate.CertificateService;
 import com.nexsol.tpa.core.domain.inquiry.InquiryService;
+import com.nexsol.tpa.core.domain.refund.RefundCommand;
 import com.nexsol.tpa.core.domain.subscription.SubscriptionService;
 
 import lombok.RequiredArgsConstructor;
@@ -75,6 +76,17 @@ public class MeritzContractController {
     public ContractCancelResponse cancel(
             @RequestParam(defaultValue = "TPA") String company,
             @RequestBody ContractCancelRequest request) {
-        return ContractCancelResponse.of(cancelService.cancel(company, request.contractId()));
+        return ContractCancelResponse.of(
+                cancelService.cancel(
+                        company,
+                        new RefundCommand(
+                                request.contractId(),
+                                null,
+                                null,
+                                request.refundMethod(),
+                                request.bankName(),
+                                request.accountNumber(),
+                                request.depositorName(),
+                                request.refundReason())));
     }
 }

@@ -7,16 +7,14 @@ import com.nexsol.tpa.core.enums.TravelPaymentMethod;
 import com.nexsol.tpa.core.enums.TravelPaymentStatus;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Getter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @Entity
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "travel_insure_payment")
 public class TravelInsurePaymentEntity extends BaseEntity {
 
@@ -37,23 +35,35 @@ public class TravelInsurePaymentEntity extends BaseEntity {
     @Column(name = "cancel_date")
     private LocalDateTime cancelDate;
 
-    @Builder.Default
     @Column(name = "paid_amount", nullable = false, precision = 15, scale = 2)
-    private BigDecimal paidAmount = BigDecimal.ZERO;
+    private BigDecimal paidAmount;
 
-    @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 20)
-    private TravelPaymentStatus status = TravelPaymentStatus.COMPLETED;
+    private TravelPaymentStatus status;
+
+    @Builder
+    public TravelInsurePaymentEntity(
+            Long contractId,
+            TravelPaymentMethod paymentMethod,
+            LocalDateTime paymentDate,
+            BigDecimal paidAmount,
+            TravelPaymentStatus status) {
+        this.contractId = contractId;
+        this.paymentMethod = paymentMethod;
+        this.paymentDate = paymentDate;
+        this.paidAmount = paidAmount == null ? BigDecimal.ZERO : paidAmount;
+        this.status = status == null ? TravelPaymentStatus.COMPLETED : status;
+    }
 
     public static TravelInsurePaymentEntity createReady(
             Long contractId, TravelPaymentMethod method, BigDecimal amount) {
-        TravelInsurePaymentEntity p = new TravelInsurePaymentEntity();
-        p.contractId = contractId;
-        p.paymentMethod = method;
-        p.paidAmount = amount == null ? BigDecimal.ZERO : amount;
-        p.status = TravelPaymentStatus.COMPLETED;
-        return p;
+        return TravelInsurePaymentEntity.builder()
+                .contractId(contractId)
+                .paymentMethod(method)
+                .paidAmount(amount)
+                .status(TravelPaymentStatus.COMPLETED)
+                .build();
     }
 
     public void markPaid(LocalDateTime paidAt) {

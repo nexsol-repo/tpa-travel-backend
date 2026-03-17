@@ -1,16 +1,16 @@
 package com.nexsol.tpa.storage.db.core.entity;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Getter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @Entity
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(
         name = "tpa_partner",
         indexes = {@Index(name = "idx_partner_name", columnList = "partner_name")},
@@ -45,11 +45,30 @@ public class TpaPartnerEntity extends BaseEntity {
     @Column(name = "service_type", columnDefinition = "longtext")
     private String serviceType;
 
-    @Builder.Default
     @Column(name = "is_active", nullable = false)
-    private Boolean isActive = true;
+    private Boolean isActive;
 
     /** soft delete */
     @Column(name = "deleted_at")
-    private java.time.LocalDateTime deletedAt;
+    private LocalDateTime deletedAt;
+
+    @Builder
+    public TpaPartnerEntity(
+            String partnerCode,
+            String partnerName,
+            String businessRegistrationNumber,
+            String ceoName,
+            String address,
+            String memo,
+            String serviceType,
+            Boolean isActive) {
+        this.partnerCode = partnerCode;
+        this.partnerName = partnerName;
+        this.businessRegistrationNumber = businessRegistrationNumber;
+        this.ceoName = ceoName;
+        this.address = address;
+        this.memo = memo;
+        this.serviceType = serviceType;
+        this.isActive = isActive == null ? true : isActive;
+    }
 }
