@@ -2,24 +2,35 @@ package com.nexsol.tpa.core.api.controller.v1.request;
 
 import java.math.BigDecimal;
 
+import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 
 @Getter
-@Setter
 public class InsurePeopleRequest {
 
-    private String name;
+    private final String name;
+    private final String gender;
+    private final String residentNumber;
+    private final String nameEng;
+    private final String passportNumber;
+    private final String insureNumber;
+    private final BigDecimal insurePremium;
 
-    private String gender;
-
-    private String residentNumber;
-
-    private String nameEng;
-
-    private String passportNumber;
-
-    private String insureNumber;
-
-    private BigDecimal insurePremium;
+    @Builder
+    private InsurePeopleRequest(
+            String name,
+            String gender,
+            String residentNumber,
+            String nameEng,
+            String passportNumber,
+            String insureNumber,
+            BigDecimal insurePremium) {
+        this.name = name;
+        this.gender = gender;
+        this.residentNumber = residentNumber;
+        this.nameEng = nameEng;
+        this.passportNumber = passportNumber;
+        this.insureNumber = insureNumber;
+        this.insurePremium = insurePremium;
+    }
 }
