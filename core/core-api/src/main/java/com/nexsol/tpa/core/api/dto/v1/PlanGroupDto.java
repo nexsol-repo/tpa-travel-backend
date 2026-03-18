@@ -13,5 +13,4 @@ public class PlanGroupDto {
     private String planNm;
 
     private List<PlanCoverageDto> coverages;
-
 }

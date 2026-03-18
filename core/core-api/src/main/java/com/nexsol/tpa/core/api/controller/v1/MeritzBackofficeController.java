@@ -1,7 +1,8 @@
 package com.nexsol.tpa.core.api.controller.v1;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
@@ -12,7 +13,7 @@ public class MeritzBackofficeController {
 
     /** 정산 목록 조회 (Meritz: /adjtLstInq) */
     @GetMapping("/settlements")
-    public Object listSettlements(/* @RequestParam ... */) {
+    public Object listSettlements(/* @RequestParam ... */ ) {
         // return service.listSettlements(...);
         return null;
     }
@@ -30,5 +31,4 @@ public class MeritzBackofficeController {
         // return service.cancelContract(contractNo, request);
         return null;
     }
-
 }

@@ -1,7 +1,8 @@
 package com.nexsol.tpa.core.api.controller.v1;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
@@ -30,5 +31,4 @@ public class MeritzEndorsementController {
         // return service.saveEndorsement(request);
         return null;
     }
-
 }

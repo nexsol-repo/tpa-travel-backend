@@ -44,5 +44,4 @@ public class MeritzTpaProperties {
     public void setClientSecret(String clientSecret) {
         this.clientSecret = clientSecret;
     }
-
 }

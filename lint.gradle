@@ -1,8 +1,40 @@
 subprojects {
     apply plugin: 'java'
-    apply plugin: 'io.spring.javaformat'
+    apply plugin: 'com.diffplug.spotless'
 
-    dependencies {
-        compileOnly "io.spring.javaformat:spring-javaformat-gradle-plugin:${springJavaFormatVersion}"
+    repositories {
+        mavenCentral()
+    }
+
+    spotless {
+        java {
+            target 'src/*/java/**/*.java'
+
+            // Google Java Format (AOSP 스타일 - 4칸 들여쓰기)
+            googleJavaFormat('1.27.0').aosp().skipJavadocFormatting()
+
+            // import 정렬
+            importOrder('java', 'javax', 'org', 'com', '')
+            removeUnusedImports()
+
+            // 줄 끝 공백 제거
+            trimTrailingWhitespace()
+
+            // 파일 끝 개행
+            endWithNewline()
+
+            // 라이센스 헤더 (필요시 활성화)
+            // licenseHeaderFile(rootProject.file('LICENSE_HEADER'))
+        }
+    }
+
+    // format task alias
+    tasks.register('format') {
+        dependsOn 'spotlessApply'
+    }
+
+    // check task에 spotlessCheck 연결
+    tasks.named('check') {
+        dependsOn 'spotlessCheck'
     }
 }

@@ -5,5 +5,4 @@ public class PlanCoverageDto {
     private String covNm;
 
     private String sbcAmt;
-
 }

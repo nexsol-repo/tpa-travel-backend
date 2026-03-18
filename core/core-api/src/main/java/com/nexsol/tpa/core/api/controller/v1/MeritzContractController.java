@@ -1,76 +1,92 @@
 package com.nexsol.tpa.core.api.controller.v1;
 
-import com.nexsol.tpa.core.api.dto.v1.MeritzCertRequest;
-import com.nexsol.tpa.core.api.dto.v1.contract.*;
-import com.nexsol.tpa.core.api.meritz.dto.contract.MeritzCtrLstInqBody;
-import com.nexsol.tpa.core.api.meritz.dto.contract.MeritzTrvCtrInqBody;
-import com.nexsol.tpa.core.api.service.v1.MeritzContractService;
-import com.nexsol.tpa.core.api.service.v1.TravelContractQueryService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
+
+import com.nexsol.tpa.client.meritz.bridge.dto.MeritzBridgeApiResponse;
+import com.nexsol.tpa.core.api.controller.v1.request.ContractApplyRequest;
+import com.nexsol.tpa.core.api.controller.v1.request.ContractCancelRequest;
+import com.nexsol.tpa.core.api.controller.v1.request.ContractCompletedRequest;
+import com.nexsol.tpa.core.api.controller.v1.request.ContractInquiryRequest;
+import com.nexsol.tpa.core.api.controller.v1.request.ContractListRequest;
+import com.nexsol.tpa.core.api.controller.v1.request.MeritzCertRequest;
+import com.nexsol.tpa.core.api.controller.v1.response.ContractApplyResponse;
+import com.nexsol.tpa.core.api.controller.v1.response.ContractCancelResponse;
+import com.nexsol.tpa.core.api.controller.v1.response.ContractCompletedResponse;
+import com.nexsol.tpa.core.domain.apply.ApplyService;
+import com.nexsol.tpa.core.domain.cancel.CancelService;
+import com.nexsol.tpa.core.domain.certificate.CertificateService;
+import com.nexsol.tpa.core.domain.inquiry.InquiryService;
+import com.nexsol.tpa.core.domain.refund.RefundCommand;
+import com.nexsol.tpa.core.domain.subscription.SubscriptionService;
+
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/v1/meritz")
 public class MeritzContractController {
 
-    private final MeritzContractService service;
-
-    private final TravelContractQueryService queryService;
+    private final ApplyService applyService;
+    private final SubscriptionService subscriptionService;
+    private final CancelService cancelService;
+    private final CertificateService certificateService;
+    private final InquiryService inquiryService;
 
     /** 계약 목록 조회 (Meritz: /ctrLstInq) */
     @GetMapping("/contracts/list")
-    public String contractList(@RequestParam(defaultValue = "TPA") String companyCode,
-            @RequestBody MeritzCtrLstInqBody request) {
-        return service.contractList(companyCode, request);
+    public MeritzBridgeApiResponse contractList(
+            @RequestParam(defaultValue = "TPA") String company,
+            @RequestBody ContractListRequest request) {
+        return inquiryService.contractList(company, request);
     }
 
     /** 계약 조회 (Meritz: /trvCtrInq) */
     @PostMapping("/contracts/inquiry")
-    public String contractInquiry(@RequestParam(defaultValue = "TPA") String companyCode,
-            @RequestBody MeritzTrvCtrInqBody request) {
-        return service.contractInquiry(companyCode, request);
+    public MeritzBridgeApiResponse contractInquiry(
+            @RequestParam(defaultValue = "TPA") String company,
+            @RequestBody ContractInquiryRequest request) {
+        return inquiryService.contractDetail(company, request);
     }
 
     /** 가입증명서 출력 */
     @PostMapping("/contracts/certificate")
-    public String joinCertificate(@RequestParam(defaultValue = "TPA") String companyCode,
+    public MeritzBridgeApiResponse joinCertificate(
+            @RequestParam(defaultValue = "TPA") String company,
             @RequestBody MeritzCertRequest request) {
-        return service.joinCertificate(companyCode, request);
+        return certificateService.issue(company, request.toCertificateCommand());
     }
 
     /** 여행자보험 접수 */
     @PostMapping("/travel/contract/apply")
     public ContractApplyResponse apply(@RequestBody ContractApplyRequest request) {
-        return service.apply(request);
+        return ContractApplyResponse.of(applyService.apply(request.toCommand()));
     }
 
     /** 여행자보험 가입(결제) */
     @PostMapping("/travel/contract/completed")
-    public ContractCompletedResponse completed(@RequestParam(defaultValue = "TPA") String companyCode,
+    public ContractCompletedResponse completed(
+            @RequestParam(defaultValue = "TPA") String company,
             @RequestBody ContractCompletedRequest request) {
-        return service.completed(companyCode, request);
+        return ContractCompletedResponse.of(
+                subscriptionService.subscribe(company, request.toSubscriptionCommand()));
     }
 
     /** 여행자보험 가입(결제취소) */
     @PostMapping("/travel/contract/cancel")
-    public ContractCancelResponse cancel(@RequestParam(defaultValue = "TPA") String companyCode,
+    public ContractCancelResponse cancel(
+            @RequestParam(defaultValue = "TPA") String company,
             @RequestBody ContractCancelRequest request) {
-        return service.cancel(companyCode, request);
+        return ContractCancelResponse.of(
+                cancelService.cancel(
+                        company,
+                        new RefundCommand(
+                                request.contractId(),
+                                null,
+                                null,
+                                request.refundMethod(),
+                                request.bankName(),
+                                request.accountNumber(),
+                                request.depositorName(),
+                                request.refundReason())));
     }
-
-    /** 계약 목록 (auth_unique_key 최신순 기본) */
-    @GetMapping("/travel/contracts")
-    public Page<TravelContractQueryDto.ContractListItem> list(@RequestParam(required = false) String authUniqueKey,
-            @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "20") int size) {
-        return queryService.list(authUniqueKey, page, size);
-    }
-
-    /** 계약 단건 조회 (id) */
-    @GetMapping("/travel/contracts/{id}")
-    public TravelContractQueryDto.ContractDetail get(@PathVariable Long id) {
-        return queryService.get(id);
-    }
-
 }
