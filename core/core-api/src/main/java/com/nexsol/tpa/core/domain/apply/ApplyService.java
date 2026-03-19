@@ -68,6 +68,7 @@ public class ApplyService {
             peopleRepository.save(
                     TravelInsurePeopleEntity.builder()
                             .contractId(saved.getId())
+                            .planId(p.planId())
                             .name(p.name())
                             .gender(p.gender())
                             .residentNumber(p.residentNumber())

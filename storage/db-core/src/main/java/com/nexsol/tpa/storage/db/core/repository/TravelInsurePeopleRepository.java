@@ -12,13 +12,14 @@ import com.nexsol.tpa.storage.db.core.entity.TravelInsurePeopleEntity;
 public interface TravelInsurePeopleRepository
         extends JpaRepository<TravelInsurePeopleEntity, Long> {
 
-    List<TravelInsurePeopleEntity> findByContractIdOrderByIdAsc(Long contractId);
+    List<TravelInsurePeopleEntity> findByContractIdAndDeletedAtIsNullOrderByIdAsc(Long contractId);
 
     @Query(
             """
                 select p
                 from TravelInsurePeopleEntity p
                 where p.contractId in :contractIds
+                  and p.deletedAt is null
                 order by p.contractId asc, p.id asc
             """)
     List<TravelInsurePeopleEntity> findByContractIds(

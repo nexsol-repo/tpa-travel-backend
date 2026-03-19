@@ -37,6 +37,7 @@ public record ContractApplyRequest(
                                 .map(
                                         p ->
                                                 new ApplyCommand.InsuredPerson(
+                                                        p.planId(),
                                                         p.name(),
                                                         p.gender(),
                                                         p.residentNumber(),

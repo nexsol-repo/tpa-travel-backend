@@ -1,6 +1,7 @@
 package com.nexsol.tpa.storage.db.core.entity;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -20,6 +21,9 @@ public class TravelInsurePeopleEntity extends BaseEntity {
 
     @Column(name = "contract_id", nullable = false)
     private Long contractId;
+
+    @Column(name = "plan_id")
+    private Long planId;
 
     @Column(name = "insure_people_name", length = 50)
     private String name;
@@ -42,9 +46,13 @@ public class TravelInsurePeopleEntity extends BaseEntity {
     @Column(name = "insure_premium", nullable = false, precision = 15, scale = 2)
     private BigDecimal insurePremium;
 
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
+
     @Builder
     public TravelInsurePeopleEntity(
             Long contractId,
+            Long planId,
             String name,
             String gender,
             String residentNumber,
@@ -53,6 +61,7 @@ public class TravelInsurePeopleEntity extends BaseEntity {
             String policyNumber,
             BigDecimal insurePremium) {
         this.contractId = contractId;
+        this.planId = planId;
         this.name = name;
         this.gender = gender;
         this.residentNumber = residentNumber;

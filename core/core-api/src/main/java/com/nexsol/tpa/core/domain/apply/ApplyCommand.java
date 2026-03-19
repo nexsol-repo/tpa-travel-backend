@@ -26,6 +26,7 @@ public record ApplyCommand(
         boolean marketingConsentUsed) {
 
     public record InsuredPerson(
+            Long planId,
             String name,
             String gender,
             String residentNumber,
