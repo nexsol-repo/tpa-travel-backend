@@ -53,7 +53,7 @@ public class TravelInsuredEntity extends BaseEntity {
     private LocalDateTime deletedAt;
 
     @Builder
-    public TravelInsurePeopleEntity(
+    public TravelInsuredEntity(
             Long contractId,
             Long planId,
             Boolean isContractor,

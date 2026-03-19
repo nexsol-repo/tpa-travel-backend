@@ -39,9 +39,6 @@ public class TravelContractEntity extends BaseEntity {
     @Column(name = "channel_name")
     private String channelName;
 
-    @Column(name = "plan_id", nullable = false)
-    private Long planId;
-
     @Column(name = "family_id")
     private Long familyId;
 
@@ -124,7 +121,6 @@ public class TravelContractEntity extends BaseEntity {
             String partnerName,
             Long channelId,
             String channelName,
-            Long planId,
             Long familyId) {
 
         TravelContractEntity entity = new TravelContractEntity();
@@ -134,7 +130,6 @@ public class TravelContractEntity extends BaseEntity {
         entity.partnerName = partnerName;
         entity.channelId = channelId;
         entity.channelName = channelName;
-        entity.planId = planId;
         entity.familyId = familyId;
         return entity;
     }
@@ -149,8 +144,7 @@ public class TravelContractEntity extends BaseEntity {
         this.countryName = countryName;
     }
 
-    public void applyContractPeople(
-            String name, String residentNumber, String hp, String mail) {
+    public void applyContractPeople(String name, String residentNumber, String hp, String mail) {
         this.contractPeopleName = name;
         this.contractPeopleResidentNumber = residentNumber;
         this.contractPeopleHp = hp;

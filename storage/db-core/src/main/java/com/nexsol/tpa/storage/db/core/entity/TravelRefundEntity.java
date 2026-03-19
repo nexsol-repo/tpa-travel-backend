@@ -14,8 +14,8 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "travel_insure_refund")
-public class TravelInsureRefundEntity extends BaseEntity {
+@Table(name = "travel_refund")
+public class TravelRefundEntity extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -50,7 +50,7 @@ public class TravelInsureRefundEntity extends BaseEntity {
     private LocalDateTime refundedAt;
 
     @Builder
-    public TravelInsureRefundEntity(
+    public TravelRefundEntity(
             Long paymentId,
             Long contractId,
             BigDecimal refundAmount,
