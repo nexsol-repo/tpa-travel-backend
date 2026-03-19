@@ -345,6 +345,8 @@ public class TravelContractQueryDto {
 
         private Long id;
 
+        private Long planId;
+
         private String name;
 
         private String nameEng;
@@ -362,6 +364,7 @@ public class TravelContractQueryDto {
         public static Person of(TravelInsurePeopleEntity p) {
             return Person.builder()
                     .id(p.getId())
+                    .planId(p.getPlanId())
                     .name(p.getName())
                     .nameEng(p.getNameEng())
                     .gender(p.getGender())
