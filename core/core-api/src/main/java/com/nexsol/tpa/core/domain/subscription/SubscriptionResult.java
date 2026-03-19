@@ -24,15 +24,19 @@ public record SubscriptionResult(
             int insuredPeopleCount) {
 
         return new SubscriptionResult(
-                true, "00001", "0",
-                contractId, insuranceProductName, planName,
-                insureStartDate, insureEndDate,
-                contractPeopleName, insuredPeopleCount);
+                true,
+                "00001",
+                "0",
+                contractId,
+                insuranceProductName,
+                planName,
+                insureStartDate,
+                insureEndDate,
+                contractPeopleName,
+                insuredPeopleCount);
     }
 
     public static SubscriptionResult fail(String errCd, String errMsg) {
-        return new SubscriptionResult(
-                false, errCd, errMsg,
-                null, null, null, null, null, null, 0);
+        return new SubscriptionResult(false, errCd, errMsg, null, null, null, null, null, null, 0);
     }
 }

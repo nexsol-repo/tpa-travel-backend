@@ -13,8 +13,13 @@ public record ContractCancelRequest(
 
     public RefundCommand toRefundCommand() {
         return new RefundCommand(
-                contractId, null, null,
-                refundMethod, bankName, accountNumber,
-                depositorName, refundReason);
+                contractId,
+                null,
+                null,
+                refundMethod,
+                bankName,
+                accountNumber,
+                depositorName,
+                refundReason);
     }
 }

@@ -8,7 +8,7 @@ import com.nexsol.tpa.core.domain.contract.ContractValidator;
 import com.nexsol.tpa.core.domain.payment.PaymentReader;
 import com.nexsol.tpa.core.domain.refund.RefundCommand;
 import com.nexsol.tpa.storage.db.core.entity.TravelContractEntity;
-import com.nexsol.tpa.storage.db.core.entity.TravelInsurePaymentEntity;
+import com.nexsol.tpa.storage.db.core.entity.TravelPaymentEntity;
 
 import lombok.RequiredArgsConstructor;
 
@@ -25,7 +25,7 @@ public class CancelService {
     public Long cancel(String company, RefundCommand refundCommand) {
         Long contractId = refundCommand.contractId();
         TravelContractEntity contract = contractReader.getById(contractId);
-        TravelInsurePaymentEntity payment = paymentReader.getByContractId(contract.getId());
+        TravelPaymentEntity payment = paymentReader.getByContractId(contract.getId());
 
         contractValidator.requireCancelable(payment);
 

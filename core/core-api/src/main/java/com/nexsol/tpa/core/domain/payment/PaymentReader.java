@@ -2,7 +2,7 @@ package com.nexsol.tpa.core.domain.payment;
 
 import org.springframework.stereotype.Component;
 
-import com.nexsol.tpa.storage.db.core.entity.TravelInsurePaymentEntity;
+import com.nexsol.tpa.storage.db.core.entity.TravelPaymentEntity;
 import com.nexsol.tpa.storage.db.core.repository.TravelInsurePaymentRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -13,7 +13,7 @@ public class PaymentReader {
 
     private final TravelInsurePaymentRepository paymentRepository;
 
-    public TravelInsurePaymentEntity getByContractId(Long contractId) {
+    public TravelPaymentEntity getByContractId(Long contractId) {
         return paymentRepository
                 .findByContractId(contractId)
                 .orElseThrow(

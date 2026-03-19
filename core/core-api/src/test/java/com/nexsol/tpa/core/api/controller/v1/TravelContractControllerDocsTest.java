@@ -21,8 +21,12 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 
-import com.nexsol.tpa.core.api.dto.v1.contract.TravelContractQueryDto;
+import com.nexsol.tpa.core.api.controller.v1.response.ContractQueryResponse;
+import com.nexsol.tpa.core.domain.contract.*;
 import com.nexsol.tpa.core.domain.contract.TravelContractQueryService;
+import com.nexsol.tpa.core.domain.payment.Payment;
+import com.nexsol.tpa.core.domain.plan.InsurancePlan;
+import com.nexsol.tpa.core.domain.plan.Insurer;
 import com.nexsol.tpa.test.api.RestDocsTest;
 
 @Tag("restdocs")
@@ -39,41 +43,39 @@ class TravelContractControllerDocsTest extends RestDocsTest {
     @Test
     void contractListByAuthKey() throws Exception {
         var item =
-                TravelContractQueryDto.ContractListItem.builder()
+                ContractQueryResponse.ContractListItem.builder()
                         .id(100L)
-                        .insurerId(1L)
-                        .insurerName("메리츠화재")
-                        .partnerId(1L)
-                        .partnerName("TPA파트너")
-                        .channelId(1L)
-                        .channelName("채널1")
-                        .planId(10L)
-                        .planName("가뿐한플랜B")
                         .policyNumber("POL001")
-                        .countryName("일본")
-                        .countryCode("JP")
-                        .insuredPeopleNumber(2)
                         .totalPremium(new BigDecimal("27000"))
                         .status("COMPLETED")
-                        .insureStartDate(LocalDate.of(2026, 3, 15))
-                        .insureEndDate(LocalDate.of(2026, 3, 20))
-                        .contractPeopleName("홍길동")
-                        .contractPeopleHp("01012345678")
-                        .contractPeopleMail("hong@test.com")
+                        .insuredPeopleNumber(2)
                         .termsUrl("https://example.com/terms.pdf")
+                        .insurer(Insurer.builder().id(1L).name("메리츠화재").build())
+                        .partner(Partner.builder().id(1L).name("TPA파트너").build())
+                        .channel(Channel.builder().id(1L).name("채널1").build())
+                        .plan(InsurancePlan.builder().id(10L).planName("가뿐한플랜").build())
+                        .insurePeriod(
+                                InsurePeriod.builder()
+                                        .startDate(LocalDate.of(2026, 3, 15))
+                                        .endDate(LocalDate.of(2026, 3, 20))
+                                        .countryCode("JP")
+                                        .countryName("일본")
+                                        .build())
+                        .auth(AuthInfo.builder().build())
+                        .contractor(
+                                Contractor.builder()
+                                        .name("홍길동")
+                                        .hp("01012345678")
+                                        .mail("hong@test.com")
+                                        .build())
                         .payment(
-                                TravelContractQueryDto.Payment.builder()
+                                Payment.builder()
                                         .id(1L)
                                         .paymentMethod("CARD")
                                         .status("PAID")
                                         .paidAmount(new BigDecimal("27000"))
                                         .build())
-                        .people(
-                                List.of(
-                                        TravelContractQueryDto.PersonSummary.builder()
-                                                .id(1L)
-                                                .name("홍길동")
-                                                .build()))
+                        .people(List.of(new PersonSummary(1L, "홍길동")))
                         .build();
 
         var page = new PageImpl<>(List.of(item), PageRequest.of(0, 20), 1);
@@ -120,145 +122,153 @@ class TravelContractControllerDocsTest extends RestDocsTest {
     private static org.springframework.restdocs.payload.FieldDescriptor[]
             contractListResponseFields() {
         return new org.springframework.restdocs.payload.FieldDescriptor[] {
-            fieldWithPath("content[].id").type(NUMBER).description("계약 ID"),
-            fieldWithPath("content[].insurerId").type(NUMBER).description("보험사 ID").optional(),
-            fieldWithPath("content[].insurerName").type(STRING).description("보험사명").optional(),
-            fieldWithPath("content[].partnerId").type(NUMBER).description("파트너 ID").optional(),
-            fieldWithPath("content[].partnerName").type(STRING).description("파트너명").optional(),
-            fieldWithPath("content[].channelId").type(NUMBER).description("채널 ID").optional(),
-            fieldWithPath("content[].channelName").type(STRING).description("채널명").optional(),
-            fieldWithPath("content[].planId").type(NUMBER).description("플랜 ID").optional(),
-            fieldWithPath("content[].planName").type(STRING).description("플랜명").optional(),
-            fieldWithPath("content[].policyNumber").type(STRING).description("증권번호").optional(),
-            fieldWithPath("content[].countryName").type(STRING).description("국가명").optional(),
-            fieldWithPath("content[].countryCode").type(STRING).description("국가코드").optional(),
-            fieldWithPath("content[].insuredPeopleNumber")
+            // ApiResponse wrapper
+            fieldWithPath("result").type(STRING).description("결과 (SUCCESS/ERROR)"),
+            fieldWithPath("error").type(OBJECT).description("에러 정보").optional(),
+            // ContractListItem
+            fieldWithPath("data.content[].id").type(NUMBER).description("계약 ID"),
+            fieldWithPath("data.content[].policyNumber")
+                    .type(STRING)
+                    .description("증권번호")
+                    .optional(),
+            fieldWithPath("data.content[].totalPremium")
                     .type(NUMBER)
-                    .description("피보험자 수")
+                    .description("총 보험료")
                     .optional(),
-            fieldWithPath("content[].totalPremium").type(NUMBER).description("총 보험료").optional(),
-            fieldWithPath("content[].status").type(STRING).description("계약 상태").optional(),
-            fieldWithPath("content[].authUniqueKey").type(STRING).description("인증 고유키").optional(),
-            fieldWithPath("content[].authStatus").type(STRING).description("인증 상태").optional(),
-            fieldWithPath("content[].authDate").type(STRING).description("인증일시").optional(),
-            fieldWithPath("content[].applyDate").type(STRING).description("접수일시").optional(),
-            fieldWithPath("content[].insureStartDate").type(STRING).description("보험시작일").optional(),
-            fieldWithPath("content[].insureEndDate").type(STRING).description("보험종료일").optional(),
-            fieldWithPath("content[].contractPeopleName")
-                    .type(STRING)
-                    .description("계약자명")
+            fieldWithPath("data.content[].status").type(STRING).description("계약 상태").optional(),
+            fieldWithPath("data.content[].insuredPeopleNumber").type(NUMBER).description("피보험자 수"),
+            fieldWithPath("data.content[].applyDate").type(STRING).description("접수일시").optional(),
+            fieldWithPath("data.content[].termsUrl").type(STRING).description("약관 URL").optional(),
+            fieldWithPath("data.content[].policyLink").type(STRING).description("증권 링크").optional(),
+            // Insurer
+            subsectionWithPath("data.content[].insurer")
+                    .type(OBJECT)
+                    .description("보험사 정보")
                     .optional(),
-            fieldWithPath("content[].contractPeopleResidentNumberMasked")
-                    .type(STRING)
-                    .description("계약자 주민번호 (마스킹)")
+            // Partner
+            subsectionWithPath("data.content[].partner")
+                    .type(OBJECT)
+                    .description("파트너 정보")
                     .optional(),
-            fieldWithPath("content[].contractPeopleHp")
-                    .type(STRING)
-                    .description("계약자 휴대폰")
+            // Channel
+            subsectionWithPath("data.content[].channel")
+                    .type(OBJECT)
+                    .description("채널 정보")
                     .optional(),
-            fieldWithPath("content[].contractPeopleMail")
-                    .type(STRING)
-                    .description("계약자 이메일")
+            // InsurancePlan
+            subsectionWithPath("data.content[].plan").type(OBJECT).description("플랜 정보").optional(),
+            // InsurePeriod
+            subsectionWithPath("data.content[].insurePeriod")
+                    .type(OBJECT)
+                    .description("보험기간 정보")
                     .optional(),
-            fieldWithPath("content[].termsUrl").type(STRING).description("약관 URL").optional(),
-            fieldWithPath("content[].policyLink").type(STRING).description("증권 링크").optional(),
-            subsectionWithPath("content[].payment").type(OBJECT).description("결제 정보").optional(),
-            fieldWithPath("content[].people[].id").type(NUMBER).description("피보험자 ID"),
-            fieldWithPath("content[].people[].name").type(STRING).description("피보험자 이름"),
+            // AuthInfo
+            subsectionWithPath("data.content[].auth").type(OBJECT).description("인증 정보").optional(),
+            // Contractor
+            subsectionWithPath("data.content[].contractor")
+                    .type(OBJECT)
+                    .description("대표계약자 정보")
+                    .optional(),
+            // Payment
+            subsectionWithPath("data.content[].payment")
+                    .type(OBJECT)
+                    .description("결제 정보")
+                    .optional(),
+            // People
+            fieldWithPath("data.content[].people[].id").type(NUMBER).description("피보험자 ID"),
+            fieldWithPath("data.content[].people[].name").type(STRING).description("피보험자 이름"),
             // Page metadata
-            subsectionWithPath("pageable").description("페이지 정보"),
-            fieldWithPath("totalElements").type(NUMBER).description("전체 건수"),
-            fieldWithPath("totalPages").type(NUMBER).description("전체 페이지 수"),
-            fieldWithPath("size").type(NUMBER).description("페이지 크기"),
-            fieldWithPath("number").type(NUMBER).description("현재 페이지"),
-            fieldWithPath("sort").type(OBJECT).description("정렬 정보"),
-            fieldWithPath("sort.empty").type(BOOLEAN).description("정렬 비어있음"),
-            fieldWithPath("sort.sorted").type(BOOLEAN).description("정렬됨"),
-            fieldWithPath("sort.unsorted").type(BOOLEAN).description("미정렬"),
-            fieldWithPath("first").type(BOOLEAN).description("첫 페이지 여부"),
-            fieldWithPath("last").type(BOOLEAN).description("마지막 페이지 여부"),
-            fieldWithPath("numberOfElements").type(NUMBER).description("현재 페이지 건수"),
-            fieldWithPath("empty").type(BOOLEAN).description("비어있음"),
+            subsectionWithPath("data.pageable").description("페이지 정보"),
+            fieldWithPath("data.totalElements").type(NUMBER).description("전체 건수"),
+            fieldWithPath("data.totalPages").type(NUMBER).description("전체 페이지 수"),
+            fieldWithPath("data.size").type(NUMBER).description("페이지 크기"),
+            fieldWithPath("data.number").type(NUMBER).description("현재 페이지"),
+            fieldWithPath("data.sort").type(OBJECT).description("정렬 정보"),
+            fieldWithPath("data.sort.empty").type(BOOLEAN).description("정렬 비어있음"),
+            fieldWithPath("data.sort.sorted").type(BOOLEAN).description("정렬됨"),
+            fieldWithPath("data.sort.unsorted").type(BOOLEAN).description("미정렬"),
+            fieldWithPath("data.first").type(BOOLEAN).description("첫 페이지 여부"),
+            fieldWithPath("data.last").type(BOOLEAN).description("마지막 페이지 여부"),
+            fieldWithPath("data.numberOfElements").type(NUMBER).description("현재 페이지 건수"),
+            fieldWithPath("data.empty").type(BOOLEAN).description("비어있음"),
         };
     }
 
     private static org.springframework.restdocs.payload.FieldDescriptor[]
             contractDetailResponseFields() {
         return new org.springframework.restdocs.payload.FieldDescriptor[] {
-            subsectionWithPath("contract").type(OBJECT).description("계약 정보"),
-            subsectionWithPath("insurer").type(OBJECT).description("보험사 정보").optional(),
-            subsectionWithPath("partner").type(OBJECT).description("파트너 정보").optional(),
-            subsectionWithPath("channel").type(OBJECT).description("채널 정보").optional(),
-            subsectionWithPath("plan").type(OBJECT).description("플랜 정보").optional(),
-            subsectionWithPath("payment").type(OBJECT).description("결제 정보").optional(),
-            fieldWithPath("termsUrl").type(STRING).description("약관 URL").optional(),
-            fieldWithPath("policyLink").type(STRING).description("증권 링크").optional(),
-            fieldWithPath("people[].id").type(NUMBER).description("피보험자 ID"),
-            fieldWithPath("people[].name").type(STRING).description("이름"),
-            fieldWithPath("people[].nameEng").type(STRING).description("영문이름").optional(),
-            fieldWithPath("people[].gender").type(STRING).description("성별"),
-            fieldWithPath("people[].residentNumberMasked")
+            // ApiResponse wrapper
+            fieldWithPath("result").type(STRING).description("결과 (SUCCESS/ERROR)"),
+            fieldWithPath("error").type(OBJECT).description("에러 정보").optional(),
+            // ContractDetail
+            subsectionWithPath("data.contract").type(OBJECT).description("계약 정보"),
+            subsectionWithPath("data.insurer").type(OBJECT).description("보험사 정보").optional(),
+            subsectionWithPath("data.partner").type(OBJECT).description("파트너 정보").optional(),
+            subsectionWithPath("data.channel").type(OBJECT).description("채널 정보").optional(),
+            subsectionWithPath("data.plan").type(OBJECT).description("플랜 정보").optional(),
+            subsectionWithPath("data.payment").type(OBJECT).description("결제 정보").optional(),
+            fieldWithPath("data.termsUrl").type(STRING).description("약관 URL").optional(),
+            fieldWithPath("data.policyLink").type(STRING).description("증권 링크").optional(),
+            fieldWithPath("data.people[].id").type(NUMBER).description("피보험자 ID"),
+            fieldWithPath("data.people[].planId").type(NUMBER).description("플랜 ID").optional(),
+            fieldWithPath("data.people[].isContractor").type(BOOLEAN).description("대표계약자 여부"),
+            fieldWithPath("data.people[].name").type(STRING).description("이름"),
+            fieldWithPath("data.people[].nameEng").type(STRING).description("영문이름").optional(),
+            fieldWithPath("data.people[].gender").type(STRING).description("성별"),
+            fieldWithPath("data.people[].residentNumberMasked")
                     .type(STRING)
                     .description("주민번호 (마스킹)")
                     .optional(),
-            fieldWithPath("people[].passportNumberMasked")
+            fieldWithPath("data.people[].passportNumberMasked")
                     .type(STRING)
                     .description("여권번호 (마스킹)")
                     .optional(),
-            fieldWithPath("people[].policyNumber").type(STRING).description("증권번호").optional(),
-            fieldWithPath("people[].insurePremium").type(NUMBER).description("피보험자 보험료").optional(),
+            fieldWithPath("data.people[].policyNumber").type(STRING).description("증권번호").optional(),
+            fieldWithPath("data.people[].insurePremium")
+                    .type(NUMBER)
+                    .description("피보험자 보험료")
+                    .optional(),
         };
     }
 
     // ── Sample Data ──
 
-    private TravelContractQueryDto.ContractDetail sampleContractDetail() {
-        return TravelContractQueryDto.ContractDetail.builder()
+    private ContractQueryResponse.ContractDetail sampleContractDetail() {
+        return ContractQueryResponse.ContractDetail.builder()
                 .contract(
-                        TravelContractQueryDto.Contract.builder()
+                        ContractInfo.builder()
                                 .id(100L)
-                                .insurerId(1L)
-                                .partnerId(1L)
-                                .channelId(1L)
-                                .planId(10L)
+                                .familyId(1L)
                                 .policyNumber("POL001")
-                                .countryName("일본")
-                                .countryCode("JP")
                                 .status("COMPLETED")
-                                .insureStartDate(LocalDate.of(2026, 3, 15))
-                                .insureEndDate(LocalDate.of(2026, 3, 20))
                                 .totalPremium(new BigDecimal("27000"))
-                                .contractPeopleName("홍길동")
-                                .contractPeopleHp("01012345678")
-                                .contractPeopleMail("hong@test.com")
+                                .insurePeriod(
+                                        InsurePeriod.builder()
+                                                .startDate(LocalDate.of(2026, 3, 15))
+                                                .endDate(LocalDate.of(2026, 3, 20))
+                                                .countryCode("JP")
+                                                .countryName("일본")
+                                                .build())
+                                .contractor(
+                                        Contractor.builder()
+                                                .name("홍길동")
+                                                .hp("01012345678")
+                                                .mail("hong@test.com")
+                                                .build())
+                                .auth(AuthInfo.builder().build())
                                 .build())
-                .insurer(
-                        TravelContractQueryDto.Insurer.builder()
-                                .id(1L)
-                                .insurerCode("MERITZ")
-                                .insurerName("메리츠화재")
-                                .build())
-                .partner(
-                        TravelContractQueryDto.Partner.builder()
-                                .id(1L)
-                                .partnerCode("TPA")
-                                .partnerName("TPA파트너")
-                                .build())
-                .channel(
-                        TravelContractQueryDto.Channel.builder()
-                                .id(1L)
-                                .channelCode("CH01")
-                                .channelName("채널1")
-                                .build())
+                .insurer(Insurer.builder().id(1L).code("MERITZ").name("메리츠화재").build())
+                .partner(Partner.builder().id(1L).code("TPA").name("TPA파트너").build())
+                .channel(Channel.builder().id(1L).code("CH01").name("채널1").build())
                 .plan(
-                        TravelContractQueryDto.Plan.builder()
+                        InsurancePlan.builder()
                                 .id(10L)
-                                .planName("가뿐한플랜B")
+                                .planName("가뿐한플랜")
                                 .planGroupCode("GRP01")
                                 .planCode("TA2")
                                 .build())
                 .payment(
-                        TravelContractQueryDto.Payment.builder()
+                        Payment.builder()
                                 .id(1L)
                                 .paymentMethod("CARD")
                                 .status("PAID")
@@ -266,16 +276,18 @@ class TravelContractControllerDocsTest extends RestDocsTest {
                                 .build())
                 .people(
                         List.of(
-                                TravelContractQueryDto.Person.builder()
+                                InsuredPerson.builder()
                                         .id(1L)
                                         .name("홍길동")
                                         .gender("1")
+                                        .isContractor(true)
                                         .residentNumberMasked("900101-*******")
                                         .build(),
-                                TravelContractQueryDto.Person.builder()
+                                InsuredPerson.builder()
                                         .id(2L)
                                         .name("김영희")
                                         .gender("2")
+                                        .isContractor(false)
                                         .residentNumberMasked("920515-*******")
                                         .build()))
                 .build();

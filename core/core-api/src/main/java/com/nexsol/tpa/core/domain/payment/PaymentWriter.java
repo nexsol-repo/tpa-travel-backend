@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 import com.nexsol.tpa.core.enums.TravelPaymentMethod;
 import com.nexsol.tpa.core.enums.TravelPaymentStatus;
-import com.nexsol.tpa.storage.db.core.entity.TravelInsurePaymentEntity;
+import com.nexsol.tpa.storage.db.core.entity.TravelPaymentEntity;
 import com.nexsol.tpa.storage.db.core.repository.TravelInsurePaymentRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -18,9 +18,9 @@ public class PaymentWriter {
 
     private final TravelInsurePaymentRepository paymentRepository;
 
-    public TravelInsurePaymentEntity createCompleted(Long contractId, BigDecimal amount) {
+    public TravelPaymentEntity createCompleted(Long contractId, BigDecimal amount) {
         return paymentRepository.save(
-                TravelInsurePaymentEntity.builder()
+                TravelPaymentEntity.builder()
                         .contractId(contractId)
                         .paymentMethod(TravelPaymentMethod.CARD)
                         .paidAmount(amount)
@@ -29,7 +29,7 @@ public class PaymentWriter {
                         .build());
     }
 
-    public void markCanceled(TravelInsurePaymentEntity payment) {
+    public void markCanceled(TravelPaymentEntity payment) {
         payment.markCanceled(LocalDateTime.now());
         paymentRepository.save(payment);
     }

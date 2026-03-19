@@ -9,7 +9,7 @@ import com.nexsol.tpa.core.domain.refund.RefundWriter;
 import com.nexsol.tpa.core.domain.snapshot.SnapshotAppender;
 import com.nexsol.tpa.core.enums.TravelPaymentMethod;
 import com.nexsol.tpa.storage.db.core.entity.TravelContractEntity;
-import com.nexsol.tpa.storage.db.core.entity.TravelInsurePaymentEntity;
+import com.nexsol.tpa.storage.db.core.entity.TravelPaymentEntity;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +28,7 @@ public class CancelWriter {
     @Transactional
     public void save(
             TravelContractEntity contract,
-            TravelInsurePaymentEntity payment,
+            TravelPaymentEntity payment,
             RefundCommand refundCommand) {
 
         paymentWriter.markCanceled(payment);

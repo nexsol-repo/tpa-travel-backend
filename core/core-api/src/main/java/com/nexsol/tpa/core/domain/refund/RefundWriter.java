@@ -2,7 +2,7 @@ package com.nexsol.tpa.core.domain.refund;
 
 import org.springframework.stereotype.Component;
 
-import com.nexsol.tpa.storage.db.core.entity.TravelInsureRefundEntity;
+import com.nexsol.tpa.storage.db.core.entity.TravelRefundEntity;
 import com.nexsol.tpa.storage.db.core.repository.TravelInsureRefundRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -13,9 +13,9 @@ public class RefundWriter {
 
     private final TravelInsureRefundRepository refundRepository;
 
-    public TravelInsureRefundEntity create(RefundCommand command) {
+    public TravelRefundEntity create(RefundCommand command) {
         return refundRepository.save(
-                TravelInsureRefundEntity.builder()
+                TravelRefundEntity.builder()
                         .paymentId(command.paymentId())
                         .contractId(command.contractId())
                         .refundAmount(command.refundAmount())

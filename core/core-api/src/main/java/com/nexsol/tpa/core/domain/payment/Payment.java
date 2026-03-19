@@ -1,9 +1,9 @@
-package com.nexsol.tpa.core.domain.contract.vo;
+package com.nexsol.tpa.core.domain.payment;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-import com.nexsol.tpa.storage.db.core.entity.TravelInsurePaymentEntity;
+import com.nexsol.tpa.storage.db.core.entity.TravelPaymentEntity;
 
 import lombok.Builder;
 
@@ -16,7 +16,7 @@ public record Payment(
         LocalDateTime paymentDate,
         LocalDateTime cancelDate) {
 
-    public static Payment of(TravelInsurePaymentEntity e) {
+    public static Payment of(TravelPaymentEntity e) {
         if (e == null) return null;
         return Payment.builder()
                 .id(e.getId())

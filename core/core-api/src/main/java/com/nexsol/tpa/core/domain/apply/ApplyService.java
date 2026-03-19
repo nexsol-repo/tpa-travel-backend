@@ -8,8 +8,8 @@ import com.nexsol.tpa.core.domain.snapshot.SnapshotAppender;
 import com.nexsol.tpa.core.support.error.CoreApiErrorType;
 import com.nexsol.tpa.core.support.error.CoreApiException;
 import com.nexsol.tpa.storage.db.core.entity.TravelContractEntity;
-import com.nexsol.tpa.storage.db.core.entity.TravelInsurePeopleEntity;
-import com.nexsol.tpa.storage.db.core.repository.TravelInsurePeopleRepository;
+import com.nexsol.tpa.storage.db.core.entity.TravelInsuredEntity;
+import com.nexsol.tpa.storage.db.core.repository.TravelInsuredRepository;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +22,7 @@ import tools.jackson.databind.ObjectMapper;
 public class ApplyService {
 
     private final ContractWriter contractWriter;
-    private final TravelInsurePeopleRepository peopleRepository;
+    private final TravelInsuredRepository peopleRepository;
     private final SnapshotAppender snapshotAppender;
     private final CompaniesConfigsProperties companies;
     private final ObjectMapper objectMapper;
@@ -31,17 +31,15 @@ public class ApplyService {
     public Long apply(ApplyCommand cmd) {
         validate(cmd);
 
-        Long repPlanId = cmd.people().stream()
-                .map(ApplyCommand.InsuredPerson::planId)
-                .filter(id -> id != null)
-                .findFirst()
-                .orElse(null);
-
-        TravelContractEntity contract = TravelContractEntity.create(
-                cmd.insurerId(), "MERITZ",
-                cmd.partnerId(), "TPA KOREA",
-                cmd.channelId(), "TPA KOREA",
-                repPlanId, cmd.familyId());
+        TravelContractEntity contract =
+                TravelContractEntity.create(
+                        cmd.insurerId(),
+                        "MERITZ",
+                        cmd.partnerId(),
+                        "TPA KOREA",
+                        cmd.channelId(),
+                        "TPA KOREA",
+                        cmd.familyId());
 
         contract.applyInsurePeriod(
                 cmd.insureBeginDate(), cmd.insureEndDate(),
@@ -51,7 +49,8 @@ public class ApplyService {
                 cmd.contractPeopleHp(), cmd.contractPeopleMail());
         contract.applyMeritzQuote(
                 companies.getTpa().getPolNo(),
-                cmd.meritzQuoteGroupNumber(), cmd.meritzQuoteRequestNumber());
+                cmd.meritzQuoteGroupNumber(),
+                cmd.meritzQuoteRequestNumber());
         contract.applyPremium(cmd.totalFee());
         contract.applyMarketingConsent(cmd.marketingConsentUsed());
 
@@ -64,7 +63,7 @@ public class ApplyService {
                         CoreApiErrorType.INVALID_CONTRACT_REQUEST, "people.name is required");
             }
             peopleRepository.save(
-                    TravelInsurePeopleEntity.builder()
+                    TravelInsuredEntity.builder()
                             .contractId(saved.getId())
                             .planId(p.planId())
                             .isContractor(first)

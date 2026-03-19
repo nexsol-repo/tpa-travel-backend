@@ -1,4 +1,4 @@
-package com.nexsol.tpa.core.domain.contract.vo;
+package com.nexsol.tpa.core.domain.plan;
 
 import com.nexsol.tpa.storage.db.core.entity.TravelInsurerEntity;
 

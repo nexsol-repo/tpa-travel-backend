@@ -1,4 +1,4 @@
-package com.nexsol.tpa.core.domain.contract.vo;
+package com.nexsol.tpa.core.domain.contract;
 
 import java.time.LocalDate;
 
@@ -8,10 +8,7 @@ import lombok.Builder;
 
 @Builder
 public record InsurePeriod(
-        LocalDate startDate,
-        LocalDate endDate,
-        String countryCode,
-        String countryName) {
+        LocalDate startDate, LocalDate endDate, String countryCode, String countryName) {
 
     public static InsurePeriod of(TravelContractEntity c) {
         return InsurePeriod.builder()

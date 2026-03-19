@@ -2,7 +2,7 @@ package com.nexsol.tpa.core.domain.refund;
 
 import org.springframework.stereotype.Component;
 
-import com.nexsol.tpa.storage.db.core.entity.TravelInsureRefundEntity;
+import com.nexsol.tpa.storage.db.core.entity.TravelRefundEntity;
 import com.nexsol.tpa.storage.db.core.repository.TravelInsureRefundRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -13,7 +13,7 @@ public class RefundReader {
 
     private final TravelInsureRefundRepository refundRepository;
 
-    public TravelInsureRefundEntity getByContractId(Long contractId) {
+    public TravelRefundEntity getByContractId(Long contractId) {
         return refundRepository
                 .findByContractId(contractId)
                 .orElseThrow(
@@ -22,7 +22,7 @@ public class RefundReader {
                                         "refund not found. contractId=" + contractId));
     }
 
-    public TravelInsureRefundEntity getByPaymentId(Long paymentId) {
+    public TravelRefundEntity getByPaymentId(Long paymentId) {
         return refundRepository
                 .findByPaymentId(paymentId)
                 .orElseThrow(

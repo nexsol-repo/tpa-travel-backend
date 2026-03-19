@@ -6,8 +6,8 @@ import com.nexsol.tpa.client.meritz.contract.CertificateApiResult;
 import com.nexsol.tpa.client.meritz.contract.MeritzContractClient;
 import com.nexsol.tpa.core.domain.contract.ContractReader;
 import com.nexsol.tpa.core.domain.contract.ContractValidator;
-import com.nexsol.tpa.core.domain.plan.PlanReader;
 import com.nexsol.tpa.core.domain.snapshot.SnapshotAppender;
+import com.nexsol.tpa.core.domain.subscription.SubscriptionInsuredReader;
 import com.nexsol.tpa.storage.db.core.entity.TravelContractEntity;
 import com.nexsol.tpa.storage.db.core.entity.TravelInsurancePlanEntity;
 
@@ -22,7 +22,7 @@ public class CertificateLinkIssuer {
 
     private final MeritzContractClient meritzClient;
     private final ContractReader contractReader;
-    private final PlanReader planReader;
+    private final SubscriptionInsuredReader subscriptionInsuredReader;
     private final SnapshotAppender snapshotAppender;
     private final ObjectMapper objectMapper;
 
@@ -31,7 +31,7 @@ public class CertificateLinkIssuer {
         String tp = normalizeOrDefault(otptTpCd, "V");
 
         TravelContractEntity contract = contractReader.getById(contractId);
-        TravelInsurancePlanEntity plan = planReader.getById(contract.getPlanId());
+        TravelInsurancePlanEntity plan = subscriptionInsuredReader.findRepPlan(contractId);
 
         String polNo = contract.getPolicyNumber();
         String pdCd = plan.getProductCode();
