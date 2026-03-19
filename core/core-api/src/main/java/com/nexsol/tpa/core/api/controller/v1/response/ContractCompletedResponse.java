@@ -4,6 +4,9 @@ import java.time.LocalDate;
 
 import com.nexsol.tpa.core.domain.subscription.SubscriptionResult;
 
+import lombok.Builder;
+
+@Builder
 public record ContractCompletedResponse(
         boolean ok,
         String errCd,
@@ -17,16 +20,17 @@ public record ContractCompletedResponse(
         int insuredPeopleCount) {
 
     public static ContractCompletedResponse of(SubscriptionResult r) {
-        return new ContractCompletedResponse(
-                r.ok(),
-                r.errCd(),
-                r.errMsg(),
-                r.contractId(),
-                r.insuranceProductName(),
-                r.planName(),
-                r.insureStartDate(),
-                r.insureEndDate(),
-                r.contractPeopleName(),
-                r.insuredPeopleCount());
+        return ContractCompletedResponse.builder()
+                .ok(r.ok())
+                .errCd(r.errCd())
+                .errMsg(r.errMsg())
+                .contractId(r.contractId())
+                .insuranceProductName(r.insuranceProductName())
+                .planName(r.planName())
+                .insureStartDate(r.insureStartDate())
+                .insureEndDate(r.insureEndDate())
+                .contractPeopleName(r.contractPeopleName())
+                .insuredPeopleCount(r.insuredPeopleCount())
+                .build();
     }
 }
