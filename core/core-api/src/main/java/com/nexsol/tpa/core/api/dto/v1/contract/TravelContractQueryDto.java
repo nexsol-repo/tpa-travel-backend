@@ -103,7 +103,7 @@ public class TravelContractQueryDto {
                     .policyNumber(c.getPolicyNumber())
                     .countryName(c.getCountryName())
                     .countryCode(c.getCountryCode())
-                    .insuredPeopleNumber(c.getInsuredPeopleNumber())
+                    .insuredPeopleNumber(people.size())
                     .totalPremium(c.getTotalPremium())
                     .status(c.getStatus() != null ? c.getStatus().name() : null)
                     .authUniqueKey(c.getAuthUniqueKey())
@@ -227,8 +227,6 @@ public class TravelContractQueryDto {
 
         private String countryCode;
 
-        private Integer insuredPeopleNumber;
-
         private BigDecimal totalPremium;
 
         private String policyLink;
@@ -285,7 +283,6 @@ public class TravelContractQueryDto {
                     .meritzQuoteRequestNumber(c.getMeritzQuoteRequestNumber())
                     .countryName(c.getCountryName())
                     .countryCode(c.getCountryCode())
-                    .insuredPeopleNumber(c.getInsuredPeopleNumber())
                     .totalPremium(c.getTotalPremium())
                     .policyLink(c.getPolicyLink())
                     .status(c.getStatus() != null ? c.getStatus().name() : null)

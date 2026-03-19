@@ -27,7 +27,6 @@ public class ContractCancelResponse {
                                 .meritzQuoteRequestNumber(c.meritzQuoteRequestNumber())
                                 .countryName(c.countryName())
                                 .countryCode(c.countryCode())
-                                .insuredPeopleNumber(c.insuredPeopleNumber())
                                 .totalFee(c.totalFee())
                                 .insureBeginDate(c.insureBeginDate())
                                 .insureEndDate(c.insureEndDate())
@@ -80,8 +79,6 @@ public class ContractCancelResponse {
         private String countryName;
 
         private String countryCode;
-
-        private Integer insuredPeopleNumber;
 
         private BigDecimal totalFee;
 

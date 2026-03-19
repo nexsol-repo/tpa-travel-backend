@@ -61,9 +61,6 @@ public class TravelContractEntity extends BaseEntity {
     @Column(name = "country_code")
     private String countryCode;
 
-    @Column(name = "insured_people_number", nullable = false)
-    private Integer insuredPeopleNumber;
-
     @Column(name = "total_premium", nullable = false, precision = 15, scale = 2)
     private BigDecimal totalPremium;
 
@@ -134,7 +131,6 @@ public class TravelContractEntity extends BaseEntity {
             String meritzQuoteRequestNumber,
             String countryName,
             String countryCode,
-            Integer insuredPeopleNumber,
             BigDecimal totalPremium,
             TravelContractStatus status,
             LocalDate insureStartDate,
@@ -163,7 +159,6 @@ public class TravelContractEntity extends BaseEntity {
         this.meritzQuoteRequestNumber = meritzQuoteRequestNumber;
         this.countryName = countryName;
         this.countryCode = countryCode;
-        this.insuredPeopleNumber = insuredPeopleNumber == null ? 1 : insuredPeopleNumber;
         this.totalPremium = totalPremium == null ? BigDecimal.ZERO : totalPremium;
         this.status = status == null ? TravelContractStatus.PENDING : status;
         this.insureStartDate = insureStartDate;

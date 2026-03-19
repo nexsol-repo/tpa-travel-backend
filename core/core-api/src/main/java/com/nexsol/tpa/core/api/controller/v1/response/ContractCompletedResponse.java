@@ -51,7 +51,6 @@ public class ContractCompletedResponse {
                                 .meritzQuoteRequestNumber(c.meritzQuoteRequestNumber())
                                 .countryName(c.countryName())
                                 .countryCode(c.countryCode())
-                                .insuredPeopleNumber(c.insuredPeopleNumber())
                                 .totalFee(c.totalFee())
                                 .status(c.status())
                                 .insureBeginDate(c.insureBeginDate())
@@ -97,8 +96,6 @@ public class ContractCompletedResponse {
         private String countryName;
 
         private String countryCode;
-
-        private Integer insuredPeopleNumber;
 
         private BigDecimal totalFee;
 

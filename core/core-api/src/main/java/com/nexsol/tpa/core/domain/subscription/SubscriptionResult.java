@@ -31,7 +31,6 @@ public record SubscriptionResult(
             String meritzQuoteRequestNumber,
             String countryName,
             String countryCode,
-            Integer insuredPeopleNumber,
             BigDecimal totalFee,
             String status,
             LocalDate insureBeginDate,

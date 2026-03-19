@@ -102,7 +102,6 @@ public class CancelService {
                         contract.getMeritzQuoteRequestNumber(),
                         contract.getCountryName(),
                         contract.getCountryCode(),
-                        contract.getInsuredPeopleNumber(),
                         contract.getTotalPremium(),
                         contract.getInsureStartDate(),
                         contract.getInsureEndDate(),

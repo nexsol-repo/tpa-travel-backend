@@ -61,7 +61,6 @@ public class ApplyService {
                         .meritzQuoteGroupNumber(cmd.meritzQuoteGroupNumber())
                         .meritzQuoteRequestNumber(cmd.meritzQuoteRequestNumber())
                         .totalPremium(cmd.totalFee())
-                        .insuredPeopleNumber(cmd.people().size())
                         .marketingConsentUsed(cmd.marketingConsentUsed())
                         .status(TravelContractStatus.PENDING)
                         .build();

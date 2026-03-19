@@ -14,7 +14,6 @@ public record CancelResult(ContractInfo contract) {
             String meritzQuoteRequestNumber,
             String countryName,
             String countryCode,
-            Integer insuredPeopleNumber,
             BigDecimal totalFee,
             LocalDate insureBeginDate,
             LocalDate insureEndDate,
