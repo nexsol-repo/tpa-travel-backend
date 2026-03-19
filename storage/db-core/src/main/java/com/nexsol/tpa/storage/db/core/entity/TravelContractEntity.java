@@ -140,7 +140,7 @@ public class TravelContractEntity extends BaseEntity {
     }
 
     public void applyPremium(BigDecimal totalPremium) {
-        this.totalPremium = totalPremium != null ? totalPremium : BigDecimal.ZERO;
+        this.totalPremium = totalPremium;
     }
 
     public void applyMarketingConsent(boolean used) {

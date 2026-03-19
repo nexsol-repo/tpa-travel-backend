@@ -200,7 +200,7 @@ class MeritzContractControllerDocsTest extends RestDocsTest {
                   "countryName": "일본",
                   "insureBeginDate": "2026-03-15",
                   "insureEndDate": "2026-03-20",
-                  "totalFee": 27000,
+                  "totalPremium": 27000,
                   "people": [
                     {
                       "planId": 10,
@@ -341,7 +341,7 @@ class MeritzContractControllerDocsTest extends RestDocsTest {
             fieldWithPath("countryName").type(STRING).description("국가명"),
             fieldWithPath("insureBeginDate").type(STRING).description("보험시작일 (YYYY-MM-DD)"),
             fieldWithPath("insureEndDate").type(STRING).description("보험종료일 (YYYY-MM-DD)"),
-            fieldWithPath("totalFee").type(NUMBER).description("총 보험료"),
+            fieldWithPath("totalPremium").type(NUMBER).description("총 보험료"),
             fieldWithPath("people[]").type(ARRAY).description("피보험자 목록"),
             fieldWithPath("people[].planId").type(NUMBER).description("피보험자 플랜 ID"),
             fieldWithPath("people[].name").type(STRING).description("피보험자 이름"),
