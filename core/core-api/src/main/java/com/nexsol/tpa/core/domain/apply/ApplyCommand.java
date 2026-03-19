@@ -17,10 +17,6 @@ public record ApplyCommand(
         String countryName,
         LocalDate insureBeginDate,
         LocalDate insureEndDate,
-        String contractPeopleName,
-        String contractPeopleResidentNumber,
-        String contractPeopleHp,
-        String contractPeopleMail,
         BigDecimal totalFee,
         List<InsuredPerson> people,
         boolean marketingConsentUsed) {
@@ -30,8 +26,10 @@ public record ApplyCommand(
             String name,
             String gender,
             String residentNumber,
-            String nameEng,
+            String englishName,
             String passportNumber,
+            String phone,
+            String email,
             String insureNumber,
             BigDecimal insurePremium) {}
 }

@@ -21,6 +21,7 @@ public class SubscriptionResultReader {
     public SubscriptionResult read(TravelContractEntity contract) {
         TravelInsurancePlanEntity plan = subscriptionInsuredReader.findRepPlan(contract.getId());
         List<TravelInsuredEntity> people = peopleFinder.findByContractId(contract.getId());
+        TravelInsuredEntity contractor = peopleFinder.findContractor(contract.getId());
 
         return SubscriptionResult.success(
                 contract.getId(),
@@ -28,7 +29,7 @@ public class SubscriptionResultReader {
                 plan.getPlanName(),
                 contract.getInsureStartDate(),
                 contract.getInsureEndDate(),
-                contract.getContractPeopleName(),
+                contractor != null ? contractor.getName() : null,
                 people.size());
     }
 }

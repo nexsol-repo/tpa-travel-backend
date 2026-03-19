@@ -73,18 +73,6 @@ public class TravelContractEntity extends BaseEntity {
     @Column(name = "insure_end_date")
     private LocalDate insureEndDate;
 
-    @Column(name = "contract_people_name")
-    private String contractPeopleName;
-
-    @Column(name = "contract_people_resident_number")
-    private String contractPeopleResidentNumber;
-
-    @Column(name = "contract_people_hp")
-    private String contractPeopleHp;
-
-    @Column(name = "contract_people_mail")
-    private String contractPeopleMail;
-
     @Column(name = "employee_id")
     private Long employeeId;
 
@@ -142,13 +130,6 @@ public class TravelContractEntity extends BaseEntity {
         this.insureEndDate = endDate;
         this.countryCode = countryCode;
         this.countryName = countryName;
-    }
-
-    public void applyContractPeople(String name, String residentNumber, String hp, String mail) {
-        this.contractPeopleName = name;
-        this.contractPeopleResidentNumber = residentNumber;
-        this.contractPeopleHp = hp;
-        this.contractPeopleMail = mail;
     }
 
     public void applyMeritzQuote(

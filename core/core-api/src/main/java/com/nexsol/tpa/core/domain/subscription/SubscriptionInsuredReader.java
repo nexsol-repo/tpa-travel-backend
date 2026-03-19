@@ -43,7 +43,7 @@ public class SubscriptionInsuredReader {
                                     ResidentNumberParser.normalizeGenderToMeritz(
                                             person.getGender(), person.getResidentNumber()),
                                     person.getName(),
-                                    person.getNameEng(),
+                                    person.getEnglishName(),
                                     plan.getPlanGroupCode(),
                                     plan.getPlanCode());
                         })

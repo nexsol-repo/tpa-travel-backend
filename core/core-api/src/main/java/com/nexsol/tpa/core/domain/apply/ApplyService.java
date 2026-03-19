@@ -44,9 +44,6 @@ public class ApplyService {
         contract.applyInsurePeriod(
                 cmd.insureBeginDate(), cmd.insureEndDate(),
                 cmd.countryCode(), cmd.countryName());
-        contract.applyContractPeople(
-                cmd.contractPeopleName(), cmd.contractPeopleResidentNumber(),
-                cmd.contractPeopleHp(), cmd.contractPeopleMail());
         contract.applyMeritzQuote(
                 companies.getTpa().getPolNo(),
                 cmd.meritzQuoteGroupNumber(),
@@ -70,8 +67,10 @@ public class ApplyService {
                             .name(p.name())
                             .gender(p.gender())
                             .residentNumber(p.residentNumber())
-                            .nameEng(p.nameEng())
+                            .englishName(p.englishName())
                             .passportNumber(p.passportNumber())
+                            .phone(p.phone())
+                            .email(p.email())
                             .policyNumber(p.insureNumber())
                             .insurePremium(p.insurePremium())
                             .build());

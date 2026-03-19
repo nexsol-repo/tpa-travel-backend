@@ -2,19 +2,20 @@ package com.nexsol.tpa.core.domain.contract;
 
 import static com.nexsol.tpa.core.support.MaskingUtils.*;
 
-import com.nexsol.tpa.storage.db.core.entity.TravelContractEntity;
+import com.nexsol.tpa.storage.db.core.entity.TravelInsuredEntity;
 
 import lombok.Builder;
 
 @Builder
-public record Contractor(String name, String residentNumberMasked, String hp, String mail) {
+public record Contractor(String name, String residentNumberMasked, String phone, String email) {
 
-    public static Contractor of(TravelContractEntity c) {
+    public static Contractor of(TravelInsuredEntity insured) {
+        if (insured == null) return null;
         return Contractor.builder()
-                .name(c.getContractPeopleName())
-                .residentNumberMasked(maskRrn(c.getContractPeopleResidentNumber()))
-                .hp(c.getContractPeopleHp())
-                .mail(c.getContractPeopleMail())
+                .name(insured.getName())
+                .residentNumberMasked(maskRrn(insured.getResidentNumber()))
+                .phone(insured.getPhone())
+                .email(insured.getEmail())
                 .build();
     }
 }

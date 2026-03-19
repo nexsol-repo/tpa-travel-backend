@@ -3,6 +3,7 @@ package com.nexsol.tpa.core.domain.auth;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.nexsol.tpa.core.domain.contract.ContractPeopleFinder;
 import com.nexsol.tpa.core.domain.contract.ContractReader;
 import com.nexsol.tpa.core.support.error.CoreApiErrorType;
 import com.nexsol.tpa.core.support.error.CoreApiException;
@@ -15,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 public class AuthCertService {
 
     private final ContractReader contractReader;
+    private final ContractPeopleFinder peopleFinder;
     private final PortOneCertificationReader certificationReader;
     private final AuthCertWriter authCertWriter;
     private final AuthCertMatcher authCertMatcher;
@@ -53,7 +55,8 @@ public class AuthCertService {
 
         var cert = certificationReader.getCertification(cmd.impUid());
 
-        boolean matched = authCertMatcher.isMatched(contract, cert);
+        var contractor = peopleFinder.findContractor(contractId);
+        boolean matched = authCertMatcher.isMatched(contractor, cert);
         String matchFailReason = matched ? null : "계약자 정보 불일치";
 
         var resultInfo =

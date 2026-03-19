@@ -14,7 +14,7 @@ public record InsuredPerson(
         Long planId,
         boolean isContractor,
         String name,
-        String nameEng,
+        String englishName,
         String gender,
         String residentNumberMasked,
         String passportNumberMasked,
@@ -27,7 +27,7 @@ public record InsuredPerson(
                 .planId(e.getPlanId())
                 .isContractor(Boolean.TRUE.equals(e.getIsContractor()))
                 .name(e.getName())
-                .nameEng(e.getNameEng())
+                .englishName(e.getEnglishName())
                 .gender(e.getGender())
                 .residentNumberMasked(maskRrn(e.getResidentNumber()))
                 .passportNumberMasked(maskPassport(e.getPassportNumber()))

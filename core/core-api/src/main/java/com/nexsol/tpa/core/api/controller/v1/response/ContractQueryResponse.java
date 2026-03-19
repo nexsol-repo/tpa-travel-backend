@@ -47,6 +47,12 @@ public final class ContractQueryResponse {
                 TravelInsurancePlanEntity plan,
                 List<TravelInsuredEntity> people) {
 
+            var contractorEntity =
+                    people.stream()
+                            .filter(p -> Boolean.TRUE.equals(p.getIsContractor()))
+                            .findFirst()
+                            .orElse(null);
+
             return ContractListItem.builder()
                     .id(c.getId())
                     .policyNumber(c.getPolicyNumber())
@@ -65,7 +71,7 @@ public final class ContractQueryResponse {
                     .plan(InsurancePlan.of(plan))
                     .insurePeriod(InsurePeriod.of(c))
                     .auth(AuthInfo.of(c))
-                    .contractor(Contractor.of(c))
+                    .contractor(Contractor.of(contractorEntity))
                     .payment(Payment.of(pay))
                     .people(
                             people.stream()
@@ -98,8 +104,14 @@ public final class ContractQueryResponse {
                 TpaPartnerEntity partner,
                 TpaChannelEntity channel) {
 
+            var contractorEntity =
+                    people.stream()
+                            .filter(p -> Boolean.TRUE.equals(p.getIsContractor()))
+                            .findFirst()
+                            .orElse(null);
+
             return ContractDetail.builder()
-                    .contract(ContractInfo.of(c))
+                    .contract(ContractInfo.of(c, Contractor.of(contractorEntity)))
                     .insurer(Insurer.of(insurer))
                     .partner(Partner.of(partner))
                     .channel(Channel.of(channel))

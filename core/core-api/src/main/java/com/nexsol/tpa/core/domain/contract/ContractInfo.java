@@ -24,7 +24,7 @@ public record ContractInfo(
         boolean marketingConsentUsed,
         Long employeeId) {
 
-    public static ContractInfo of(TravelContractEntity c) {
+    public static ContractInfo of(TravelContractEntity c, Contractor contractor) {
         return ContractInfo.builder()
                 .id(c.getId())
                 .familyId(c.getFamilyId())
@@ -36,7 +36,7 @@ public record ContractInfo(
                 .status(c.getStatus() != null ? c.getStatus().name() : null)
                 .applyDate(c.getApplyDate())
                 .insurePeriod(InsurePeriod.of(c))
-                .contractor(Contractor.of(c))
+                .contractor(contractor)
                 .auth(AuthInfo.of(c))
                 .marketingConsentUsed(Boolean.TRUE.equals(c.getMarketingConsentUsed()))
                 .employeeId(c.getEmployeeId())
