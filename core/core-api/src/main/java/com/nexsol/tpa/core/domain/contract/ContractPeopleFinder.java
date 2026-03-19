@@ -21,6 +21,10 @@ public class ContractPeopleFinder {
         return peopleRepository.findByContractIdAndDeletedAtIsNullOrderByIdAsc(contractId);
     }
 
+    public TravelInsurePeopleEntity findContractor(Long contractId) {
+        return peopleRepository.findByContractIdAndIsContractorTrueAndDeletedAtIsNull(contractId);
+    }
+
     public Map<Long, List<TravelInsurePeopleEntity>> findGroupByContractIds(
             List<Long> contractIds) {
         return peopleRepository.findByContractIds(contractIds).stream()

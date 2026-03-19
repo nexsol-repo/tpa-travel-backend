@@ -67,6 +67,7 @@ public class ApplyService {
 
         TravelContractEntity saved = contractWriter.save(contract);
 
+        boolean first = true;
         for (ApplyCommand.InsuredPerson p : cmd.people()) {
             if (p.name() == null || p.name().isBlank()) {
                 throw new CoreApiException(
@@ -76,6 +77,7 @@ public class ApplyService {
                     TravelInsurePeopleEntity.builder()
                             .contractId(saved.getId())
                             .planId(p.planId())
+                            .isContractor(first)
                             .name(p.name())
                             .gender(p.gender())
                             .residentNumber(p.residentNumber())
@@ -84,6 +86,7 @@ public class ApplyService {
                             .policyNumber(p.insureNumber())
                             .insurePremium(p.insurePremium())
                             .build());
+            first = false;
         }
 
         ApplyResult result = new ApplyResult(saved.getId(), saved.getStatus().name());

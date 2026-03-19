@@ -350,6 +350,8 @@ public class TravelContractQueryDto {
 
         private Long planId;
 
+        private Boolean isContractor;
+
         private String name;
 
         private String nameEng;
@@ -368,6 +370,7 @@ public class TravelContractQueryDto {
             return Person.builder()
                     .id(p.getId())
                     .planId(p.getPlanId())
+                    .isContractor(Boolean.TRUE.equals(p.getIsContractor()))
                     .name(p.getName())
                     .nameEng(p.getNameEng())
                     .gender(p.getGender())

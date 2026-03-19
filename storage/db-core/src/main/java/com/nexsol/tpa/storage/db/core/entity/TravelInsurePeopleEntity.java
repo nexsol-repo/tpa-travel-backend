@@ -25,6 +25,9 @@ public class TravelInsurePeopleEntity extends BaseEntity {
     @Column(name = "plan_id")
     private Long planId;
 
+    @Column(name = "is_contractor", nullable = false)
+    private Boolean isContractor;
+
     @Column(name = "insure_people_name", length = 50)
     private String name;
 
@@ -53,6 +56,7 @@ public class TravelInsurePeopleEntity extends BaseEntity {
     public TravelInsurePeopleEntity(
             Long contractId,
             Long planId,
+            Boolean isContractor,
             String name,
             String gender,
             String residentNumber,
@@ -62,6 +66,7 @@ public class TravelInsurePeopleEntity extends BaseEntity {
             BigDecimal insurePremium) {
         this.contractId = contractId;
         this.planId = planId;
+        this.isContractor = isContractor != null && isContractor;
         this.name = name;
         this.gender = gender;
         this.residentNumber = residentNumber;

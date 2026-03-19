@@ -76,7 +76,7 @@ public class MeritzContractController {
     public ContractCancelResponse cancel(
             @RequestParam(defaultValue = "TPA") String company,
             @RequestBody ContractCancelRequest request) {
-        return ContractCancelResponse.of(
+        Long contractId =
                 cancelService.cancel(
                         company,
                         new RefundCommand(
@@ -87,6 +87,7 @@ public class MeritzContractController {
                                 request.bankName(),
                                 request.accountNumber(),
                                 request.depositorName(),
-                                request.refundReason())));
+                                request.refundReason()));
+        return ContractCancelResponse.of(contractId);
     }
 }

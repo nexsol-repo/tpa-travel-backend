@@ -14,6 +14,8 @@ public interface TravelInsurePeopleRepository
 
     List<TravelInsurePeopleEntity> findByContractIdAndDeletedAtIsNullOrderByIdAsc(Long contractId);
 
+    TravelInsurePeopleEntity findByContractIdAndIsContractorTrueAndDeletedAtIsNull(Long contractId);
+
     @Query(
             """
                 select p
