@@ -21,6 +21,9 @@ public class TravelInsurancePlanEntity extends BaseEntity {
     @Column(name = "insurer_id", nullable = false)
     private Long insurerId;
 
+    @Column(name = "family_id")
+    private Long familyId;
+
     @Column(name = "insurance_product_name")
     private String insuranceProductName;
 
@@ -61,6 +64,7 @@ public class TravelInsurancePlanEntity extends BaseEntity {
     public TravelInsurancePlanEntity(
             Long id,
             Long insurerId,
+            Long familyId,
             String insuranceProductName,
             String planName,
             String productCode,
@@ -75,6 +79,7 @@ public class TravelInsurancePlanEntity extends BaseEntity {
             Integer sortOrder) {
         this.id = id;
         this.insurerId = insurerId;
+        this.familyId = familyId;
         this.insuranceProductName = insuranceProductName;
         this.planName = planName;
         this.productCode = productCode;
