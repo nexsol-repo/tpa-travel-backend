@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 import com.nexsol.tpa.client.meritz.contract.MeritzContractClient;
 import com.nexsol.tpa.core.domain.contract.ContractReader;
 import com.nexsol.tpa.core.domain.contract.ContractValidator;
-import com.nexsol.tpa.core.domain.contract.ContractValidator.CancelValidation;
 import com.nexsol.tpa.core.domain.payment.PaymentReader;
 import com.nexsol.tpa.core.domain.refund.RefundCommand;
 import com.nexsol.tpa.storage.db.core.entity.TravelContractEntity;
@@ -28,23 +27,20 @@ public class CancelService {
         TravelContractEntity contract = contractReader.getById(contractId);
         TravelInsurePaymentEntity payment = paymentReader.getByContractId(contract.getId());
 
-        CancelValidation validation = contractValidator.validateCancel(payment);
-        if (validation.isAlreadyCanceled()) {
-            return contractId;
+        contractValidator.requireCancelable(payment);
+
+        if (!contractValidator.isAlreadyCanceled(payment)) {
+            ContractValidator.requireNotBlank(
+                    contract.getPolicyNumber(), "policyNumber(polNo) is required");
+
+            meritzClient.cancelContract(
+                    company,
+                    contract.getPolicyNumber(),
+                    contract.getMeritzQuoteGroupNumber(),
+                    contract.getMeritzQuoteRequestNumber());
+
+            cancelWriter.save(contract, payment, refundCommand);
         }
-
-        ContractValidator.requireNotBlank(
-                contract.getPolicyNumber(), "policyNumber(polNo) is required");
-
-        // 1. 외부 API 호출 (tx 밖)
-        meritzClient.cancelContract(
-                company,
-                contract.getPolicyNumber(),
-                contract.getMeritzQuoteGroupNumber(),
-                contract.getMeritzQuoteRequestNumber());
-
-        // 2. DB 일괄 업데이트 (tx 안 — CancelWriter)
-        cancelWriter.save(contract, payment, refundCommand);
 
         return contractId;
     }

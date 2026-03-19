@@ -1,6 +1,6 @@
 package com.nexsol.tpa.core.domain.contract;
 
-import static com.nexsol.tpa.core.api.dto.v1.contract.TravelContractQueryDto.*;
+import static com.nexsol.tpa.core.api.controller.v1.response.ContractQueryResponse.*;
 
 import java.util.List;
 import java.util.Objects;

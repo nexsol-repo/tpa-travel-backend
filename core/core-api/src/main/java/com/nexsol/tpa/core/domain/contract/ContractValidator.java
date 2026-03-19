@@ -22,29 +22,22 @@ public class ContractValidator {
 
     /**
      * 취소 가능 상태를 검증한다.
-     * - CANCELED → 이미 취소됨 (멱등성, alreadyCanceled = true)
-     * - COMPLETED → 취소 가능 (alreadyCanceled = false)
+     * - CANCELED → 이미 취소됨 (멱등성, 통과)
+     * - COMPLETED → 취소 가능
      * - 그 외 → 예외
      */
-    public CancelValidation validateCancel(TravelInsurePaymentEntity payment) {
-        if (payment.getStatus() == TravelPaymentStatus.CANCELED) {
-            return CancelValidation.ALREADY_CANCELED;
+    public void requireCancelable(TravelInsurePaymentEntity payment) {
+        TravelPaymentStatus status = payment.getStatus();
+        if (status == TravelPaymentStatus.CANCELED || status == TravelPaymentStatus.COMPLETED) {
+            return;
         }
-        if (payment.getStatus() != TravelPaymentStatus.COMPLETED) {
-            throw new CoreApiException(
-                    CoreApiErrorType.INVALID_CONTRACT_REQUEST,
-                    "결제 상태는 COMPLETED 이어야 합니다. 현재 상태=" + payment.getStatus());
-        }
-        return CancelValidation.CANCELABLE;
+        throw new CoreApiException(
+                CoreApiErrorType.INVALID_CONTRACT_REQUEST,
+                "결제 상태는 COMPLETED 또는 CANCELED 이어야 합니다. 현재 상태=" + status);
     }
 
-    public enum CancelValidation {
-        ALREADY_CANCELED,
-        CANCELABLE;
-
-        public boolean isAlreadyCanceled() {
-            return this == ALREADY_CANCELED;
-        }
+    public boolean isAlreadyCanceled(TravelInsurePaymentEntity payment) {
+        return payment.getStatus() == TravelPaymentStatus.CANCELED;
     }
 
     public static void requireNotBlank(String value, String message) {

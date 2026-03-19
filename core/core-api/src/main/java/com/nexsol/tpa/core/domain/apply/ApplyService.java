@@ -28,7 +28,7 @@ public class ApplyService {
     private final ObjectMapper objectMapper;
 
     @Transactional
-    public ApplyResult apply(ApplyCommand cmd) {
+    public Long apply(ApplyCommand cmd) {
         validate(cmd);
 
         Long repPlanId = cmd.people().stream()
@@ -79,11 +79,9 @@ public class ApplyService {
             first = false;
         }
 
-        ApplyResult result = new ApplyResult(saved.getId(), saved.getStatus().name());
+        snapshotAppender.append(saved.getId(), cmd.insurerId(), "QUOTE", toJson(saved.getId()));
 
-        snapshotAppender.append(saved.getId(), cmd.insurerId(), "QUOTE", toJson(result));
-
-        return result;
+        return saved.getId();
     }
 
     private void validate(ApplyCommand cmd) {
