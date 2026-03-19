@@ -29,23 +29,28 @@ public class ApplyService {
     public Long apply(ApplyCommand cmd) {
         applyValidator.validate(cmd);
 
-        TravelContractEntity contract = TravelContractEntity.create(
-                cmd.insurerId(), "MERITZ",
-                cmd.partnerId(), "TPA KOREA",
-                cmd.channelId(), "TPA KOREA",
-                cmd.familyId());
+        TravelContractEntity contract =
+                TravelContractEntity.create(
+                        cmd.insurerId(),
+                        "MERITZ",
+                        cmd.partnerId(),
+                        "TPA KOREA",
+                        cmd.channelId(),
+                        "TPA KOREA",
+                        cmd.familyId());
 
         contract.applyInsurePeriod(
                 cmd.insureBeginDate(), cmd.insureEndDate(),
                 cmd.countryCode(), cmd.countryName());
         contract.applyMeritzQuote(
                 companies.getTpa().getPolNo(),
-                cmd.meritzQuoteGroupNumber(), cmd.meritzQuoteRequestNumber());
+                cmd.meritzQuoteGroupNumber(),
+                cmd.meritzQuoteRequestNumber());
         contract.applyPremium(cmd.totalPremium());
         contract.applyMarketingConsent(cmd.marketingConsentUsed());
 
         TravelContractEntity saved = contractWriter.save(contract);
-        peopleWriter.saveAll(saved.getId(), cmd.people());
+        peopleWriter.register(saved.getId(), cmd.people());
         snapshotAppender.append(saved.getId(), cmd.insurerId(), "QUOTE", toJson(saved.getId()));
 
         return saved.getId();
