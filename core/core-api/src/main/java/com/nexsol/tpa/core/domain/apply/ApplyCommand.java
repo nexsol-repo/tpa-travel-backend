@@ -10,7 +10,7 @@ public record ApplyCommand(
         String partnerName,
         Long channelId,
         String channelName,
-        Long planId,
+        Long familyId,
         String meritzQuoteGroupNumber,
         String meritzQuoteRequestNumber,
         String countryCode,

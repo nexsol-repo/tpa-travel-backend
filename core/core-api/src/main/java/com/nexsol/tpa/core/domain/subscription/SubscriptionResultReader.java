@@ -25,6 +25,7 @@ public class SubscriptionResultReader {
                         contract.getPartnerId(),
                         contract.getChannelId(),
                         contract.getPlanId(),
+                        contract.getFamilyId(),
                         contract.getPolicyNumber(),
                         contract.getMeritzQuoteGroupNumber(),
                         contract.getMeritzQuoteRequestNumber(),

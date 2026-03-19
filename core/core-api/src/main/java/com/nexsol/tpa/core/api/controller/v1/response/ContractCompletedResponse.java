@@ -45,6 +45,7 @@ public class ContractCompletedResponse {
                                 .partnerId(c.partnerId())
                                 .channelId(c.channelId())
                                 .planId(c.planId())
+                                .familyId(c.familyId())
                                 .policyNumber(c.policyNumber())
                                 .meritzQuoteGroupNumber(c.meritzQuoteGroupNumber())
                                 .meritzQuoteRequestNumber(c.meritzQuoteRequestNumber())
@@ -84,6 +85,8 @@ public class ContractCompletedResponse {
         private Long channelId;
 
         private Long planId;
+
+        private Long familyId;
 
         private String policyNumber;
 
