@@ -65,8 +65,8 @@ class TravelContractControllerDocsTest extends RestDocsTest {
                         .contractor(
                                 Contractor.builder()
                                         .name("홍길동")
-                                        .hp("01012345678")
-                                        .mail("hong@test.com")
+                                        .phone("01012345678")
+                                        .email("hong@test.com")
                                         .build())
                         .payment(
                                 Payment.builder()
@@ -213,7 +213,7 @@ class TravelContractControllerDocsTest extends RestDocsTest {
             fieldWithPath("data.people[].planId").type(NUMBER).description("플랜 ID").optional(),
             fieldWithPath("data.people[].isContractor").type(BOOLEAN).description("대표계약자 여부"),
             fieldWithPath("data.people[].name").type(STRING).description("이름"),
-            fieldWithPath("data.people[].nameEng").type(STRING).description("영문이름").optional(),
+            fieldWithPath("data.people[].englishName").type(STRING).description("영문이름").optional(),
             fieldWithPath("data.people[].gender").type(STRING).description("성별"),
             fieldWithPath("data.people[].residentNumberMasked")
                     .type(STRING)
@@ -252,8 +252,8 @@ class TravelContractControllerDocsTest extends RestDocsTest {
                                 .contractor(
                                         Contractor.builder()
                                                 .name("홍길동")
-                                                .hp("01012345678")
-                                                .mail("hong@test.com")
+                                                .phone("01012345678")
+                                                .email("hong@test.com")
                                                 .build())
                                 .auth(AuthInfo.builder().build())
                                 .build())
