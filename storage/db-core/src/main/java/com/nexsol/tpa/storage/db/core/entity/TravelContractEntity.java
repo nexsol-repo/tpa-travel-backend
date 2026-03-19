@@ -8,7 +8,6 @@ import com.nexsol.tpa.core.enums.TravelContractStatus;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -62,11 +61,11 @@ public class TravelContractEntity extends BaseEntity {
     private String countryCode;
 
     @Column(name = "total_premium", nullable = false, precision = 15, scale = 2)
-    private BigDecimal totalPremium;
+    private BigDecimal totalPremium = BigDecimal.ZERO;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 20)
-    private TravelContractStatus status;
+    private TravelContractStatus status = TravelContractStatus.PENDING;
 
     @Column(name = "apply_date", insertable = false, updatable = false)
     private LocalDateTime applyDate;
@@ -81,7 +80,7 @@ public class TravelContractEntity extends BaseEntity {
     private String contractPeopleName;
 
     @Column(name = "contract_people_resident_number")
-    private String contractPeopleResidentNumber; // TODO 암호화
+    private String contractPeopleResidentNumber;
 
     @Column(name = "contract_people_hp")
     private String contractPeopleHp;
@@ -96,10 +95,10 @@ public class TravelContractEntity extends BaseEntity {
     private String policyLink;
 
     @Column(name = "marketing_consent_used", nullable = false)
-    private Boolean marketingConsentUsed;
+    private Boolean marketingConsentUsed = false;
 
     @Column(name = "auth_provider", length = 20)
-    private String authProvider; // ex) DANAL_PASS
+    private String authProvider;
 
     @Column(name = "auth_imp_uid", length = 100)
     private String authImpUid;
@@ -111,13 +110,14 @@ public class TravelContractEntity extends BaseEntity {
     private String authUniqueKey;
 
     @Column(name = "auth_status", length = 20)
-    private String authStatus; // NONE / SUCCESS / FAIL
+    private String authStatus = "NONE";
 
     @Column(name = "auth_date")
     private LocalDateTime authDate;
 
-    @Builder
-    public TravelContractEntity(
+    // ── 생성 ──
+
+    public static TravelContractEntity create(
             Long insurerId,
             String insurerName,
             Long partnerId,
@@ -125,55 +125,51 @@ public class TravelContractEntity extends BaseEntity {
             Long channelId,
             String channelName,
             Long planId,
-            Long familyId,
-            String policyNumber,
-            String meritzQuoteGroupNumber,
-            String meritzQuoteRequestNumber,
-            String countryName,
-            String countryCode,
-            BigDecimal totalPremium,
-            TravelContractStatus status,
-            LocalDate insureStartDate,
-            LocalDate insureEndDate,
-            String contractPeopleName,
-            String contractPeopleResidentNumber,
-            String contractPeopleHp,
-            String contractPeopleMail,
-            Long employeeId,
-            Boolean marketingConsentUsed,
-            String authProvider,
-            String authImpUid,
-            String authRequestId,
-            String authUniqueKey,
-            String authStatus) {
-        this.insurerId = insurerId;
-        this.insurerName = insurerName;
-        this.partnerId = partnerId;
-        this.partnerName = partnerName;
-        this.channelId = channelId;
-        this.channelName = channelName;
-        this.planId = planId;
-        this.familyId = familyId;
-        this.policyNumber = policyNumber;
-        this.meritzQuoteGroupNumber = meritzQuoteGroupNumber;
-        this.meritzQuoteRequestNumber = meritzQuoteRequestNumber;
-        this.countryName = countryName;
+            Long familyId) {
+
+        TravelContractEntity entity = new TravelContractEntity();
+        entity.insurerId = insurerId;
+        entity.insurerName = insurerName;
+        entity.partnerId = partnerId;
+        entity.partnerName = partnerName;
+        entity.channelId = channelId;
+        entity.channelName = channelName;
+        entity.planId = planId;
+        entity.familyId = familyId;
+        return entity;
+    }
+
+    // ── 도메인 업데이트 메서드 ──
+
+    public void applyInsurePeriod(
+            LocalDate startDate, LocalDate endDate, String countryCode, String countryName) {
+        this.insureStartDate = startDate;
+        this.insureEndDate = endDate;
         this.countryCode = countryCode;
-        this.totalPremium = totalPremium == null ? BigDecimal.ZERO : totalPremium;
-        this.status = status == null ? TravelContractStatus.PENDING : status;
-        this.insureStartDate = insureStartDate;
-        this.insureEndDate = insureEndDate;
-        this.contractPeopleName = contractPeopleName;
-        this.contractPeopleResidentNumber = contractPeopleResidentNumber;
-        this.contractPeopleHp = contractPeopleHp;
-        this.contractPeopleMail = contractPeopleMail;
-        this.employeeId = employeeId;
-        this.marketingConsentUsed = marketingConsentUsed == null ? false : marketingConsentUsed;
-        this.authProvider = authProvider;
-        this.authImpUid = authImpUid;
-        this.authRequestId = authRequestId;
-        this.authUniqueKey = authUniqueKey;
-        this.authStatus = authStatus == null ? "NONE" : authStatus;
+        this.countryName = countryName;
+    }
+
+    public void applyContractPeople(
+            String name, String residentNumber, String hp, String mail) {
+        this.contractPeopleName = name;
+        this.contractPeopleResidentNumber = residentNumber;
+        this.contractPeopleHp = hp;
+        this.contractPeopleMail = mail;
+    }
+
+    public void applyMeritzQuote(
+            String policyNumber, String quoteGroupNumber, String quoteRequestNumber) {
+        this.policyNumber = policyNumber;
+        this.meritzQuoteGroupNumber = quoteGroupNumber;
+        this.meritzQuoteRequestNumber = quoteRequestNumber;
+    }
+
+    public void applyPremium(BigDecimal totalPremium) {
+        this.totalPremium = totalPremium != null ? totalPremium : BigDecimal.ZERO;
+    }
+
+    public void applyMarketingConsent(boolean used) {
+        this.marketingConsentUsed = used;
     }
 
     public void markCompleted() {

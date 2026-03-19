@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 import com.nexsol.tpa.client.meritz.config.CompaniesConfigsProperties;
 import com.nexsol.tpa.core.domain.contract.ContractWriter;
 import com.nexsol.tpa.core.domain.snapshot.SnapshotAppender;
-import com.nexsol.tpa.core.enums.TravelContractStatus;
 import com.nexsol.tpa.core.support.error.CoreApiErrorType;
 import com.nexsol.tpa.core.support.error.CoreApiException;
 import com.nexsol.tpa.storage.db.core.entity.TravelContractEntity;
@@ -32,38 +31,29 @@ public class ApplyService {
     public ApplyResult apply(ApplyCommand cmd) {
         validate(cmd);
 
-        // planId: 첫번째 피보험자의 planId를 대표로 사용 (DB NOT NULL 호환)
         Long repPlanId = cmd.people().stream()
                 .map(ApplyCommand.InsuredPerson::planId)
                 .filter(id -> id != null)
                 .findFirst()
                 .orElse(null);
 
-        TravelContractEntity contract =
-                TravelContractEntity.builder()
-                        .insurerId(cmd.insurerId())
-                        .insurerName("MERITZ")
-                        .partnerId(cmd.partnerId())
-                        .partnerName("TPA KOREA")
-                        .channelId(cmd.channelId())
-                        .channelName("TPA KOREA")
-                        .planId(repPlanId)
-                        .familyId(cmd.familyId())
-                        .countryName(cmd.countryName())
-                        .countryCode(cmd.countryCode())
-                        .insureStartDate(cmd.insureBeginDate())
-                        .insureEndDate(cmd.insureEndDate())
-                        .contractPeopleName(cmd.contractPeopleName())
-                        .contractPeopleResidentNumber(cmd.contractPeopleResidentNumber())
-                        .contractPeopleHp(cmd.contractPeopleHp())
-                        .contractPeopleMail(cmd.contractPeopleMail())
-                        .policyNumber(companies.getTpa().getPolNo())
-                        .meritzQuoteGroupNumber(cmd.meritzQuoteGroupNumber())
-                        .meritzQuoteRequestNumber(cmd.meritzQuoteRequestNumber())
-                        .totalPremium(cmd.totalFee())
-                        .marketingConsentUsed(cmd.marketingConsentUsed())
-                        .status(TravelContractStatus.PENDING)
-                        .build();
+        TravelContractEntity contract = TravelContractEntity.create(
+                cmd.insurerId(), "MERITZ",
+                cmd.partnerId(), "TPA KOREA",
+                cmd.channelId(), "TPA KOREA",
+                repPlanId, cmd.familyId());
+
+        contract.applyInsurePeriod(
+                cmd.insureBeginDate(), cmd.insureEndDate(),
+                cmd.countryCode(), cmd.countryName());
+        contract.applyContractPeople(
+                cmd.contractPeopleName(), cmd.contractPeopleResidentNumber(),
+                cmd.contractPeopleHp(), cmd.contractPeopleMail());
+        contract.applyMeritzQuote(
+                companies.getTpa().getPolNo(),
+                cmd.meritzQuoteGroupNumber(), cmd.meritzQuoteRequestNumber());
+        contract.applyPremium(cmd.totalFee());
+        contract.applyMarketingConsent(cmd.marketingConsentUsed());
 
         TravelContractEntity saved = contractWriter.save(contract);
 
