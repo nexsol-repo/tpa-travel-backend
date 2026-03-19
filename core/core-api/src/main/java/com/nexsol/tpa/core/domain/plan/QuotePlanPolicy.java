@@ -21,11 +21,13 @@ public class QuotePlanPolicy {
 
     /**
      * 피보험자 나이 기반 planType 결정.
-     * 70세 이상이 1명이라도 있으면 "A", 아니면 "B".
+     * 신청일(오늘) 기준 만나이로 판단. 70세 이상이 1명이라도 있으면 "A", 아니면 "B".
+     * 메리츠 API도 sbcpDt(청약일) 기준으로 나이를 판단한다.
      */
-    public String resolvePlanType(List<PlanCondition.Insured> insuredList, String insBgnDt) {
+    public String resolvePlanType(List<PlanCondition.Insured> insuredList) {
+        String today = LocalDate.now().format(YYYYMMDD);
         for (PlanCondition.Insured insured : insuredList) {
-            int age = calcAge(insured.birth(), insBgnDt);
+            int age = calcAge(insured.birth(), today);
             if (age >= 70) return "A";
         }
         return "B";

@@ -36,6 +36,8 @@ public interface TravelInsurancePlanRepository
 
     List<TravelInsurancePlanEntity> findByIdInAndIsActiveTrue(Collection<Long> ids);
 
+    List<TravelInsurancePlanEntity> findByFamilyIdAndIsActiveTrue(Long familyId);
+
     @Query(
             """
             select
