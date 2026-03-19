@@ -17,7 +17,7 @@ public record ApplyCommand(
         String countryName,
         LocalDate insureBeginDate,
         LocalDate insureEndDate,
-        BigDecimal totalFee,
+        BigDecimal totalPremium,
         List<InsuredPerson> people,
         boolean marketingConsentUsed) {
 

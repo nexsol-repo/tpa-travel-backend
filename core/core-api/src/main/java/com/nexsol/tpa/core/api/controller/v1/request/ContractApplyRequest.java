@@ -20,7 +20,7 @@ public record ContractApplyRequest(
         String countryName,
         LocalDate insureBeginDate,
         LocalDate insureEndDate,
-        BigDecimal totalFee,
+        BigDecimal totalPremium,
         List<InsurePeopleRequest> people,
         boolean marketingConsentUsed) {
 
@@ -57,7 +57,7 @@ public record ContractApplyRequest(
                 countryName,
                 insureBeginDate,
                 insureEndDate,
-                totalFee,
+                totalPremium,
                 insuredPeople,
                 marketingConsentUsed);
     }
