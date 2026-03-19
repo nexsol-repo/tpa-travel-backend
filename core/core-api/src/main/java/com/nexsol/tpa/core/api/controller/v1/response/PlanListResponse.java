@@ -41,6 +41,8 @@ public class PlanListResponse {
     @Builder
     public static class PlanSummary {
 
+        private Long familyId;
+
         private Long planId;
 
         private String planGrpCd;
@@ -92,6 +94,7 @@ public class PlanListResponse {
 
             plans.add(
                     PlanSummary.builder()
+                            .familyId(family.familyId())
                             .planId(planId)
                             .planGrpCd(family.repPlan().getPlanGroupCode())
                             .planCd(family.repPlan().getPlanCode())

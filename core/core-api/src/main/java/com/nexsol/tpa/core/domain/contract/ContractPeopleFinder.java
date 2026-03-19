@@ -6,8 +6,8 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
-import com.nexsol.tpa.storage.db.core.entity.TravelInsurePeopleEntity;
-import com.nexsol.tpa.storage.db.core.repository.TravelInsurePeopleRepository;
+import com.nexsol.tpa.storage.db.core.entity.TravelInsuredEntity;
+import com.nexsol.tpa.storage.db.core.repository.TravelInsuredRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -15,15 +15,18 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ContractPeopleFinder {
 
-    private final TravelInsurePeopleRepository peopleRepository;
+    private final TravelInsuredRepository peopleRepository;
 
-    public List<TravelInsurePeopleEntity> findByContractId(Long contractId) {
+    public List<TravelInsuredEntity> findByContractId(Long contractId) {
         return peopleRepository.findByContractIdAndDeletedAtIsNullOrderByIdAsc(contractId);
     }
 
-    public Map<Long, List<TravelInsurePeopleEntity>> findGroupByContractIds(
-            List<Long> contractIds) {
+    public TravelInsuredEntity findContractor(Long contractId) {
+        return peopleRepository.findByContractIdAndIsContractorTrueAndDeletedAtIsNull(contractId);
+    }
+
+    public Map<Long, List<TravelInsuredEntity>> findGroupByContractIds(List<Long> contractIds) {
         return peopleRepository.findByContractIds(contractIds).stream()
-                .collect(Collectors.groupingBy(TravelInsurePeopleEntity::getContractId));
+                .collect(Collectors.groupingBy(TravelInsuredEntity::getContractId));
     }
 }

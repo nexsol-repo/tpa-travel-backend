@@ -5,12 +5,11 @@ import org.springframework.stereotype.Service;
 import com.nexsol.tpa.client.meritz.config.CompaniesConfigsProperties;
 import com.nexsol.tpa.core.domain.contract.ContractWriter;
 import com.nexsol.tpa.core.domain.snapshot.SnapshotAppender;
-import com.nexsol.tpa.core.enums.TravelContractStatus;
 import com.nexsol.tpa.core.support.error.CoreApiErrorType;
 import com.nexsol.tpa.core.support.error.CoreApiException;
 import com.nexsol.tpa.storage.db.core.entity.TravelContractEntity;
-import com.nexsol.tpa.storage.db.core.entity.TravelInsurePeopleEntity;
-import com.nexsol.tpa.storage.db.core.repository.TravelInsurePeopleRepository;
+import com.nexsol.tpa.storage.db.core.entity.TravelInsuredEntity;
+import com.nexsol.tpa.storage.db.core.repository.TravelInsuredRepository;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -23,75 +22,64 @@ import tools.jackson.databind.ObjectMapper;
 public class ApplyService {
 
     private final ContractWriter contractWriter;
-    private final TravelInsurePeopleRepository peopleRepository;
+    private final TravelInsuredRepository peopleRepository;
     private final SnapshotAppender snapshotAppender;
     private final CompaniesConfigsProperties companies;
     private final ObjectMapper objectMapper;
 
     @Transactional
-    public ApplyResult apply(ApplyCommand cmd) {
+    public Long apply(ApplyCommand cmd) {
         validate(cmd);
 
-        // planId: 첫번째 피보험자의 planId를 대표로 사용 (DB NOT NULL 호환)
-        Long repPlanId = cmd.people().stream()
-                .map(ApplyCommand.InsuredPerson::planId)
-                .filter(id -> id != null)
-                .findFirst()
-                .orElse(null);
-
         TravelContractEntity contract =
-                TravelContractEntity.builder()
-                        .insurerId(cmd.insurerId())
-                        .insurerName("MERITZ")
-                        .partnerId(cmd.partnerId())
-                        .partnerName("TPA KOREA")
-                        .channelId(cmd.channelId())
-                        .channelName("TPA KOREA")
-                        .planId(repPlanId)
-                        .familyId(cmd.familyId())
-                        .countryName(cmd.countryName())
-                        .countryCode(cmd.countryCode())
-                        .insureStartDate(cmd.insureBeginDate())
-                        .insureEndDate(cmd.insureEndDate())
-                        .contractPeopleName(cmd.contractPeopleName())
-                        .contractPeopleResidentNumber(cmd.contractPeopleResidentNumber())
-                        .contractPeopleHp(cmd.contractPeopleHp())
-                        .contractPeopleMail(cmd.contractPeopleMail())
-                        .policyNumber(companies.getTpa().getPolNo())
-                        .meritzQuoteGroupNumber(cmd.meritzQuoteGroupNumber())
-                        .meritzQuoteRequestNumber(cmd.meritzQuoteRequestNumber())
-                        .totalPremium(cmd.totalFee())
-                        .insuredPeopleNumber(cmd.people().size())
-                        .marketingConsentUsed(cmd.marketingConsentUsed())
-                        .status(TravelContractStatus.PENDING)
-                        .build();
+                TravelContractEntity.create(
+                        cmd.insurerId(),
+                        "MERITZ",
+                        cmd.partnerId(),
+                        "TPA KOREA",
+                        cmd.channelId(),
+                        "TPA KOREA",
+                        cmd.familyId());
+
+        contract.applyInsurePeriod(
+                cmd.insureBeginDate(), cmd.insureEndDate(),
+                cmd.countryCode(), cmd.countryName());
+        contract.applyMeritzQuote(
+                companies.getTpa().getPolNo(),
+                cmd.meritzQuoteGroupNumber(),
+                cmd.meritzQuoteRequestNumber());
+        contract.applyPremium(cmd.totalFee());
+        contract.applyMarketingConsent(cmd.marketingConsentUsed());
 
         TravelContractEntity saved = contractWriter.save(contract);
 
+        boolean first = true;
         for (ApplyCommand.InsuredPerson p : cmd.people()) {
             if (p.name() == null || p.name().isBlank()) {
                 throw new CoreApiException(
                         CoreApiErrorType.INVALID_CONTRACT_REQUEST, "people.name is required");
             }
             peopleRepository.save(
-                    TravelInsurePeopleEntity.builder()
+                    TravelInsuredEntity.builder()
                             .contractId(saved.getId())
                             .planId(p.planId())
+                            .isContractor(first)
                             .name(p.name())
                             .gender(p.gender())
                             .residentNumber(p.residentNumber())
-                            .nameEng(p.nameEng())
+                            .englishName(p.englishName())
                             .passportNumber(p.passportNumber())
+                            .phone(p.phone())
+                            .email(p.email())
                             .policyNumber(p.insureNumber())
                             .insurePremium(p.insurePremium())
                             .build());
+            first = false;
         }
 
-        ApplyResult result = new ApplyResult(saved.getId(), saved.getStatus().name());
+        snapshotAppender.append(saved.getId(), cmd.insurerId(), "QUOTE", toJson(saved.getId()));
 
-        snapshotAppender.append(saved.getId(), cmd.insurerId(), "QUOTE", toJson(result));
-
-        return result;
+        return saved.getId();
     }
 
     private void validate(ApplyCommand cmd) {

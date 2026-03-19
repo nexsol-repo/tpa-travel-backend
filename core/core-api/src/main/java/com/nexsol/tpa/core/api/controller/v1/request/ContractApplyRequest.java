@@ -8,7 +8,6 @@ import com.nexsol.tpa.core.domain.apply.ApplyCommand;
 
 public record ContractApplyRequest(
         Long insurerId,
-        String insuerName,
         Long partnerId,
         String partnerName,
         Long channelId,
@@ -21,10 +20,6 @@ public record ContractApplyRequest(
         String countryName,
         LocalDate insureBeginDate,
         LocalDate insureEndDate,
-        String contractPeopleName,
-        String contractPeopleResidentNumber,
-        String contractPeopleHp,
-        String contractPeopleMail,
         BigDecimal totalFee,
         List<InsurePeopleRequest> people,
         boolean marketingConsentUsed) {
@@ -41,8 +36,10 @@ public record ContractApplyRequest(
                                                         p.name(),
                                                         p.gender(),
                                                         p.residentNumber(),
-                                                        p.nameEng(),
+                                                        p.englishName(),
                                                         p.passportNumber(),
+                                                        p.phone(),
+                                                        p.email(),
                                                         p.insureNumber(),
                                                         p.insurePremium()))
                                 .toList();
@@ -60,10 +57,6 @@ public record ContractApplyRequest(
                 countryName,
                 insureBeginDate,
                 insureEndDate,
-                contractPeopleName,
-                contractPeopleResidentNumber,
-                contractPeopleHp,
-                contractPeopleMail,
                 totalFee,
                 insuredPeople,
                 marketingConsentUsed);

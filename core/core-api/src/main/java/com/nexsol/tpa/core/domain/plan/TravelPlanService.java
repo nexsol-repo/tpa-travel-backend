@@ -32,7 +32,7 @@ public class TravelPlanService {
         validateQuoteCommand(cmd);
 
         List<PlanFamily> allFamilies = planReader.loadAllFamilies(cmd.insurerId());
-        String planType = policy.resolvePlanType(cmd.insuredList(), cmd.insBgnDt());
+        String planType = policy.resolvePlanType(cmd.insuredList());
         boolean silsonExclude = cmd.silsonExclude() != null && cmd.silsonExclude();
         List<PlanFamily> families = policy.filterFamilies(allFamilies, planType, silsonExclude);
 
@@ -51,7 +51,7 @@ public class TravelPlanService {
         validateQuoteCommand(cmd);
 
         List<PlanFamily> allFamilies = planReader.loadAllFamilies(cmd.insurerId());
-        String planType = policy.resolvePlanType(cmd.insuredList(), cmd.insBgnDt());
+        String planType = policy.resolvePlanType(cmd.insuredList());
         String typeMarker = "플랜" + planType;
 
         return allFamilies.stream()
@@ -72,7 +72,7 @@ public class TravelPlanService {
         validateQuoteCommand(cmd);
 
         List<PlanFamily> allFamilies = planReader.loadAllFamilies(cmd.insurerId());
-        String planType = policy.resolvePlanType(cmd.insuredList(), cmd.insBgnDt());
+        String planType = policy.resolvePlanType(cmd.insuredList());
 
         List<PlanFamily> lossFamilies = policy.filterFamilies(allFamilies, planType, false);
         List<PlanFamily> excludeFamilies = policy.filterFamilies(allFamilies, planType, true);

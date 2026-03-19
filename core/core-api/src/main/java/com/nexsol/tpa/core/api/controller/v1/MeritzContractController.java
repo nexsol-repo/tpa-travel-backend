@@ -9,15 +9,13 @@ import com.nexsol.tpa.core.api.controller.v1.request.ContractCompletedRequest;
 import com.nexsol.tpa.core.api.controller.v1.request.ContractInquiryRequest;
 import com.nexsol.tpa.core.api.controller.v1.request.ContractListRequest;
 import com.nexsol.tpa.core.api.controller.v1.request.MeritzCertRequest;
-import com.nexsol.tpa.core.api.controller.v1.response.ContractApplyResponse;
-import com.nexsol.tpa.core.api.controller.v1.response.ContractCancelResponse;
 import com.nexsol.tpa.core.api.controller.v1.response.ContractCompletedResponse;
 import com.nexsol.tpa.core.domain.apply.ApplyService;
 import com.nexsol.tpa.core.domain.cancel.CancelService;
 import com.nexsol.tpa.core.domain.certificate.CertificateService;
 import com.nexsol.tpa.core.domain.inquiry.InquiryService;
-import com.nexsol.tpa.core.domain.refund.RefundCommand;
 import com.nexsol.tpa.core.domain.subscription.SubscriptionService;
+import com.nexsol.tpa.core.support.response.ApiResponse;
 
 import lombok.RequiredArgsConstructor;
 
@@ -58,35 +56,25 @@ public class MeritzContractController {
 
     /** 여행자보험 접수 */
     @PostMapping("/travel/contract/apply")
-    public ContractApplyResponse apply(@RequestBody ContractApplyRequest request) {
-        return ContractApplyResponse.of(applyService.apply(request.toCommand()));
+    public ApiResponse<Long> apply(@RequestBody ContractApplyRequest request) {
+        return ApiResponse.success(applyService.apply(request.toCommand()));
     }
 
     /** 여행자보험 가입(결제) */
     @PostMapping("/travel/contract/completed")
-    public ContractCompletedResponse completed(
+    public ApiResponse<ContractCompletedResponse> completed(
             @RequestParam(defaultValue = "TPA") String company,
             @RequestBody ContractCompletedRequest request) {
-        return ContractCompletedResponse.of(
-                subscriptionService.subscribe(company, request.toSubscriptionCommand()));
+        var result = subscriptionService.subscribe(company, request.toSubscriptionCommand());
+        return ApiResponse.success(ContractCompletedResponse.of(result));
     }
 
     /** 여행자보험 가입(결제취소) */
     @PostMapping("/travel/contract/cancel")
-    public ContractCancelResponse cancel(
+    public ApiResponse<Long> cancel(
             @RequestParam(defaultValue = "TPA") String company,
             @RequestBody ContractCancelRequest request) {
-        return ContractCancelResponse.of(
-                cancelService.cancel(
-                        company,
-                        new RefundCommand(
-                                request.contractId(),
-                                null,
-                                null,
-                                request.refundMethod(),
-                                request.bankName(),
-                                request.accountNumber(),
-                                request.depositorName(),
-                                request.refundReason())));
+        Long contractId = cancelService.cancel(company, request.toRefundCommand());
+        return ApiResponse.success(contractId);
     }
 }

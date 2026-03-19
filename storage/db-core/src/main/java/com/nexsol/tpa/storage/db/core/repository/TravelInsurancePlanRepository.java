@@ -36,6 +36,8 @@ public interface TravelInsurancePlanRepository
 
     List<TravelInsurancePlanEntity> findByIdInAndIsActiveTrue(Collection<Long> ids);
 
+    List<TravelInsurancePlanEntity> findByFamilyIdAndIsActiveTrue(Long familyId);
+
     @Query(
             """
             select
@@ -48,13 +50,12 @@ public interface TravelInsurancePlanRepository
                 p.planGroupCode as planGroupCode,
                 p.productCode as productCode,
                 p.unitProductCode as unitProductCode
-            from TravelInsurancePlanFamilyEntity fam
-            join TravelInsurancePlanFamilyMapEntity fmap on fmap.familyId = fam.id
-            join TravelInsurancePlanEntity p on p.id = fmap.planId
-            where fam.insurerId = :insurerId
+            from TravelInsurancePlanEntity p
+            join TravelInsurancePlanFamilyEntity fam on fam.id = p.familyId
+            where p.insurerId = :insurerId
+              and p.isActive = true
               and fam.isActive = true
               and fam.deletedAt is null
-              and p.isActive = true
             order by fam.sortOrder asc, p.ageGroupId asc, p.sortOrder asc, p.id asc
                 """)
     List<PlanFamilyPlanRow> findActiveFamilyPlans(@Param("insurerId") Long insurerId);

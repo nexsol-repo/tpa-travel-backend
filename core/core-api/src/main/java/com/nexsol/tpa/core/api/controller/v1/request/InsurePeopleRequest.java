@@ -7,7 +7,9 @@ public record InsurePeopleRequest(
         String name,
         String gender,
         String residentNumber,
-        String nameEng,
+        String englishName,
         String passportNumber,
+        String phone,
+        String email,
         String insureNumber,
         BigDecimal insurePremium) {}

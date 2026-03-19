@@ -7,21 +7,21 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import com.nexsol.tpa.storage.db.core.entity.TravelInsurePeopleEntity;
+import com.nexsol.tpa.storage.db.core.entity.TravelInsuredEntity;
 
-public interface TravelInsurePeopleRepository
-        extends JpaRepository<TravelInsurePeopleEntity, Long> {
+public interface TravelInsuredRepository extends JpaRepository<TravelInsuredEntity, Long> {
 
-    List<TravelInsurePeopleEntity> findByContractIdAndDeletedAtIsNullOrderByIdAsc(Long contractId);
+    List<TravelInsuredEntity> findByContractIdAndDeletedAtIsNullOrderByIdAsc(Long contractId);
+
+    TravelInsuredEntity findByContractIdAndIsContractorTrueAndDeletedAtIsNull(Long contractId);
 
     @Query(
             """
                 select p
-                from TravelInsurePeopleEntity p
+                from TravelInsuredEntity p
                 where p.contractId in :contractIds
                   and p.deletedAt is null
                 order by p.contractId asc, p.id asc
             """)
-    List<TravelInsurePeopleEntity> findByContractIds(
-            @Param("contractIds") Collection<Long> contractIds);
+    List<TravelInsuredEntity> findByContractIds(@Param("contractIds") Collection<Long> contractIds);
 }

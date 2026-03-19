@@ -12,8 +12,8 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "travel_insure_people")
-public class TravelInsurePeopleEntity extends BaseEntity {
+@Table(name = "travel_insured")
+public class TravelInsuredEntity extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,20 +25,29 @@ public class TravelInsurePeopleEntity extends BaseEntity {
     @Column(name = "plan_id")
     private Long planId;
 
-    @Column(name = "insure_people_name", length = 50)
+    @Column(name = "is_contractor", nullable = false)
+    private Boolean isContractor;
+
+    @Column(name = "name", length = 50)
     private String name;
 
-    @Column(name = "insure_people_gender", length = 10)
+    @Column(name = "gender", length = 10)
     private String gender;
 
-    @Column(name = "insure_people_resident_number", length = 20)
+    @Column(name = "resident_number", length = 20)
     private String residentNumber;
 
-    @Column(name = "insure_people_name_eng", length = 100)
-    private String nameEng;
+    @Column(name = "english_name", length = 100)
+    private String englishName;
 
-    @Column(name = "insure_people_passport_number", length = 30)
+    @Column(name = "passport_number", length = 30)
     private String passportNumber;
+
+    @Column(name = "phone", length = 30)
+    private String phone;
+
+    @Column(name = "email", length = 100)
+    private String email;
 
     @Column(name = "policy_number", length = 50)
     private String policyNumber;
@@ -50,23 +59,29 @@ public class TravelInsurePeopleEntity extends BaseEntity {
     private LocalDateTime deletedAt;
 
     @Builder
-    public TravelInsurePeopleEntity(
+    public TravelInsuredEntity(
             Long contractId,
             Long planId,
+            Boolean isContractor,
             String name,
             String gender,
             String residentNumber,
-            String nameEng,
+            String englishName,
             String passportNumber,
+            String phone,
+            String email,
             String policyNumber,
             BigDecimal insurePremium) {
         this.contractId = contractId;
         this.planId = planId;
+        this.isContractor = isContractor != null && isContractor;
         this.name = name;
         this.gender = gender;
         this.residentNumber = residentNumber;
-        this.nameEng = nameEng;
+        this.englishName = englishName;
         this.passportNumber = passportNumber;
+        this.phone = phone;
+        this.email = email;
         this.policyNumber = policyNumber;
         this.insurePremium = insurePremium == null ? BigDecimal.ZERO : insurePremium;
     }
