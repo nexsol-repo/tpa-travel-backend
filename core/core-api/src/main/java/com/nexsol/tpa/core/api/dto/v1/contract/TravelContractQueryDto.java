@@ -37,6 +37,8 @@ public class TravelContractQueryDto {
 
         private Long planId;
 
+        private Long familyId;
+
         private String planName;
 
         private String policyNumber;
@@ -93,6 +95,7 @@ public class TravelContractQueryDto {
                     .channelId(c.getChannelId())
                     .channelName(c.getChannelName())
                     .planId(c.getPlanId())
+                    .familyId(c.getFamilyId())
                     .planName(
                             plan != null
                                     ? toDisplayName(plan.getPlanFullName(), plan.getPlanName())
@@ -206,6 +209,8 @@ public class TravelContractQueryDto {
 
         private Long planId;
 
+        private Long familyId;
+
         private String insurerName;
 
         private String partnerName;
@@ -271,6 +276,7 @@ public class TravelContractQueryDto {
                     .partnerId(c.getPartnerId())
                     .channelId(c.getChannelId())
                     .planId(c.getPlanId())
+                    .familyId(c.getFamilyId())
                     .insurerName(c.getInsurerName())
                     .partnerName(c.getPartnerName())
                     .channelName(c.getChannelName())

@@ -43,6 +43,9 @@ public class TravelContractEntity extends BaseEntity {
     @Column(name = "plan_id", nullable = false)
     private Long planId;
 
+    @Column(name = "family_id")
+    private Long familyId;
+
     @Column(name = "policy_number")
     private String policyNumber;
 
@@ -125,6 +128,7 @@ public class TravelContractEntity extends BaseEntity {
             Long channelId,
             String channelName,
             Long planId,
+            Long familyId,
             String policyNumber,
             String meritzQuoteGroupNumber,
             String meritzQuoteRequestNumber,
@@ -153,6 +157,7 @@ public class TravelContractEntity extends BaseEntity {
         this.channelId = channelId;
         this.channelName = channelName;
         this.planId = planId;
+        this.familyId = familyId;
         this.policyNumber = policyNumber;
         this.meritzQuoteGroupNumber = meritzQuoteGroupNumber;
         this.meritzQuoteRequestNumber = meritzQuoteRequestNumber;

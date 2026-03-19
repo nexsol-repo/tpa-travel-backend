@@ -25,6 +25,7 @@ public record SubscriptionResult(
             Long partnerId,
             Long channelId,
             Long planId,
+            Long familyId,
             String policyNumber,
             String meritzQuoteGroupNumber,
             String meritzQuoteRequestNumber,

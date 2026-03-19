@@ -32,6 +32,13 @@ public class ApplyService {
     public ApplyResult apply(ApplyCommand cmd) {
         validate(cmd);
 
+        // planId: 첫번째 피보험자의 planId를 대표로 사용 (DB NOT NULL 호환)
+        Long repPlanId = cmd.people().stream()
+                .map(ApplyCommand.InsuredPerson::planId)
+                .filter(id -> id != null)
+                .findFirst()
+                .orElse(null);
+
         TravelContractEntity contract =
                 TravelContractEntity.builder()
                         .insurerId(cmd.insurerId())
@@ -40,7 +47,8 @@ public class ApplyService {
                         .partnerName("TPA KOREA")
                         .channelId(cmd.channelId())
                         .channelName("TPA KOREA")
-                        .planId(cmd.planId())
+                        .planId(repPlanId)
+                        .familyId(cmd.familyId())
                         .countryName(cmd.countryName())
                         .countryCode(cmd.countryCode())
                         .insureStartDate(cmd.insureBeginDate())
@@ -87,10 +95,10 @@ public class ApplyService {
     }
 
     private void validate(ApplyCommand cmd) {
-        if (cmd.partnerId() == null || cmd.channelId() == null || cmd.planId() == null) {
+        if (cmd.partnerId() == null || cmd.channelId() == null || cmd.familyId() == null) {
             throw new CoreApiException(
                     CoreApiErrorType.INVALID_CONTRACT_REQUEST,
-                    "partnerId/channelId/planId is required");
+                    "partnerId/channelId/familyId is required");
         }
         if (cmd.insurerId() == null) {
             throw new CoreApiException(
