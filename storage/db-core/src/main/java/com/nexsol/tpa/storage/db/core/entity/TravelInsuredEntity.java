@@ -58,8 +58,27 @@ public class TravelInsuredEntity extends BaseEntity {
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
+    public static TravelInsuredEntity create(
+            Long contractId,
+            Long planId,
+            boolean isContractor,
+            String name,
+            String gender,
+            String residentNumber,
+            String englishName,
+            String passportNumber,
+            String phone,
+            String email,
+            String policyNumber,
+            BigDecimal insurePremium) {
+        return new TravelInsuredEntity(
+                contractId, planId, isContractor, name, gender,
+                residentNumber, englishName, passportNumber,
+                phone, email, policyNumber, insurePremium);
+    }
+
     @Builder
-    public TravelInsuredEntity(
+    private TravelInsuredEntity(
             Long contractId,
             Long planId,
             Boolean isContractor,

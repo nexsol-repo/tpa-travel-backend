@@ -35,7 +35,7 @@ public class ApplyValidator {
         requireNotBlank(p.residentNumber(), "people[" + index + "].residentNumber");
     }
 
-    private void requireNotNull(Object value, String fieldName) {
+    private void  requireNotNull(Object value, String fieldName) {
         if (value == null) {
             throw invalid(fieldName + " is required");
         }
