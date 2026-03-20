@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 
 import com.nexsol.tpa.client.meritz.quote.MeritzQuoteClient;
 import com.nexsol.tpa.client.meritz.quote.MeritzQuoteClient.PremiumRequest;
-import com.nexsol.tpa.core.domain.plan.TravelPlanReader.PlanFamily;
+import com.nexsol.tpa.core.domain.plan.PlanFamily;
 import com.nexsol.tpa.core.error.CoreErrorType;
 import com.nexsol.tpa.core.error.CoreException;
 
@@ -43,11 +43,11 @@ public class PremiumService {
                 log.warn(
                         "[PREMIUM] calculation skipped. familyId={}, planCd={}",
                         family.familyId(),
-                        family.repPlan().getPlanCode());
+                        family.repPlan().planCode());
                 continue;
             }
             results.put(
-                    family.repPlan().getId(), quoteResultComposer.compose(rawData, cmd, repIdx));
+                    family.repPlan().id(), quoteResultComposer.compose(rawData, cmd, repIdx));
         }
         return results;
     }
@@ -61,7 +61,7 @@ public class PremiumService {
         if (rawData == null) {
             throw new CoreException(
                     CoreErrorType.PREMIUM_CALCULATION_FAILED,
-                    "familyId=" + family.familyId() + ", planCd=" + family.repPlan().getPlanCode());
+                    "familyId=" + family.familyId() + ", planCd=" + family.repPlan().planCode());
         }
         return quoteResultComposer.compose(rawData, cmd, repIdx);
     }

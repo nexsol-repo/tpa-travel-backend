@@ -31,7 +31,7 @@ public class ApplyService {
         applyValidator.validate(cmd);
 
         ContractInfo contract = contractCreator.create(cmd, companies.getTpa().getPolNo());
-        ContractInfo saved = contractWriter.save(contract);
+        ContractInfo saved = contractWriter.writerContract(contract);
 
         peopleWriter.register(saved.id(), cmd.people());
         snapshotAppender.append(saved.id(), cmd.insurerId(), "QUOTE", toJson(saved.id()));

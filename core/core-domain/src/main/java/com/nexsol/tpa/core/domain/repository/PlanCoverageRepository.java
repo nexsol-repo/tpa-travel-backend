@@ -1,8 +1,9 @@
 package com.nexsol.tpa.core.domain.repository;
 
 import java.util.List;
-import com.nexsol.tpa.core.domain.repository.projection.TravelPlanCoverageRow;
+
+import com.nexsol.tpa.core.domain.coverage.PlanCoverage;
 
 public interface PlanCoverageRepository {
-    List<TravelPlanCoverageRow> findRowsByPlanId(Long planId);
+    List<PlanCoverage> findByPlanId(Long planId);
 }

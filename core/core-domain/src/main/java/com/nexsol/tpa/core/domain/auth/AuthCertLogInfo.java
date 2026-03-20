@@ -4,6 +4,7 @@ import lombok.Builder;
 
 @Builder
 public record AuthCertLogInfo(
+        Long id,
         Long contractId,
         String bizNum,
         String impUid,

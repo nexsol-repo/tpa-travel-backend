@@ -6,7 +6,7 @@ import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
-import com.nexsol.tpa.core.domain.plan.TravelPlanReader.PlanFamily;
+import com.nexsol.tpa.core.domain.plan.PlanFamily;
 import com.nexsol.tpa.core.domain.premium.PlanCondition;
 import com.nexsol.tpa.core.error.CoreErrorType;
 import com.nexsol.tpa.core.error.CoreException;
@@ -21,7 +21,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class TravelPlanService {
 
-    private final TravelPlanReader planReader;
+    private final PlanReader planReader;
     private final QuotePlanPolicy policy;
 
     /**
@@ -56,7 +56,7 @@ public class TravelPlanService {
 
         return allFamilies.stream()
                 .filter(f -> f.familyName() != null && f.familyName().contains(typeMarker))
-                .filter(f -> f.plans().stream().anyMatch(p -> p.getId().equals(planId)))
+                .filter(f -> f.plans().stream().anyMatch(p -> p.id().equals(planId)))
                 .findFirst()
                 .orElseThrow(
                         () ->
@@ -80,16 +80,16 @@ public class TravelPlanService {
         // 실손제외 planCode → repPlanId 인덱싱
         Map<String, Long> excludeByCode = new HashMap<>();
         for (PlanFamily f : excludeFamilies) {
-            excludeByCode.put(f.repPlan().getPlanCode(), f.repPlan().getId());
+            excludeByCode.put(f.repPlan().planCode(), f.repPlan().id());
         }
 
         // 실손포함 repPlanId → 실손제외 repPlanId 매핑 (planCode + "P")
         Map<Long, Long> result = new HashMap<>();
         for (PlanFamily f : lossFamilies) {
-            String excludeCode = f.repPlan().getPlanCode() + "P";
+            String excludeCode = f.repPlan().planCode() + "P";
             Long excludePlanId = excludeByCode.get(excludeCode);
             if (excludePlanId != null) {
-                result.put(f.repPlan().getId(), excludePlanId);
+                result.put(f.repPlan().id(), excludePlanId);
             }
         }
         return result;

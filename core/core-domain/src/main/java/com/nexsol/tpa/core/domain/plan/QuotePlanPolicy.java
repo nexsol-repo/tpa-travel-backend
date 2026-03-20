@@ -6,7 +6,7 @@ import java.util.*;
 
 import org.springframework.stereotype.Component;
 
-import com.nexsol.tpa.core.domain.plan.TravelPlanReader.PlanFamily;
+import com.nexsol.tpa.core.domain.plan.PlanFamily;
 import com.nexsol.tpa.core.domain.premium.PlanCondition;
 
 /**

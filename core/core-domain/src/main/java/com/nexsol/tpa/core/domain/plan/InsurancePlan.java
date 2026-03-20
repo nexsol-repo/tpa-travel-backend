@@ -5,6 +5,7 @@ import lombok.Builder;
 @Builder
 public record InsurancePlan(
         Long id,
+        Long familyId,
         String insuranceProductName,
         String planName,
         String planFullName,

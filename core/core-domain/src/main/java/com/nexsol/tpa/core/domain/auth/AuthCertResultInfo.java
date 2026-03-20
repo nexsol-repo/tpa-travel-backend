@@ -4,6 +4,8 @@ import lombok.Builder;
 
 @Builder
 public record AuthCertResultInfo(
+        Long id,
+        Long logId,
         String provider,
         String moid,
         String impUid,
@@ -17,5 +19,6 @@ public record AuthCertResultInfo(
         String certGender,
         String certPhone,
         boolean matched,
+        String matchedYn,
         String matchFailReason,
         String rawResJson) {}
