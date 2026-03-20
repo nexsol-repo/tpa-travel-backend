@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import com.nexsol.tpa.storage.db.core.entity.TravelContractEntity;
 
-public interface TravelContractRepository extends JpaRepository<TravelContractEntity, Long> {
+public interface JpaContractRepository extends JpaRepository<TravelContractEntity, Long> {
 
     @Query(
             """

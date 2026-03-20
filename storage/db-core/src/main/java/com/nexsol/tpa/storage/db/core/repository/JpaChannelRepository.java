@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.nexsol.tpa.storage.db.core.entity.TpaChannelEntity;
 
-public interface TpaChannelRepository extends JpaRepository<TpaChannelEntity, Long> {
+public interface JpaChannelRepository extends JpaRepository<TpaChannelEntity, Long> {
 
     Optional<TpaChannelEntity> findByChannelCode(String channelCode);
 

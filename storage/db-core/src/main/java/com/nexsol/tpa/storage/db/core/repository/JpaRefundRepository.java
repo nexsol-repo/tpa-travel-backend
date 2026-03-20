@@ -10,7 +10,7 @@ import org.springframework.data.repository.query.Param;
 
 import com.nexsol.tpa.storage.db.core.entity.TravelRefundEntity;
 
-public interface TravelInsureRefundRepository extends JpaRepository<TravelRefundEntity, Long> {
+public interface JpaRefundRepository extends JpaRepository<TravelRefundEntity, Long> {
 
     Optional<TravelRefundEntity> findByPaymentId(Long paymentId);
 

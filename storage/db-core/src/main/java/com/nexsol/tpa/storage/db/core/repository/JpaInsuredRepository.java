@@ -9,7 +9,7 @@ import org.springframework.data.repository.query.Param;
 
 import com.nexsol.tpa.storage.db.core.entity.TravelInsuredEntity;
 
-public interface TravelInsuredRepository extends JpaRepository<TravelInsuredEntity, Long> {
+public interface JpaInsuredRepository extends JpaRepository<TravelInsuredEntity, Long> {
 
     List<TravelInsuredEntity> findByContractIdAndDeletedAtIsNullOrderByIdAsc(Long contractId);
 

@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.nexsol.tpa.storage.db.core.entity.TpaPartnerEntity;
 
-public interface TpaPartnerRepository extends JpaRepository<TpaPartnerEntity, Long> {
+public interface JpaPartnerRepository extends JpaRepository<TpaPartnerEntity, Long> {
 
     Optional<TpaPartnerEntity> findByPartnerCode(String partnerCode);
 

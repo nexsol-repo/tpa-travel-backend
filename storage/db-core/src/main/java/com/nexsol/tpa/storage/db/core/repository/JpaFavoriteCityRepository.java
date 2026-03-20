@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.nexsol.tpa.storage.db.core.entity.FavoriteCityEntity;
 
-public interface FavoriteCityRepository extends JpaRepository<FavoriteCityEntity, Long> {
+public interface JpaFavoriteCityRepository extends JpaRepository<FavoriteCityEntity, Long> {
 
     List<FavoriteCityEntity> findByDeletedAtIsNullOrderBySortOrderAsc();
 

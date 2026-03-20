@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.nexsol.tpa.storage.db.core.entity.TpaAuthCertResultEntity;
 
-public interface TpaAuthCertResultRepository extends JpaRepository<TpaAuthCertResultEntity, Long> {
+public interface JpaAuthCertResultRepository extends JpaRepository<TpaAuthCertResultEntity, Long> {
 
     Optional<TpaAuthCertResultEntity> findByImpUid(String impUid);
 
