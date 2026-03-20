@@ -15,8 +15,8 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "travel_insure_payment")
-public class TravelInsurePaymentEntity extends BaseEntity {
+@Table(name = "travel_payment")
+public class TravelPaymentEntity extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,7 +43,7 @@ public class TravelInsurePaymentEntity extends BaseEntity {
     private TravelPaymentStatus status;
 
     @Builder
-    public TravelInsurePaymentEntity(
+    public TravelPaymentEntity(
             Long contractId,
             TravelPaymentMethod paymentMethod,
             LocalDateTime paymentDate,
@@ -56,9 +56,9 @@ public class TravelInsurePaymentEntity extends BaseEntity {
         this.status = status == null ? TravelPaymentStatus.COMPLETED : status;
     }
 
-    public static TravelInsurePaymentEntity createReady(
+    public static TravelPaymentEntity createReady(
             Long contractId, TravelPaymentMethod method, BigDecimal amount) {
-        return TravelInsurePaymentEntity.builder()
+        return TravelPaymentEntity.builder()
                 .contractId(contractId)
                 .paymentMethod(method)
                 .paidAmount(amount)

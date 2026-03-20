@@ -10,27 +10,26 @@ public record ApplyCommand(
         String partnerName,
         Long channelId,
         String channelName,
-        Long planId,
+        Long familyId,
         String meritzQuoteGroupNumber,
         String meritzQuoteRequestNumber,
         String countryCode,
         String countryName,
         LocalDate insureBeginDate,
         LocalDate insureEndDate,
-        String contractPeopleName,
-        String contractPeopleResidentNumber,
-        String contractPeopleHp,
-        String contractPeopleMail,
-        BigDecimal totalFee,
+        BigDecimal totalPremium,
         List<InsuredPerson> people,
         boolean marketingConsentUsed) {
 
     public record InsuredPerson(
+            Long planId,
             String name,
             String gender,
             String residentNumber,
-            String nameEng,
+            String englishName,
             String passportNumber,
+            String phone,
+            String email,
             String insureNumber,
             BigDecimal insurePremium) {}
 }

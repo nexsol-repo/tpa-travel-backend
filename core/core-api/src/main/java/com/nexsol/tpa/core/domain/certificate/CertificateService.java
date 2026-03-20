@@ -6,8 +6,8 @@ import com.nexsol.tpa.client.meritz.bridge.dto.MeritzBridgeApiResponse;
 import com.nexsol.tpa.client.meritz.contract.MeritzContractClient;
 import com.nexsol.tpa.core.domain.contract.ContractReader;
 import com.nexsol.tpa.core.domain.contract.ContractValidator;
-import com.nexsol.tpa.core.domain.plan.PlanReader;
 import com.nexsol.tpa.core.domain.snapshot.SnapshotAppender;
+import com.nexsol.tpa.core.domain.subscription.SubscriptionInsuredReader;
 import com.nexsol.tpa.core.support.error.CoreApiErrorType;
 import com.nexsol.tpa.core.support.error.CoreApiException;
 import com.nexsol.tpa.storage.db.core.entity.TravelContractEntity;
@@ -24,7 +24,7 @@ public class CertificateService {
 
     private final MeritzContractClient meritzClient;
     private final ContractReader contractReader;
-    private final PlanReader planReader;
+    private final SubscriptionInsuredReader subscriptionInsuredReader;
     private final SnapshotAppender snapshotAppender;
     private final ObjectMapper objectMapper;
     private final CertificateLinkIssuer certificateLinkIssuer;
@@ -64,7 +64,7 @@ public class CertificateService {
 
     private CertificateParams resolveParams(Long contractId) {
         TravelContractEntity contract = contractReader.getById(contractId);
-        TravelInsurancePlanEntity plan = planReader.getById(contract.getPlanId());
+        TravelInsurancePlanEntity plan = subscriptionInsuredReader.findRepPlan(contractId);
 
         return new CertificateParams(
                 contract.getInsurerId(),

@@ -3,24 +3,25 @@ package com.nexsol.tpa.core.domain.auth;
 import org.springframework.stereotype.Component;
 
 import com.nexsol.tpa.client.portone.PortOneClient;
-import com.nexsol.tpa.storage.db.core.entity.TravelContractEntity;
+import com.nexsol.tpa.storage.db.core.entity.TravelInsuredEntity;
 
 @Component
 public class AuthCertMatcher {
 
     public boolean isMatched(
-            TravelContractEntity contract, PortOneClient.CertificationResponse cert) {
-        String contractName = contract.getContractPeopleName();
+            TravelInsuredEntity contractor, PortOneClient.CertificationResponse cert) {
+        if (contractor == null) return false;
 
         boolean nameOk =
-                contractName != null
+                contractor.getName() != null
                         && cert.getName() != null
-                        && normalizeName(contractName).equals(normalizeName(cert.getName()));
+                        && normalizeName(contractor.getName())
+                                .equals(normalizeName(cert.getName()));
 
         boolean phoneOk =
-                contract.getContractPeopleHp() != null
+                contractor.getPhone() != null
                         && cert.getPhone() != null
-                        && normalizePhone(contract.getContractPeopleHp())
+                        && normalizePhone(contractor.getPhone())
                                 .equals(normalizePhone(cert.getPhone()));
 
         return nameOk && phoneOk;

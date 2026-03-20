@@ -151,7 +151,8 @@ class TravelPlanControllerDocsTest extends RestDocsTest {
             fieldWithPath("period.insBgnDt").type(STRING).description("보험시작일자"),
             fieldWithPath("period.insEdDt").type(STRING).description("보험종료일자"),
             fieldWithPath("insuredCount").type(NUMBER).description("피보험자 수"),
-            fieldWithPath("plans[].planId").type(NUMBER).description("플랜 ID"),
+            fieldWithPath("plans[].familyId").type(NUMBER).description("플랜 패밀리 ID"),
+            fieldWithPath("plans[].planId").type(NUMBER).description("플랜 ID (대표플랜)"),
             fieldWithPath("plans[].planGrpCd").type(STRING).description("플랜그룹코드"),
             fieldWithPath("plans[].planCd").type(STRING).description("플랜코드"),
             fieldWithPath("plans[].planNm").type(STRING).description("플랜명"),
@@ -178,7 +179,8 @@ class TravelPlanControllerDocsTest extends RestDocsTest {
 
     private static org.springframework.restdocs.payload.FieldDescriptor[] planCardResponseFields() {
         return new org.springframework.restdocs.payload.FieldDescriptor[] {
-            fieldWithPath("planId").type(NUMBER).description("플랜 ID"),
+            fieldWithPath("familyId").type(NUMBER).description("플랜 패밀리 ID"),
+            fieldWithPath("planId").type(NUMBER).description("플랜 ID (대표플랜)"),
             fieldWithPath("planGrpCd").type(STRING).description("플랜그룹코드"),
             fieldWithPath("planCd").type(STRING).description("플랜코드"),
             fieldWithPath("planNm").type(STRING).description("플랜명"),
@@ -186,6 +188,10 @@ class TravelPlanControllerDocsTest extends RestDocsTest {
             fieldWithPath("premium.ttPrem").type(NUMBER).description("총 보험료"),
             fieldWithPath("premium.currency").type(STRING).description("통화 (KRW)"),
             fieldWithPath("insuredPremiums[].index").type(NUMBER).description("피보험자 인덱스"),
+            fieldWithPath("insuredPremiums[].planId")
+                    .type(NUMBER)
+                    .description("피보험자별 플랜 ID (나이에 맞는 실제 플랜)")
+                    .optional(),
             fieldWithPath("insuredPremiums[].currency").type(STRING).description("통화"),
             fieldWithPath("insuredPremiums[].ppsPrem").type(NUMBER).description("인당 보험료"),
             fieldWithPath("insuredPremiums[].birth").type(STRING).description("생년월일"),

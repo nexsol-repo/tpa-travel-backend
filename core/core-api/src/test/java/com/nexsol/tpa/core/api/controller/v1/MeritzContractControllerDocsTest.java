@@ -11,9 +11,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -27,9 +25,7 @@ import com.nexsol.tpa.client.meritz.bridge.dto.MeritzBridgeApiResponse;
 import com.nexsol.tpa.core.api.controller.v1.request.ContractInquiryRequest;
 import com.nexsol.tpa.core.api.controller.v1.request.ContractListRequest;
 import com.nexsol.tpa.core.domain.apply.ApplyCommand;
-import com.nexsol.tpa.core.domain.apply.ApplyResult;
 import com.nexsol.tpa.core.domain.apply.ApplyService;
-import com.nexsol.tpa.core.domain.cancel.CancelResult;
 import com.nexsol.tpa.core.domain.cancel.CancelService;
 import com.nexsol.tpa.core.domain.certificate.CertificateCommand;
 import com.nexsol.tpa.core.domain.certificate.CertificateService;
@@ -184,8 +180,7 @@ class MeritzContractControllerDocsTest extends RestDocsTest {
 
     @Test
     void apply() throws Exception {
-        when(applyService.apply(any(ApplyCommand.class)))
-                .thenReturn(new ApplyResult(100L, "PENDING"));
+        when(applyService.apply(any(ApplyCommand.class))).thenReturn(100L);
 
         mockMvc.perform(
                         post("/v1/meritz/travel/contract/apply")
@@ -198,33 +193,33 @@ class MeritzContractControllerDocsTest extends RestDocsTest {
                   "partnerName": "TPA파트너",
                   "channelId": 1,
                   "channelName": "채널1",
-                  "planId": 10,
+                  "familyId": 1,
                   "meritzQuoteGroupNumber": "QG001",
                   "meritzQuoteRequestNumber": "QR001",
                   "countryCode": "JP",
                   "countryName": "일본",
                   "insureBeginDate": "2026-03-15",
                   "insureEndDate": "2026-03-20",
-                  "contractPeopleName": "홍길동",
-                  "contractPeopleResidentNumber": "9001011234567",
-                  "contractPeopleHp": "01012345678",
-                  "contractPeopleMail": "hong@test.com",
-                  "totalFee": 27000,
+                  "totalPremium": 27000,
                   "people": [
                     {
+                      "planId": 10,
                       "name": "홍길동",
                       "gender": "1",
                       "residentNumber": "9001011234567",
-                      "nameEng": "HONG GILDONG",
+                      "englishName": "HONG GILDONG",
                       "passportNumber": "M12345678",
+                      "phone": "01012345678",
+                      "email": "hong@test.com",
                       "insureNumber": "001",
                       "insurePremium": 15000
                     },
                     {
+                      "planId": 11,
                       "name": "김영희",
                       "gender": "2",
                       "residentNumber": "9205152345678",
-                      "nameEng": "KIM YOUNGHEE",
+                      "englishName": "KIM YOUNGHEE",
                       "passportNumber": "M87654321",
                       "insureNumber": "002",
                       "insurePremium": 12000
@@ -239,39 +234,23 @@ class MeritzContractControllerDocsTest extends RestDocsTest {
                                 "meritz-contract-apply",
                                 requestFields(applyRequestFields()),
                                 responseFields(
-                                        fieldWithPath("contractId")
-                                                .type(NUMBER)
-                                                .description("계약 ID"),
-                                        fieldWithPath("status")
-                                                .type(STRING)
-                                                .description("계약 상태"))));
+                                        apiResponseFields(
+                                                fieldWithPath("data")
+                                                        .type(NUMBER)
+                                                        .description("계약 ID")))));
     }
 
     @Test
     void completed() throws Exception {
         var result =
                 SubscriptionResult.success(
-                        new SubscriptionResult.ContractInfo(
-                                100L,
-                                1L,
-                                1L,
-                                10L,
-                                "POL001",
-                                "QG001",
-                                "QR001",
-                                "일본",
-                                "JP",
-                                2,
-                                new BigDecimal("27000"),
-                                "COMPLETED",
-                                LocalDate.of(2026, 3, 15),
-                                LocalDate.of(2026, 3, 20),
-                                "홍길동",
-                                "01012345678",
-                                "hong@test.com"),
-                        new SubscriptionResult.InsurerInfo(1L, "메리츠화재", "MERITZ"),
-                        new SubscriptionResult.PlanInfo(
-                                10L, "해외여행자보험", "가뿐한플랜B", "PD001", "UPD001", "GRP01", "TA2"));
+                        100L,
+                        "해외여행자보험",
+                        "가뿐한플랜",
+                        LocalDate.of(2026, 3, 15),
+                        LocalDate.of(2026, 3, 20),
+                        "홍길동",
+                        2);
 
         when(subscriptionService.subscribe(eq("TPA"), any(SubscriptionCommand.class)))
                 .thenReturn(result);
@@ -313,35 +292,7 @@ class MeritzContractControllerDocsTest extends RestDocsTest {
 
     @Test
     void cancel() throws Exception {
-        var result =
-                new CancelResult(
-                        new CancelResult.ContractInfo(
-                                100L,
-                                "CANCELLED",
-                                "POL001",
-                                "QG001",
-                                "QR001",
-                                "일본",
-                                "JP",
-                                2,
-                                new BigDecimal("27000"),
-                                LocalDate.of(2026, 3, 15),
-                                LocalDate.of(2026, 3, 20),
-                                new CancelResult.InsurerInfo(1L, "MERITZ", "메리츠화재"),
-                                new CancelResult.PlanInfo(
-                                        10L, "해외여행자보험", "가뿐한플랜B", "PD001", "UPD001", "GRP01",
-                                        "TA2"),
-                                new CancelResult.PaymentInfo(
-                                        1L,
-                                        "CARD",
-                                        "CANCELLED",
-                                        new BigDecimal("27000"),
-                                        LocalDateTime.of(2026, 3, 12, 10, 0),
-                                        LocalDateTime.of(2026, 3, 12, 11, 0),
-                                        "삼성카드"),
-                                new BigDecimal("27000")));
-
-        when(cancelService.cancel(eq("TPA"), any(RefundCommand.class))).thenReturn(result);
+        when(cancelService.cancel(eq("TPA"), any(RefundCommand.class))).thenReturn(100L);
 
         mockMvc.perform(
                         post("/v1/meritz/travel/contract/cancel")
@@ -367,7 +318,11 @@ class MeritzContractControllerDocsTest extends RestDocsTest {
                                                 .description("회사코드 (기본값: TPA)")
                                                 .optional()),
                                 requestFields(cancelRequestFields()),
-                                responseFields(cancelResponseFields())));
+                                responseFields(
+                                        apiResponseFields(
+                                                fieldWithPath("data")
+                                                        .type(NUMBER)
+                                                        .description("계약 ID")))));
     }
 
     // ── Request Field Descriptors ──
@@ -379,24 +334,29 @@ class MeritzContractControllerDocsTest extends RestDocsTest {
             fieldWithPath("partnerName").type(STRING).description("파트너명"),
             fieldWithPath("channelId").type(NUMBER).description("채널 ID"),
             fieldWithPath("channelName").type(STRING).description("채널명"),
-            fieldWithPath("planId").type(NUMBER).description("플랜 ID"),
-            fieldWithPath("meritzQuoteGroupNumber").type(STRING).description("메리츠 견적그룹번호"),
-            fieldWithPath("meritzQuoteRequestNumber").type(STRING).description("메리츠 견적요청번호"),
+            fieldWithPath("familyId").type(NUMBER).description("플랜 패밀리 ID"),
+            fieldWithPath("meritzQuoteGroupNumber")
+                    .type(STRING)
+                    .description("메리츠 견적그룹번호")
+                    .optional(),
+            fieldWithPath("meritzQuoteRequestNumber")
+                    .type(STRING)
+                    .description("메리츠 견적요청번호")
+                    .optional(),
             fieldWithPath("countryCode").type(STRING).description("국가코드"),
             fieldWithPath("countryName").type(STRING).description("국가명"),
             fieldWithPath("insureBeginDate").type(STRING).description("보험시작일 (YYYY-MM-DD)"),
             fieldWithPath("insureEndDate").type(STRING).description("보험종료일 (YYYY-MM-DD)"),
-            fieldWithPath("contractPeopleName").type(STRING).description("계약자 이름"),
-            fieldWithPath("contractPeopleResidentNumber").type(STRING).description("계약자 주민등록번호"),
-            fieldWithPath("contractPeopleHp").type(STRING).description("계약자 휴대폰"),
-            fieldWithPath("contractPeopleMail").type(STRING).description("계약자 이메일"),
-            fieldWithPath("totalFee").type(NUMBER).description("총 보험료"),
+            fieldWithPath("totalPremium").type(NUMBER).description("총 보험료"),
             fieldWithPath("people[]").type(ARRAY).description("피보험자 목록"),
+            fieldWithPath("people[].planId").type(NUMBER).description("피보험자 플랜 ID"),
             fieldWithPath("people[].name").type(STRING).description("피보험자 이름"),
             fieldWithPath("people[].gender").type(STRING).description("성별 (1: 남, 2: 여)"),
             fieldWithPath("people[].residentNumber").type(STRING).description("주민등록번호"),
-            fieldWithPath("people[].nameEng").type(STRING).description("영문이름"),
+            fieldWithPath("people[].englishName").type(STRING).description("영문이름"),
             fieldWithPath("people[].passportNumber").type(STRING).description("여권번호"),
+            fieldWithPath("people[].phone").type(STRING).description("휴대폰번호").optional(),
+            fieldWithPath("people[].email").type(STRING).description("이메일").optional(),
             fieldWithPath("people[].insureNumber").type(STRING).description("보험자번호"),
             fieldWithPath("people[].insurePremium").type(NUMBER).description("피보험자 보험료"),
             fieldWithPath("marketingConsentUsed").type(BOOLEAN).description("마케팅 동의 여부"),
@@ -425,80 +385,33 @@ class MeritzContractControllerDocsTest extends RestDocsTest {
         };
     }
 
-    private static org.springframework.restdocs.payload.FieldDescriptor[]
-            completedResponseFields() {
-        return new org.springframework.restdocs.payload.FieldDescriptor[] {
-            fieldWithPath("ok").type(BOOLEAN).description("성공 여부"),
-            fieldWithPath("errCd").type(STRING).description("에러 코드").optional(),
-            fieldWithPath("errMsg").type(STRING).description("에러 메시지").optional(),
-            fieldWithPath("contract").type(OBJECT).description("계약 정보"),
-            fieldWithPath("contract.id").type(NUMBER).description("계약 ID"),
-            fieldWithPath("contract.partnerId").type(NUMBER).description("파트너 ID"),
-            fieldWithPath("contract.channelId").type(NUMBER).description("채널 ID"),
-            fieldWithPath("contract.planId").type(NUMBER).description("플랜 ID"),
-            fieldWithPath("contract.policyNumber").type(STRING).description("증권번호"),
-            fieldWithPath("contract.meritzQuoteGroupNumber").type(STRING).description("견적그룹번호"),
-            fieldWithPath("contract.meritzQuoteRequestNumber").type(STRING).description("견적요청번호"),
-            fieldWithPath("contract.countryName").type(STRING).description("국가명"),
-            fieldWithPath("contract.countryCode").type(STRING).description("국가코드"),
-            fieldWithPath("contract.insuredPeopleNumber").type(NUMBER).description("피보험자 수"),
-            fieldWithPath("contract.totalFee").type(NUMBER).description("총 보험료"),
-            fieldWithPath("contract.status").type(STRING).description("계약 상태"),
-            fieldWithPath("contract.insureBeginDate").type(STRING).description("보험시작일"),
-            fieldWithPath("contract.insureEndDate").type(STRING).description("보험종료일"),
-            fieldWithPath("contract.contractPeopleName").type(STRING).description("계약자명"),
-            fieldWithPath("contract.contractPeopleHp").type(STRING).description("계약자 휴대폰"),
-            fieldWithPath("contract.contractPeopleMail").type(STRING).description("계약자 이메일"),
-            fieldWithPath("insurer").type(OBJECT).description("보험사 정보"),
-            fieldWithPath("insurer.id").type(NUMBER).description("보험사 ID"),
-            fieldWithPath("insurer.name").type(STRING).description("보험사명"),
-            fieldWithPath("insurer.code").type(STRING).description("보험사 코드"),
-            fieldWithPath("plan").type(OBJECT).description("플랜 정보"),
-            fieldWithPath("plan.id").type(NUMBER).description("플랜 ID"),
-            fieldWithPath("plan.insuranceProductName").type(STRING).description("보험상품명"),
-            fieldWithPath("plan.planName").type(STRING).description("플랜명"),
-            fieldWithPath("plan.productCode").type(STRING).description("상품코드"),
-            fieldWithPath("plan.unitProductCode").type(STRING).description("단위상품코드"),
-            fieldWithPath("plan.planGroupCode").type(STRING).description("플랜그룹코드"),
-            fieldWithPath("plan.planCode").type(STRING).description("플랜코드"),
-        };
+    private static org.springframework.restdocs.payload.FieldDescriptor[] apiResponseFields(
+            org.springframework.restdocs.payload.FieldDescriptor... dataFields) {
+        var base =
+                new org.springframework.restdocs.payload.FieldDescriptor[] {
+                    fieldWithPath("result").type(STRING).description("결과 (SUCCESS/ERROR)"),
+                    fieldWithPath("error").type(OBJECT).description("에러 정보").optional(),
+                };
+        var result =
+                new org.springframework.restdocs.payload.FieldDescriptor
+                        [base.length + dataFields.length];
+        System.arraycopy(base, 0, result, 0, base.length);
+        System.arraycopy(dataFields, 0, result, base.length, dataFields.length);
+        return result;
     }
 
-    private static org.springframework.restdocs.payload.FieldDescriptor[] cancelResponseFields() {
-        return new org.springframework.restdocs.payload.FieldDescriptor[] {
-            fieldWithPath("contract").type(OBJECT).description("계약 정보"),
-            fieldWithPath("contract.id").type(NUMBER).description("계약 ID"),
-            fieldWithPath("contract.status").type(STRING).description("계약 상태"),
-            fieldWithPath("contract.policyNumber").type(STRING).description("증권번호"),
-            fieldWithPath("contract.meritzQuoteGroupNumber").type(STRING).description("견적그룹번호"),
-            fieldWithPath("contract.meritzQuoteRequestNumber").type(STRING).description("견적요청번호"),
-            fieldWithPath("contract.countryName").type(STRING).description("국가명"),
-            fieldWithPath("contract.countryCode").type(STRING).description("국가코드"),
-            fieldWithPath("contract.insuredPeopleNumber").type(NUMBER).description("피보험자 수"),
-            fieldWithPath("contract.totalFee").type(NUMBER).description("총 보험료"),
-            fieldWithPath("contract.insureBeginDate").type(STRING).description("보험시작일"),
-            fieldWithPath("contract.insureEndDate").type(STRING).description("보험종료일"),
-            fieldWithPath("contract.insurer").type(OBJECT).description("보험사 정보"),
-            fieldWithPath("contract.insurer.id").type(NUMBER).description("보험사 ID"),
-            fieldWithPath("contract.insurer.insurerCode").type(STRING).description("보험사 코드"),
-            fieldWithPath("contract.insurer.insurerName").type(STRING).description("보험사명"),
-            fieldWithPath("contract.plan").type(OBJECT).description("플랜 정보"),
-            fieldWithPath("contract.plan.id").type(NUMBER).description("플랜 ID"),
-            fieldWithPath("contract.plan.insuranceProductName").type(STRING).description("보험상품명"),
-            fieldWithPath("contract.plan.planName").type(STRING).description("플랜명"),
-            fieldWithPath("contract.plan.productCode").type(STRING).description("상품코드"),
-            fieldWithPath("contract.plan.unitProductCode").type(STRING).description("단위상품코드"),
-            fieldWithPath("contract.plan.planGroupCode").type(STRING).description("플랜그룹코드"),
-            fieldWithPath("contract.plan.planCode").type(STRING).description("플랜코드"),
-            fieldWithPath("contract.payment").type(OBJECT).description("결제 정보"),
-            fieldWithPath("contract.payment.id").type(NUMBER).description("결제 ID"),
-            fieldWithPath("contract.payment.paymentMethod").type(STRING).description("결제수단"),
-            fieldWithPath("contract.payment.status").type(STRING).description("결제 상태"),
-            fieldWithPath("contract.payment.paidAmount").type(NUMBER).description("결제금액"),
-            fieldWithPath("contract.payment.paymentDate").type(STRING).description("결제일시"),
-            fieldWithPath("contract.payment.cancelDate").type(STRING).description("취소일시"),
-            fieldWithPath("contract.payment.cardCompanyName").type(STRING).description("카드사명"),
-            fieldWithPath("contract.refundAmount").type(NUMBER).description("환불금액"),
-        };
+    private static org.springframework.restdocs.payload.FieldDescriptor[]
+            completedResponseFields() {
+        return apiResponseFields(
+                fieldWithPath("data.ok").type(BOOLEAN).description("성공 여부"),
+                fieldWithPath("data.errCd").type(STRING).description("에러 코드").optional(),
+                fieldWithPath("data.errMsg").type(STRING).description("에러 메시지").optional(),
+                fieldWithPath("data.contractId").type(NUMBER).description("계약 ID"),
+                fieldWithPath("data.insuranceProductName").type(STRING).description("보험상품명"),
+                fieldWithPath("data.planName").type(STRING).description("플랜명"),
+                fieldWithPath("data.insureStartDate").type(STRING).description("보험시작일"),
+                fieldWithPath("data.insureEndDate").type(STRING).description("보험종료일"),
+                fieldWithPath("data.contractPeopleName").type(STRING).description("대표계약자명"),
+                fieldWithPath("data.insuredPeopleCount").type(NUMBER).description("가입인원수"));
     }
 }

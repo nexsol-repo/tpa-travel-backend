@@ -8,12 +8,11 @@ import com.nexsol.tpa.core.domain.apply.ApplyCommand;
 
 public record ContractApplyRequest(
         Long insurerId,
-        String insuerName,
         Long partnerId,
         String partnerName,
         Long channelId,
         String channelName,
-        Long planId,
+        Long familyId,
         String policyNumber,
         String meritzQuoteGroupNumber,
         String meritzQuoteRequestNumber,
@@ -21,11 +20,7 @@ public record ContractApplyRequest(
         String countryName,
         LocalDate insureBeginDate,
         LocalDate insureEndDate,
-        String contractPeopleName,
-        String contractPeopleResidentNumber,
-        String contractPeopleHp,
-        String contractPeopleMail,
-        BigDecimal totalFee,
+        BigDecimal totalPremium,
         List<InsurePeopleRequest> people,
         boolean marketingConsentUsed) {
 
@@ -37,11 +32,14 @@ public record ContractApplyRequest(
                                 .map(
                                         p ->
                                                 new ApplyCommand.InsuredPerson(
+                                                        p.planId(),
                                                         p.name(),
                                                         p.gender(),
                                                         p.residentNumber(),
-                                                        p.nameEng(),
+                                                        p.englishName(),
                                                         p.passportNumber(),
+                                                        p.phone(),
+                                                        p.email(),
                                                         p.insureNumber(),
                                                         p.insurePremium()))
                                 .toList();
@@ -52,18 +50,14 @@ public record ContractApplyRequest(
                 partnerName,
                 channelId,
                 channelName,
-                planId,
+                familyId,
                 meritzQuoteGroupNumber,
                 meritzQuoteRequestNumber,
                 countryCode,
                 countryName,
                 insureBeginDate,
                 insureEndDate,
-                contractPeopleName,
-                contractPeopleResidentNumber,
-                contractPeopleHp,
-                contractPeopleMail,
-                totalFee,
+                totalPremium,
                 insuredPeople,
                 marketingConsentUsed);
     }
