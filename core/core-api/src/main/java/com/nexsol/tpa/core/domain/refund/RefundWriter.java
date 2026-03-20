@@ -13,7 +13,7 @@ public class RefundWriter {
 
     private final TravelInsureRefundRepository refundRepository;
 
-    public TravelRefundEntity create(RefundCommand command) {
+    public TravelRefundEntity create(ContractRefund command) {
         return refundRepository.save(
                 TravelRefundEntity.builder()
                         .paymentId(command.paymentId())

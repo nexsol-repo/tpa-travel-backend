@@ -6,7 +6,7 @@ import com.nexsol.tpa.client.meritz.contract.MeritzContractClient;
 import com.nexsol.tpa.core.domain.contract.ContractReader;
 import com.nexsol.tpa.core.domain.contract.ContractValidator;
 import com.nexsol.tpa.core.domain.payment.PaymentReader;
-import com.nexsol.tpa.core.domain.refund.RefundCommand;
+import com.nexsol.tpa.core.domain.refund.ContractRefund;
 import com.nexsol.tpa.storage.db.core.entity.TravelContractEntity;
 import com.nexsol.tpa.storage.db.core.entity.TravelPaymentEntity;
 
@@ -22,8 +22,8 @@ public class CancelService {
     private final PaymentReader paymentReader;
     private final CancelWriter cancelWriter;
 
-    public Long cancel(String company, RefundCommand refundCommand) {
-        Long contractId = refundCommand.contractId();
+    public Long cancel(String company, ContractRefund contractRefund) {
+        Long contractId = contractRefund.contractId();
         TravelContractEntity contract = contractReader.getById(contractId);
         TravelPaymentEntity payment = paymentReader.getByContractId(contract.getId());
 
@@ -39,7 +39,7 @@ public class CancelService {
                     contract.getMeritzQuoteGroupNumber(),
                     contract.getMeritzQuoteRequestNumber());
 
-            cancelWriter.save(contract, payment, refundCommand);
+            cancelWriter.save(contract, payment, contractRefund);
         }
 
         return contractId;

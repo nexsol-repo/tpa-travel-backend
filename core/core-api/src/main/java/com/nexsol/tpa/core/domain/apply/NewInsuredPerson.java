@@ -1,8 +1,8 @@
-package com.nexsol.tpa.core.api.controller.v1.request;
+package com.nexsol.tpa.core.domain.apply;
 
 import java.math.BigDecimal;
 
-public record InsurePeopleRequest(
+public record NewInsuredPerson(
         Long planId,
         String name,
         String gender,

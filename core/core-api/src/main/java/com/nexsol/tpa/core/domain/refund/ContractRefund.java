@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 
 import com.nexsol.tpa.core.enums.TravelPaymentMethod;
 
-public record RefundCommand(
+public record ContractRefund(
         Long contractId,
         Long paymentId,
         BigDecimal refundAmount,

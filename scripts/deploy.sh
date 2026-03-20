@@ -45,7 +45,7 @@ else
 fi
 
 # 2. Blue-Green 포트 결정
-CURRENT_PORT_FILE="${BASE_PATH}/current_port.txt"
+CURRENT_PORT_FILE="${BASE_PATH}/current_port_${TARGET_ENV}.txt"
 if [ -f "$CURRENT_PORT_FILE" ]; then
     CURRENT_PORT=$(cat "$CURRENT_PORT_FILE")
 else

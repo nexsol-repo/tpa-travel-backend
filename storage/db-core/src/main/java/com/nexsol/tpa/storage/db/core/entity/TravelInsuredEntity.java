@@ -49,9 +49,6 @@ public class TravelInsuredEntity extends BaseEntity {
     @Column(name = "email", length = 100)
     private String email;
 
-    @Column(name = "policy_number", length = 50)
-    private String policyNumber;
-
     @Column(name = "insure_premium", nullable = false, precision = 15, scale = 2)
     private BigDecimal insurePremium;
 
@@ -69,7 +66,6 @@ public class TravelInsuredEntity extends BaseEntity {
             String passportNumber,
             String phone,
             String email,
-            String policyNumber,
             BigDecimal insurePremium) {
         return new TravelInsuredEntity(
                 contractId,
@@ -82,7 +78,6 @@ public class TravelInsuredEntity extends BaseEntity {
                 passportNumber,
                 phone,
                 email,
-                policyNumber,
                 insurePremium);
     }
 
@@ -98,7 +93,6 @@ public class TravelInsuredEntity extends BaseEntity {
             String passportNumber,
             String phone,
             String email,
-            String policyNumber,
             BigDecimal insurePremium) {
         this.contractId = contractId;
         this.planId = planId;
@@ -110,7 +104,6 @@ public class TravelInsuredEntity extends BaseEntity {
         this.passportNumber = passportNumber;
         this.phone = phone;
         this.email = email;
-        this.policyNumber = policyNumber;
         this.insurePremium = insurePremium == null ? BigDecimal.ZERO : insurePremium;
     }
 }

@@ -1,6 +1,6 @@
 package com.nexsol.tpa.core.domain.auth;
 
-public record AuthCertCommand(
+public record AuthCertification(
         Long contractId,
         String impUid,
         String requestId,

@@ -5,7 +5,7 @@ import java.util.stream.IntStream;
 
 import org.springframework.stereotype.Component;
 
-import com.nexsol.tpa.core.domain.apply.ApplyCommand;
+import com.nexsol.tpa.core.domain.apply.NewInsuredPerson;
 import com.nexsol.tpa.storage.db.core.entity.TravelInsuredEntity;
 import com.nexsol.tpa.storage.db.core.repository.TravelInsuredRepository;
 
@@ -17,7 +17,7 @@ public class ContractPeopleWriter {
 
     private final TravelInsuredRepository insuredRepository;
 
-    public void register(Long contractId, List<ApplyCommand.InsuredPerson> people) {
+    public void register(Long contractId, List<NewInsuredPerson> people) {
         IntStream.range(0, people.size())
                 .mapToObj(
                         i -> {
@@ -33,7 +33,6 @@ public class ContractPeopleWriter {
                                     p.passportNumber(),
                                     p.phone(),
                                     p.email(),
-                                    p.insureNumber(),
                                     p.insurePremium());
                         })
                 .forEach(insuredRepository::save);
