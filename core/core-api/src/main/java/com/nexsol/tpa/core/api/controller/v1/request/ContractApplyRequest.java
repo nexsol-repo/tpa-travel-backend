@@ -4,7 +4,8 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
-import com.nexsol.tpa.core.domain.apply.ApplyCommand;
+import com.nexsol.tpa.core.domain.apply.ContractApply;
+import com.nexsol.tpa.core.domain.apply.NewInsuredPerson;
 
 public record ContractApplyRequest(
         Long insurerId,
@@ -24,14 +25,14 @@ public record ContractApplyRequest(
         List<InsurePeopleRequest> people,
         boolean marketingConsentUsed) {
 
-    public ApplyCommand toCommand() {
-        List<ApplyCommand.InsuredPerson> insuredPeople =
+    public ContractApply toCommand() {
+        List<NewInsuredPerson> insuredPeople =
                 people == null
                         ? List.of()
                         : people.stream()
                                 .map(
                                         p ->
-                                                new ApplyCommand.InsuredPerson(
+                                                new NewInsuredPerson(
                                                         p.planId(),
                                                         p.name(),
                                                         p.gender(),
@@ -40,11 +41,10 @@ public record ContractApplyRequest(
                                                         p.passportNumber(),
                                                         p.phone(),
                                                         p.email(),
-                                                        p.insureNumber(),
                                                         p.insurePremium()))
                                 .toList();
 
-        return new ApplyCommand(
+        return new ContractApply(
                 insurerId,
                 partnerId,
                 partnerName,

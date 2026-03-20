@@ -223,7 +223,6 @@ class TravelContractControllerDocsTest extends RestDocsTest {
                     .type(STRING)
                     .description("여권번호 (마스킹)")
                     .optional(),
-            fieldWithPath("data.people[].policyNumber").type(STRING).description("증권번호").optional(),
             fieldWithPath("data.people[].insurePremium")
                     .type(NUMBER)
                     .description("피보험자 보험료")

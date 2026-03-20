@@ -15,10 +15,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 
-import com.nexsol.tpa.core.domain.auth.AuthCertCommand;
-import com.nexsol.tpa.core.domain.auth.AuthCertHistoryCommand;
+import com.nexsol.tpa.core.domain.auth.AuthCertHistory;
 import com.nexsol.tpa.core.domain.auth.AuthCertResult;
 import com.nexsol.tpa.core.domain.auth.AuthCertService;
+import com.nexsol.tpa.core.domain.auth.AuthCertification;
 import com.nexsol.tpa.test.api.RestDocsTest;
 
 @Tag("restdocs")
@@ -34,7 +34,7 @@ class AuthCertControllerDocsTest extends RestDocsTest {
 
     @Test
     void certComplete() throws Exception {
-        when(authCertService.complete(any(AuthCertCommand.class), any(), any(), any()))
+        when(authCertService.complete(any(AuthCertification.class), any(), any(), any()))
                 .thenReturn(sampleResult());
 
         mockMvc.perform(
@@ -63,8 +63,7 @@ class AuthCertControllerDocsTest extends RestDocsTest {
 
     @Test
     void certHistoryComplete() throws Exception {
-        when(authCertService.historyComplete(
-                        any(AuthCertHistoryCommand.class), any(), any(), any()))
+        when(authCertService.historyComplete(any(AuthCertHistory.class), any(), any(), any()))
                 .thenReturn(sampleResult());
 
         mockMvc.perform(

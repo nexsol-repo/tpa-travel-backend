@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
-public record ApplyCommand(
+public record ContractApply(
         Long insurerId,
         Long partnerId,
         String partnerName,
@@ -18,18 +18,5 @@ public record ApplyCommand(
         LocalDate insureBeginDate,
         LocalDate insureEndDate,
         BigDecimal totalPremium,
-        List<InsuredPerson> people,
-        boolean marketingConsentUsed) {
-
-    public record InsuredPerson(
-            Long planId,
-            String name,
-            String gender,
-            String residentNumber,
-            String englishName,
-            String passportNumber,
-            String phone,
-            String email,
-            String insureNumber,
-            BigDecimal insurePremium) {}
-}
+        List<NewInsuredPerson> people,
+        boolean marketingConsentUsed) {}
