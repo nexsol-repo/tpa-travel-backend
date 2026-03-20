@@ -5,10 +5,10 @@ import org.springframework.web.bind.annotation.*;
 import com.nexsol.tpa.core.api.controller.v1.request.AuthCertCompleteRequest;
 import com.nexsol.tpa.core.api.controller.v1.request.AuthCertHistoryCompleteRequest;
 import com.nexsol.tpa.core.api.controller.v1.response.AuthCertResultResponse;
-import com.nexsol.tpa.core.domain.auth.AuthCertCommand;
-import com.nexsol.tpa.core.domain.auth.AuthCertHistoryCommand;
+import com.nexsol.tpa.core.domain.auth.AuthCertHistory;
 import com.nexsol.tpa.core.domain.auth.AuthCertResult;
 import com.nexsol.tpa.core.domain.auth.AuthCertService;
+import com.nexsol.tpa.core.domain.auth.AuthCertification;
 import com.nexsol.tpa.core.support.response.ApiResponse;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,7 +25,7 @@ public class AuthCertController {
     public ApiResponse<AuthCertResultResponse> complete(
             @RequestBody AuthCertCompleteRequest req, HttpServletRequest httpReq) {
         var cmd =
-                new AuthCertCommand(
+                new AuthCertification(
                         req.getContractId(),
                         req.getImpUid(),
                         req.getRequestId(),
@@ -47,7 +47,7 @@ public class AuthCertController {
     public ApiResponse<AuthCertResultResponse> historyComplete(
             @RequestBody AuthCertHistoryCompleteRequest req, HttpServletRequest httpReq) {
         var cmd =
-                new AuthCertHistoryCommand(
+                new AuthCertHistory(
                         req.getImpUid(),
                         req.getRequestId(),
                         req.getMoid(),

@@ -1,6 +1,6 @@
 package com.nexsol.tpa.core.api.controller.v1.request;
 
-import com.nexsol.tpa.core.domain.refund.RefundCommand;
+import com.nexsol.tpa.core.domain.refund.ContractRefund;
 import com.nexsol.tpa.core.enums.TravelPaymentMethod;
 
 public record ContractCancelRequest(
@@ -11,8 +11,8 @@ public record ContractCancelRequest(
         String depositorName,
         String refundReason) {
 
-    public RefundCommand toRefundCommand() {
-        return new RefundCommand(
+    public ContractRefund toRefundCommand() {
+        return new ContractRefund(
                 contractId,
                 null,
                 null,

@@ -24,13 +24,13 @@ import org.springframework.restdocs.RestDocumentationContextProvider;
 import com.nexsol.tpa.client.meritz.bridge.dto.MeritzBridgeApiResponse;
 import com.nexsol.tpa.core.api.controller.v1.request.ContractInquiryRequest;
 import com.nexsol.tpa.core.api.controller.v1.request.ContractListRequest;
-import com.nexsol.tpa.core.domain.apply.ApplyCommand;
 import com.nexsol.tpa.core.domain.apply.ApplyService;
+import com.nexsol.tpa.core.domain.apply.ContractApply;
 import com.nexsol.tpa.core.domain.cancel.CancelService;
 import com.nexsol.tpa.core.domain.certificate.CertificateCommand;
 import com.nexsol.tpa.core.domain.certificate.CertificateService;
 import com.nexsol.tpa.core.domain.inquiry.InquiryService;
-import com.nexsol.tpa.core.domain.refund.RefundCommand;
+import com.nexsol.tpa.core.domain.refund.ContractRefund;
 import com.nexsol.tpa.core.domain.subscription.SubscriptionCommand;
 import com.nexsol.tpa.core.domain.subscription.SubscriptionResult;
 import com.nexsol.tpa.core.domain.subscription.SubscriptionService;
@@ -180,7 +180,7 @@ class MeritzContractControllerDocsTest extends RestDocsTest {
 
     @Test
     void apply() throws Exception {
-        when(applyService.apply(any(ApplyCommand.class))).thenReturn(100L);
+        when(applyService.apply(any(ContractApply.class))).thenReturn(100L);
 
         mockMvc.perform(
                         post("/v1/meritz/travel/contract/apply")
@@ -211,7 +211,6 @@ class MeritzContractControllerDocsTest extends RestDocsTest {
                       "passportNumber": "M12345678",
                       "phone": "01012345678",
                       "email": "hong@test.com",
-                      "insureNumber": "001",
                       "insurePremium": 15000
                     },
                     {
@@ -221,7 +220,6 @@ class MeritzContractControllerDocsTest extends RestDocsTest {
                       "residentNumber": "9205152345678",
                       "englishName": "KIM YOUNGHEE",
                       "passportNumber": "M87654321",
-                      "insureNumber": "002",
                       "insurePremium": 12000
                     }
                   ],
@@ -292,7 +290,7 @@ class MeritzContractControllerDocsTest extends RestDocsTest {
 
     @Test
     void cancel() throws Exception {
-        when(cancelService.cancel(eq("TPA"), any(RefundCommand.class))).thenReturn(100L);
+        when(cancelService.cancel(eq("TPA"), any(ContractRefund.class))).thenReturn(100L);
 
         mockMvc.perform(
                         post("/v1/meritz/travel/contract/cancel")
@@ -357,7 +355,6 @@ class MeritzContractControllerDocsTest extends RestDocsTest {
             fieldWithPath("people[].passportNumber").type(STRING).description("여권번호"),
             fieldWithPath("people[].phone").type(STRING).description("휴대폰번호").optional(),
             fieldWithPath("people[].email").type(STRING).description("이메일").optional(),
-            fieldWithPath("people[].insureNumber").type(STRING).description("보험자번호"),
             fieldWithPath("people[].insurePremium").type(NUMBER).description("피보험자 보험료"),
             fieldWithPath("marketingConsentUsed").type(BOOLEAN).description("마케팅 동의 여부"),
         };

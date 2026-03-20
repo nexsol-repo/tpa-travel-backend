@@ -22,7 +22,7 @@ public class AuthCertService {
     private final AuthCertMatcher authCertMatcher;
 
     public AuthCertResult complete(
-            AuthCertCommand cmd, String userAgent, String clientIp, String referer) {
+            AuthCertification cmd, String userAgent, String clientIp, String referer) {
 
         if (cmd.contractId() == null) {
             throw new CoreApiException(
@@ -81,7 +81,7 @@ public class AuthCertService {
 
     @Transactional
     public AuthCertResult historyComplete(
-            AuthCertHistoryCommand cmd, String userAgent, String clientIp, String referer) {
+            AuthCertHistory cmd, String userAgent, String clientIp, String referer) {
 
         if (cmd.impUid() == null || cmd.impUid().isBlank()) {
             throw new CoreApiException(CoreApiErrorType.INVALID_AUTH_REQUEST, "impUid is required");

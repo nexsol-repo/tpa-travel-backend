@@ -26,7 +26,7 @@ public class ApplyService {
     private final ObjectMapper objectMapper;
 
     @Transactional
-    public Long apply(ApplyCommand cmd) {
+    public Long apply(ContractApply cmd) {
         applyValidator.validate(cmd);
 
         TravelContractEntity contract =

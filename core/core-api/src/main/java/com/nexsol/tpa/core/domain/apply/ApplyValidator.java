@@ -8,7 +8,7 @@ import com.nexsol.tpa.core.support.error.CoreApiException;
 @Component
 public class ApplyValidator {
 
-    public void validate(ApplyCommand cmd) {
+    public void validate(ContractApply cmd) {
         requireNotNull(cmd.insurerId(), "insurerId");
         requireNotNull(cmd.partnerId(), "partnerId");
         requireNotNull(cmd.channelId(), "channelId");
@@ -27,7 +27,7 @@ public class ApplyValidator {
         }
     }
 
-    private void validatePerson(ApplyCommand.InsuredPerson p, int index) {
+    private void validatePerson(NewInsuredPerson p, int index) {
         requireNotNull(p.planId(), "people[" + index + "].planId");
         requireNotBlank(p.name(), "people[" + index + "].name");
         requireNotBlank(p.residentNumber(), "people[" + index + "].residentNumber");

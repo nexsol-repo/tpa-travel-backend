@@ -4,7 +4,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.nexsol.tpa.core.domain.payment.PaymentWriter;
-import com.nexsol.tpa.core.domain.refund.RefundCommand;
+import com.nexsol.tpa.core.domain.refund.ContractRefund;
 import com.nexsol.tpa.core.domain.refund.RefundWriter;
 import com.nexsol.tpa.core.domain.snapshot.SnapshotAppender;
 import com.nexsol.tpa.core.enums.TravelPaymentMethod;
@@ -29,20 +29,20 @@ public class CancelWriter {
     public void save(
             TravelContractEntity contract,
             TravelPaymentEntity payment,
-            RefundCommand refundCommand) {
+            ContractRefund contractRefund) {
 
         paymentWriter.markCanceled(payment);
 
         refundWriter.create(
-                new RefundCommand(
+                new ContractRefund(
                         contract.getId(),
                         payment.getId(),
                         contract.getTotalPremium(),
                         TravelPaymentMethod.CARD,
-                        refundCommand.bankName(),
-                        refundCommand.accountNumber(),
-                        refundCommand.depositorName(),
-                        refundCommand.refundReason()));
+                        contractRefund.bankName(),
+                        contractRefund.accountNumber(),
+                        contractRefund.depositorName(),
+                        contractRefund.refundReason()));
 
         snapshotAppender.append(
                 contract.getId(), contract.getInsurerId(), "CANCEL", toJson("CANCELED"));
