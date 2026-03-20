@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 
 import com.nexsol.tpa.core.domain.plan.TravelPlanReader.PlanFamily;
 import com.nexsol.tpa.core.domain.premium.PlanCondition;
-import com.nexsol.tpa.core.support.error.CoreApiException;
+import com.nexsol.tpa.core.error.CoreException;
 import com.nexsol.tpa.storage.db.core.entity.TravelInsurancePlanEntity;
 
 class TravelPlanServiceTest {
@@ -89,9 +89,9 @@ class TravelPlanServiceTest {
                 family(15L, "가뿐한플랜B 실손제외", false, planB_15_69_ex, List.of(planB_15_69_ex)));
     }
 
-    private static void assertCoreApiException(Throwable t, String dataContains) {
-        assertThat(t).isInstanceOf(CoreApiException.class);
-        assertThat(((CoreApiException) t).getData().toString()).contains(dataContains);
+    private static void assertCoreException(Throwable t, String messageContains) {
+        assertThat(t).isInstanceOf(CoreException.class);
+        assertThat(t.getMessage()).contains(messageContains);
     }
 
     // ── 검증 실패 ──
@@ -106,7 +106,7 @@ class TravelPlanServiceTest {
             var cmd = condition("20260326", List.of());
 
             assertThatThrownBy(() -> service.findQuoteFamilies(cmd))
-                    .satisfies(t -> assertCoreApiException(t, "insuredList is empty"));
+                    .satisfies(t -> assertCoreException(t, "insuredList is empty"));
         }
 
         @Test
@@ -123,7 +123,7 @@ class TravelPlanServiceTest {
                             false);
 
             assertThatThrownBy(() -> service.findQuoteFamilies(cmd))
-                    .satisfies(t -> assertCoreApiException(t, "insurerId is required"));
+                    .satisfies(t -> assertCoreException(t, "insurerId is required"));
         }
 
         @Test
@@ -140,7 +140,7 @@ class TravelPlanServiceTest {
                             false);
 
             assertThatThrownBy(() -> service.findQuoteFamilies(cmd))
-                    .satisfies(t -> assertCoreApiException(t, "representativeIndex is invalid"));
+                    .satisfies(t -> assertCoreException(t, "representativeIndex is invalid"));
         }
     }
 
@@ -249,7 +249,7 @@ class TravelPlanServiceTest {
                             List.of(insured("19941118", "1"), insured("19550101", "1")));
 
             assertThatThrownBy(() -> service.findFamilyByPlanId(cmd, 8L))
-                    .satisfies(t -> assertCoreApiException(t, "planId=8"));
+                    .satisfies(t -> assertCoreException(t, "planId=8"));
         }
 
         @Test
@@ -260,7 +260,7 @@ class TravelPlanServiceTest {
             var cmd = condition("20260326", List.of(insured("19941118", "1")));
 
             assertThatThrownBy(() -> service.findFamilyByPlanId(cmd, 999L))
-                    .satisfies(t -> assertCoreApiException(t, "planId=999"));
+                    .satisfies(t -> assertCoreException(t, "planId=999"));
         }
     }
 
