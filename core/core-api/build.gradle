@@ -7,14 +7,14 @@ dependencies {
     implementation project(":support:monitoring")
     implementation project(":support:logging")
 
-    // TODO: Phase 4~6 완료 후 runtimeOnly로 변경
-    implementation project(":storage:db-core")
+    runtimeOnly project(":storage:db-core")
+
+    // TODO: client 인터페이스 분리 후 runtimeOnly로 변경
     implementation project(":clients:client-meritz")
     implementation project(":clients:client-aligo")
     implementation project(":clients:client-portone")
 
     implementation ("org.springframework.boot:spring-boot-starter-webmvc")
-    implementation("org.springframework.boot:spring-boot-webflux")
 
     testImplementation project(":tests:api-docs")
 

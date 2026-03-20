@@ -10,31 +10,30 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import com.nexsol.tpa.core.domain.plan.TravelPlanReader.PlanFamily;
+import com.nexsol.tpa.core.domain.plan.InsurancePlan;
+import com.nexsol.tpa.core.domain.plan.PlanFamily;
 import com.nexsol.tpa.core.domain.premium.PlanCondition;
 import com.nexsol.tpa.core.error.CoreException;
-import com.nexsol.tpa.storage.db.core.entity.TravelInsurancePlanEntity;
 
 class TravelPlanServiceTest {
 
-    private TravelPlanReader planReader;
+    private PlanReader planReader;
     private QuotePlanPolicy policy;
     private TravelPlanService service;
 
     @BeforeEach
     void setUp() {
-        planReader = mock(TravelPlanReader.class);
+        planReader = mock(PlanReader.class);
         policy = new QuotePlanPolicy();
         service = new TravelPlanService(planReader, policy);
     }
 
     // ── 테스트 데이터 ──
 
-    private static TravelInsurancePlanEntity plan(
+    private static InsurancePlan plan(
             Long id, int ageGroupId, String planCode, String planName) {
-        return TravelInsurancePlanEntity.builder()
+        return InsurancePlan.builder()
                 .id(id)
-                .insurerId(1L)
                 .familyId(1L)
                 .planName(planName)
                 .planFullName(planName)
@@ -43,8 +42,6 @@ class TravelPlanServiceTest {
                 .productCode("15540")
                 .unitProductCode("15541")
                 .ageGroupId(ageGroupId)
-                .isActive(true)
-                .sortOrder(0)
                 .build();
     }
 
@@ -52,9 +49,15 @@ class TravelPlanServiceTest {
             Long familyId,
             String familyName,
             boolean isLoss,
-            TravelInsurancePlanEntity repPlan,
-            List<TravelInsurancePlanEntity> plans) {
-        return new PlanFamily(familyId, familyName, isLoss, repPlan, plans);
+            InsurancePlan repPlan,
+            List<InsurancePlan> plans) {
+        return PlanFamily.builder()
+                .familyId(familyId)
+                .familyName(familyName)
+                .isLoss(isLoss)
+                .repPlan(repPlan)
+                .plans(plans)
+                .build();
     }
 
     private static PlanCondition condition(

@@ -21,13 +21,13 @@ import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 
 import com.nexsol.tpa.core.domain.coverage.TravelCoverageService;
-import com.nexsol.tpa.core.domain.plan.TravelPlanReader.PlanFamily;
+import com.nexsol.tpa.core.domain.plan.PlanFamily;
 import com.nexsol.tpa.core.domain.plan.TravelPlanService;
 import com.nexsol.tpa.core.domain.premium.PlanCondition;
+import com.nexsol.tpa.core.domain.plan.InsurancePlan;
 import com.nexsol.tpa.core.domain.premium.PremiumResult;
 import com.nexsol.tpa.core.domain.premium.PremiumService;
 import com.nexsol.tpa.core.domain.premium.QuoteResult;
-import com.nexsol.tpa.storage.db.core.entity.TravelInsurancePlanEntity;
 import com.nexsol.tpa.test.api.RestDocsTest;
 
 @Tag("restdocs")
@@ -235,8 +235,8 @@ class TravelPlanControllerDocsTest extends RestDocsTest {
     // ── Sample Data ──
 
     private List<PlanFamily> sampleFamilies() {
-        TravelInsurancePlanEntity plan =
-                TravelInsurancePlanEntity.builder()
+        InsurancePlan plan =
+                InsurancePlan.builder()
                         .id(10L)
                         .planGroupCode("GRP01")
                         .planCode("TA2")
@@ -246,7 +246,14 @@ class TravelPlanControllerDocsTest extends RestDocsTest {
                         .unitProductCode("UPD001")
                         .ageGroupId(2)
                         .build();
-        return List.of(new PlanFamily(1L, "가뿐한플랜B", true, plan, List.of(plan)));
+        return List.of(
+                PlanFamily.builder()
+                        .familyId(1L)
+                        .familyName("가뿐한플랜B")
+                        .isLoss(true)
+                        .repPlan(plan)
+                        .plans(List.of(plan))
+                        .build());
     }
 
     private Map<Long, PremiumResult> samplePremiumMap() {

@@ -5,10 +5,10 @@ import java.util.List;
 import java.util.Map;
 
 import com.nexsol.tpa.core.domain.plan.AgeBand;
-import com.nexsol.tpa.core.domain.plan.TravelPlanReader.PlanFamily;
+import com.nexsol.tpa.core.domain.plan.PlanFamily;
 import com.nexsol.tpa.core.domain.premium.PremiumResult;
 import com.nexsol.tpa.core.domain.premium.QuoteResult;
-import com.nexsol.tpa.storage.db.core.entity.TravelInsurancePlanEntity;
+import com.nexsol.tpa.core.domain.plan.InsurancePlan;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -112,14 +112,14 @@ public class PlanCoverageResponse {
 
         return PlanCoverageResponse.builder()
                 .familyId(family.familyId())
-                .planId(family.repPlan().getId())
-                .planGrpCd(family.repPlan().getPlanGroupCode())
-                .planCd(family.repPlan().getPlanCode())
+                .planId(family.repPlan().id())
+                .planGrpCd(family.repPlan().planGroupCode())
+                .planCd(family.repPlan().planCode())
                 .planNm(toDisplayName(family.familyName()))
                 .planNmRaw(
-                        family.repPlan().getPlanFullName() != null
-                                ? family.repPlan().getPlanFullName()
-                                : family.repPlan().getPlanName())
+                        family.repPlan().planFullName() != null
+                                ? family.repPlan().planFullName()
+                                : family.repPlan().planName())
                 .premium(Premium.builder().ttPrem(premium.totalPremium()).currency("KRW").build())
                 .insuredPremiums(
                         premium.insuredPremiums() != null
@@ -133,7 +133,7 @@ public class PlanCoverageResponse {
     }
 
     private static InsuredPremium toInsuredPremium(
-            QuoteResult.InsuredPremium ip, List<TravelInsurancePlanEntity> familyPlans) {
+            QuoteResult.InsuredPremium ip, List<InsurancePlan> familyPlans) {
         Long planId = resolvePlanId(ip.birth(), familyPlans);
         return InsuredPremium.builder()
                 .index(ip.index())
@@ -147,13 +147,13 @@ public class PlanCoverageResponse {
                 .build();
     }
 
-    private static Long resolvePlanId(String birth, List<TravelInsurancePlanEntity> familyPlans) {
+    private static Long resolvePlanId(String birth, List<InsurancePlan> familyPlans) {
         if (birth == null || familyPlans == null) return null;
         AgeBand band = AgeBand.fromAge(calcAgeFromToday(birth));
         if (band == null) return null;
         return familyPlans.stream()
-                .filter(p -> p.getAgeGroupId() != null && p.getAgeGroupId() == band.ageGroupId())
-                .map(TravelInsurancePlanEntity::getId)
+                .filter(p -> p.ageGroupId() != null && p.ageGroupId() == band.ageGroupId())
+                .map(InsurancePlan::id)
                 .findFirst()
                 .orElse(null);
     }
