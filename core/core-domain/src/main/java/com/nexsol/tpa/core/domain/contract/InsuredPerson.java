@@ -7,11 +7,14 @@ import lombok.Builder;
 @Builder
 public record InsuredPerson(
         Long id,
+        Long contractId,
         Long planId,
         boolean isContractor,
         String name,
         String englishName,
         String gender,
-        String residentNumberMasked,
-        String passportNumberMasked,
+        String residentNumber,
+        String passportNumber,
+        String phone,
+        String email,
         BigDecimal insurePremium) {}

@@ -8,8 +8,8 @@ import org.springframework.stereotype.Service;
 
 import com.nexsol.tpa.core.domain.plan.TravelPlanReader.PlanFamily;
 import com.nexsol.tpa.core.domain.premium.PlanCondition;
-import com.nexsol.tpa.core.support.error.CoreApiErrorType;
-import com.nexsol.tpa.core.support.error.CoreApiException;
+import com.nexsol.tpa.core.error.CoreErrorType;
+import com.nexsol.tpa.core.error.CoreException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -37,8 +37,8 @@ public class TravelPlanService {
         List<PlanFamily> families = policy.filterFamilies(allFamilies, planType, silsonExclude);
 
         if (families.isEmpty()) {
-            throw new CoreApiException(
-                    CoreApiErrorType.QUOTE_PLAN_NOT_FOUND, "플랜타입(" + planType + ") 기준 플랜 없음");
+            throw new CoreException(
+                    CoreErrorType.QUOTE_PLAN_NOT_FOUND, "플랜타입(" + planType + ") 기준 플랜 없음");
         }
         return families;
     }
@@ -60,8 +60,8 @@ public class TravelPlanService {
                 .findFirst()
                 .orElseThrow(
                         () ->
-                                new CoreApiException(
-                                        CoreApiErrorType.QUOTE_PLAN_NOT_FOUND, "planId=" + planId));
+                                new CoreException(
+                                        CoreErrorType.QUOTE_PLAN_NOT_FOUND, "planId=" + planId));
     }
 
     /**
@@ -99,17 +99,17 @@ public class TravelPlanService {
 
     private void validateQuoteCommand(PlanCondition cmd) {
         if (cmd.insuredList() == null || cmd.insuredList().isEmpty()) {
-            throw new CoreApiException(
-                    CoreApiErrorType.INVALID_QUOTE_REQUEST, "insuredList is empty");
+            throw new CoreException(
+                    CoreErrorType.INVALID_QUOTE_REQUEST, "insuredList is empty");
         }
         if (cmd.insurerId() == null) {
-            throw new CoreApiException(
-                    CoreApiErrorType.INVALID_QUOTE_REQUEST, "insurerId is required");
+            throw new CoreException(
+                    CoreErrorType.INVALID_QUOTE_REQUEST, "insurerId is required");
         }
         int repIdx = cmd.representativeIndex() == null ? 0 : cmd.representativeIndex();
         if (repIdx < 0 || repIdx >= cmd.insuredList().size()) {
-            throw new CoreApiException(
-                    CoreApiErrorType.INVALID_QUOTE_REQUEST, "representativeIndex is invalid");
+            throw new CoreException(
+                    CoreErrorType.INVALID_QUOTE_REQUEST, "representativeIndex is invalid");
         }
     }
 }

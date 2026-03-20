@@ -2,8 +2,9 @@ package com.nexsol.tpa.core.domain.coverage;
 
 import org.springframework.stereotype.Component;
 
-import com.nexsol.tpa.storage.db.core.entity.TravelInsuranceCoverageEntity;
-import com.nexsol.tpa.storage.db.core.repository.TravelInsuranceCoverageRepository;
+import com.nexsol.tpa.core.domain.repository.InsuranceCoverageRepository;
+import com.nexsol.tpa.core.error.CoreException;
+import com.nexsol.tpa.core.error.CoreErrorType;
 
 import lombok.RequiredArgsConstructor;
 
@@ -11,13 +12,15 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CoverageReader {
 
-    private final TravelInsuranceCoverageRepository coverageRepository;
+    private final InsuranceCoverageRepository coverageRepository;
 
-    public TravelInsuranceCoverageEntity getByInsurerIdAndCoverageCode(
+    public InsuranceCoverage getByInsurerIdAndCoverageCode(
             Long insurerId, String coverageCode) {
         return coverageRepository
-                .findByInsurerIdAndCoverageCodeAndDeletedAtIsNull(insurerId, coverageCode)
+                .findByInsurerIdAndCoverageCode(insurerId, coverageCode)
                 .orElseThrow(
-                        () -> new IllegalArgumentException("coverage not found: " + coverageCode));
+                        () -> new CoreException(
+                                CoreErrorType.NOT_FOUND_DATA,
+                                "coverage not found: " + coverageCode));
     }
 }

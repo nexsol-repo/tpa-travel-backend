@@ -1,15 +1,14 @@
 package com.nexsol.tpa.core.domain.cancel;
 
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
+import com.nexsol.tpa.core.domain.contract.ContractInfo;
+import com.nexsol.tpa.core.domain.payment.Payment;
 import com.nexsol.tpa.core.domain.payment.PaymentWriter;
 import com.nexsol.tpa.core.domain.refund.ContractRefund;
 import com.nexsol.tpa.core.domain.refund.RefundWriter;
 import com.nexsol.tpa.core.domain.snapshot.SnapshotAppender;
 import com.nexsol.tpa.core.enums.TravelPaymentMethod;
-import com.nexsol.tpa.storage.db.core.entity.TravelContractEntity;
-import com.nexsol.tpa.storage.db.core.entity.TravelPaymentEntity;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,19 +24,19 @@ public class CancelWriter {
     private final SnapshotAppender snapshotAppender;
     private final ObjectMapper objectMapper;
 
-    @Transactional
+
     public void save(
-            TravelContractEntity contract,
-            TravelPaymentEntity payment,
+            ContractInfo contract,
+            Payment payment,
             ContractRefund contractRefund) {
 
         paymentWriter.markCanceled(payment);
 
         refundWriter.create(
                 new ContractRefund(
-                        contract.getId(),
-                        payment.getId(),
-                        contract.getTotalPremium(),
+                        contract.id(),
+                        payment.id(),
+                        contract.totalPremium(),
                         TravelPaymentMethod.CARD,
                         contractRefund.bankName(),
                         contractRefund.accountNumber(),
@@ -45,7 +44,7 @@ public class CancelWriter {
                         contractRefund.refundReason()));
 
         snapshotAppender.append(
-                contract.getId(), contract.getInsurerId(), "CANCEL", toJson("CANCELED"));
+                contract.id(), contract.insurerId(), "CANCEL", toJson("CANCELED"));
     }
 
     private String toJson(Object obj) {

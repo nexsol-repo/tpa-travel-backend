@@ -3,12 +3,12 @@ package com.nexsol.tpa.core.domain.cancel;
 import org.springframework.stereotype.Service;
 
 import com.nexsol.tpa.client.meritz.contract.MeritzContractClient;
+import com.nexsol.tpa.core.domain.contract.ContractInfo;
 import com.nexsol.tpa.core.domain.contract.ContractReader;
 import com.nexsol.tpa.core.domain.contract.ContractValidator;
+import com.nexsol.tpa.core.domain.payment.Payment;
 import com.nexsol.tpa.core.domain.payment.PaymentReader;
 import com.nexsol.tpa.core.domain.refund.ContractRefund;
-import com.nexsol.tpa.storage.db.core.entity.TravelContractEntity;
-import com.nexsol.tpa.storage.db.core.entity.TravelPaymentEntity;
 
 import lombok.RequiredArgsConstructor;
 
@@ -24,20 +24,20 @@ public class CancelService {
 
     public Long cancel(String company, ContractRefund contractRefund) {
         Long contractId = contractRefund.contractId();
-        TravelContractEntity contract = contractReader.getById(contractId);
-        TravelPaymentEntity payment = paymentReader.getByContractId(contract.getId());
+        ContractInfo contract = contractReader.getById(contractId);
+        Payment payment = paymentReader.getByContractId(contract.id());
 
         contractValidator.requireCancelable(payment);
 
         if (!contractValidator.isAlreadyCanceled(payment)) {
             ContractValidator.requireNotBlank(
-                    contract.getPolicyNumber(), "policyNumber(polNo) is required");
+                    contract.policyNumber(), "policyNumber(polNo) is required");
 
             meritzClient.cancelContract(
                     company,
-                    contract.getPolicyNumber(),
-                    contract.getMeritzQuoteGroupNumber(),
-                    contract.getMeritzQuoteRequestNumber());
+                    contract.policyNumber(),
+                    contract.meritzQuote().groupNumber(),
+                    contract.meritzQuote().requestNumber());
 
             cancelWriter.save(contract, payment, contractRefund);
         }

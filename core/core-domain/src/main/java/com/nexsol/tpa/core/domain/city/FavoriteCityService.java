@@ -3,16 +3,15 @@ package com.nexsol.tpa.core.domain.city;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import com.nexsol.tpa.storage.db.core.entity.FavoriteCityEntity;
-import com.nexsol.tpa.storage.db.core.repository.FavoriteCityRepository;
+import com.nexsol.tpa.core.domain.repository.FavoriteCityRepository;
+import com.nexsol.tpa.core.error.CoreException;
+import com.nexsol.tpa.core.error.CoreErrorType;
 
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class FavoriteCityService {
 
     private final FavoriteCityRepository favoriteCityRepository;
@@ -21,55 +20,28 @@ public class FavoriteCityService {
      * 자주가는 도시 목록 조회 - deleted_at IS NULL - sort_order 오름차순
      */
     public List<CityInfo> getFavoriteCities() {
-        return favoriteCityRepository.findByDeletedAtIsNullOrderBySortOrderAsc().stream()
+        return favoriteCityRepository.findAllActive().stream()
                 .map(
                         e ->
                                 new CityInfo(
-                                        e.getCountryCode(),
-                                        e.getCountryNameKorean(),
-                                        e.getCountryNameEnglish(),
-                                        e.getCityNameKorean(),
-                                        e.getCityNameEnglish(),
-                                        e.getTravelRiskGradeCode(),
-                                        e.getSortOrder()))
+                                        e.countryCode(),
+                                        e.countryNameKorean(),
+                                        e.countryNameEnglish(),
+                                        e.cityNameKorean(),
+                                        e.cityNameEnglish(),
+                                        e.travelRiskGradeCode(),
+                                        e.sortOrder()))
                 .toList();
     }
 
     /**
      * 단건 조회 (삭제 제외)
      */
-    public FavoriteCityEntity getFavoriteCity(Long id) {
+    public FavoriteCity getFavoriteCity(Long id) {
         return favoriteCityRepository
-                .findByIdAndDeletedAtIsNull(id)
-                .orElseThrow(() -> new IllegalArgumentException("자주가는 도시 정보가 없습니다. id=" + id));
-    }
-
-    /**
-     * 삭제 (Soft Delete)
-     */
-    @Transactional
-    public void deleteFavoriteCity(Long id, String actor) {
-        FavoriteCityEntity city =
-                favoriteCityRepository
-                        .findByIdAndDeletedAtIsNull(id)
-                        .orElseThrow(
-                                () -> new IllegalArgumentException("자주가는 도시 정보가 없습니다. id=" + id));
-
-        city.softDelete(actor);
-        // save() 호출 안 해도 @Transactional + dirty checking으로 반영됨
-    }
-
-    /**
-     * 정렬 순서 변경
-     */
-    @Transactional
-    public void updateSortOrder(Long id, int sortOrder, String actor) {
-        FavoriteCityEntity city =
-                favoriteCityRepository
-                        .findByIdAndDeletedAtIsNull(id)
-                        .orElseThrow(
-                                () -> new IllegalArgumentException("자주가는 도시 정보가 없습니다. id=" + id));
-
-        city.changeSortOrder(sortOrder, actor);
+                .findActiveById(id)
+                .orElseThrow(() -> new CoreException(
+                        CoreErrorType.NOT_FOUND_DATA,
+                        "자주가는 도시 정보가 없습니다. id=" + id));
     }
 }

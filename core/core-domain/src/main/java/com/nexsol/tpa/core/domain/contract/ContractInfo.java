@@ -8,16 +8,20 @@ import lombok.Builder;
 @Builder
 public record ContractInfo(
         Long id,
+        Long insurerId,
+        String insurerName,
+        Long partnerId,
+        String partnerName,
+        Long channelId,
+        String channelName,
         Long familyId,
         String policyNumber,
-        String meritzQuoteGroupNumber,
-        String meritzQuoteRequestNumber,
+        MeritzQuote meritzQuote,
         BigDecimal totalPremium,
         String policyLink,
         String status,
         LocalDateTime applyDate,
         InsurePeriod insurePeriod,
-        Contractor contractor,
         AuthInfo auth,
         boolean marketingConsentUsed,
         Long employeeId) {}

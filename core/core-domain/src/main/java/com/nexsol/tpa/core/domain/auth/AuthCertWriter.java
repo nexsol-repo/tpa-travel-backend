@@ -1,18 +1,17 @@
 package com.nexsol.tpa.core.domain.auth;
 
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
-import com.nexsol.tpa.core.support.error.CoreApiErrorType;
-import com.nexsol.tpa.core.support.error.CoreApiException;
-import com.nexsol.tpa.storage.db.core.entity.TpaAuthCertLogEntity;
-import com.nexsol.tpa.storage.db.core.entity.TpaAuthCertResultEntity;
-import com.nexsol.tpa.storage.db.core.entity.TravelContractEntity;
-import com.nexsol.tpa.storage.db.core.entity.TravelContractSnapshotEntity;
-import com.nexsol.tpa.storage.db.core.repository.TpaAuthCertLogRepository;
-import com.nexsol.tpa.storage.db.core.repository.TpaAuthCertResultRepository;
-import com.nexsol.tpa.storage.db.core.repository.TravelContractRepository;
-import com.nexsol.tpa.storage.db.core.repository.TravelContractSnapshotRepository;
+import com.nexsol.tpa.core.domain.contract.ContractInfo;
+import com.nexsol.tpa.core.domain.contract.ContractUpdater;
+import com.nexsol.tpa.core.domain.contract.ContractWriter;
+import com.nexsol.tpa.core.domain.repository.AuthCertLogRepository;
+import com.nexsol.tpa.core.domain.repository.AuthCertResultRepository;
+import com.nexsol.tpa.core.domain.repository.ContractRepository;
+import com.nexsol.tpa.core.domain.repository.ContractSnapshotRepository;
+import com.nexsol.tpa.core.domain.snapshot.ContractSnapshot;
+import com.nexsol.tpa.core.error.CoreErrorType;
+import com.nexsol.tpa.core.error.CoreException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -20,119 +19,135 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AuthCertWriter {
 
-    private final TpaAuthCertLogRepository logRepository;
-    private final TpaAuthCertResultRepository resultRepository;
-    private final TravelContractRepository contractRepository;
-    private final TravelContractSnapshotRepository snapshotRepository;
+    private final AuthCertLogRepository logRepository;
+    private final AuthCertResultRepository resultRepository;
+    private final ContractRepository contractRepository;
+    private final ContractSnapshotRepository snapshotRepository;
+    private final ContractUpdater contractUpdater;
+    private final ContractWriter contractWriter;
 
-    @Transactional
+
     public Long createOrUpdateLog(AuthCertLogInfo info) {
-        TpaAuthCertLogEntity log =
+        AuthCertLogInfo existing =
                 logRepository
                         .findByImpUid(info.impUid())
-                        .orElseGet(TpaAuthCertLogEntity::createEmpty);
-        log.update(
-                info.bizNum(),
-                info.impUid(),
-                info.requestId(),
-                info.pathRoot(),
-                info.moid(),
-                info.pg(),
-                info.provider(),
-                info.userAgent(),
-                info.clientIp(),
-                info.referer());
+                        .orElse(null);
 
-        return logRepository.save(log).getId();
+        AuthCertLogInfo logInfo =
+                AuthCertLogInfo.builder()
+                        .id(existing != null ? existing.id() : null)
+                        .contractId(info.contractId())
+                        .bizNum(info.bizNum())
+                        .impUid(info.impUid())
+                        .requestId(info.requestId())
+                        .pathRoot(info.pathRoot())
+                        .moid(info.moid())
+                        .pg(info.pg())
+                        .provider(info.provider())
+                        .userAgent(info.userAgent())
+                        .clientIp(info.clientIp())
+                        .referer(info.referer())
+                        .build();
+
+        return logRepository.save(logInfo).id();
     }
 
-    @Transactional
+
     public AuthCertResult saveResultAndUpdateContract(Long contractId, AuthCertResultInfo info) {
-        TravelContractEntity contract =
+        ContractInfo contract =
                 contractRepository
                         .findById(contractId)
                         .orElseThrow(
                                 () ->
-                                        new CoreApiException(
-                                                CoreApiErrorType.AUTH_CONTRACT_NOT_FOUND,
+                                        new CoreException(
+                                                CoreErrorType.AUTH_CONTRACT_NOT_FOUND,
                                                 "contractId=" + contractId));
 
-        contract.updateAuth(
+        ContractInfo updatedContract = contractUpdater.updateAuth(
+                contract,
                 info.provider(),
                 info.impUid(),
                 info.requestId(),
                 info.uniqueKey(),
                 "SUCCESS".equalsIgnoreCase(info.resultStatus()) ? "SUCCESS" : "FAIL");
-        contractRepository.save(contract);
+        contractWriter.writerContract(updatedContract);
 
         Long logId =
                 logRepository
                         .findByImpUid(info.impUid())
-                        .map(TpaAuthCertLogEntity::getId)
+                        .map(AuthCertLogInfo::id)
                         .orElse(null);
 
-        TpaAuthCertResultEntity result =
+        AuthCertResultInfo existingResult =
                 resultRepository
                         .findByImpUid(info.impUid())
-                        .orElseGet(TpaAuthCertResultEntity::createEmpty);
-        result.update(
-                logId,
-                info.impUid(),
-                info.requestId(),
-                info.moid(),
-                info.uniqueKey(),
-                info.resultStatus(),
-                info.resultCode(),
-                info.resultMsg(),
-                info.certName(),
-                normalizeBirthday(info.certBirthday()),
-                info.certGender(),
-                info.certPhone(),
-                info.matched() ? "Y" : "N",
-                info.matched() ? null : info.matchFailReason(),
-                info.rawResJson());
+                        .orElse(null);
 
-        resultRepository.save(result);
+        AuthCertResultInfo resultInfo =
+                AuthCertResultInfo.builder()
+                        .id(existingResult != null ? existingResult.id() : null)
+                        .logId(logId)
+                        .impUid(info.impUid())
+                        .requestId(info.requestId())
+                        .moid(info.moid())
+                        .uniqueKey(info.uniqueKey())
+                        .resultStatus(info.resultStatus())
+                        .resultCode(info.resultCode())
+                        .resultMsg(info.resultMsg())
+                        .certName(info.certName())
+                        .certBirthday(normalizeBirthday(info.certBirthday()))
+                        .certGender(info.certGender())
+                        .certPhone(info.certPhone())
+                        .matchedYn(info.matched() ? "Y" : "N")
+                        .matchFailReason(info.matched() ? null : info.matchFailReason())
+                        .rawResJson(info.rawResJson())
+                        .build();
 
-        if (contract.getInsurerId() != null
+        resultRepository.save(resultInfo);
+
+        if (contract.insurerId() != null
                 && info.rawResJson() != null
                 && !info.rawResJson().isBlank()) {
-            upsertAuthSnapshot(contractId, contract.getInsurerId(), info.rawResJson());
+            upsertAuthSnapshot(contractId, contract.insurerId(), info.rawResJson());
         }
 
         return toResult(info);
     }
 
-    @Transactional
+
     public AuthCertResult saveHistoryResult(AuthCertResultInfo info) {
         Long logId =
                 logRepository
                         .findByImpUid(info.impUid())
-                        .map(TpaAuthCertLogEntity::getId)
+                        .map(AuthCertLogInfo::id)
                         .orElse(null);
 
-        TpaAuthCertResultEntity result =
+        AuthCertResultInfo existingResult =
                 resultRepository
                         .findByImpUid(info.impUid())
-                        .orElseGet(TpaAuthCertResultEntity::createEmpty);
-        result.update(
-                logId,
-                info.impUid(),
-                info.requestId(),
-                info.moid(),
-                info.uniqueKey(),
-                info.resultStatus(),
-                info.resultCode(),
-                info.resultMsg(),
-                info.certName(),
-                normalizeBirthday(info.certBirthday()),
-                info.certGender(),
-                info.certPhone(),
-                "Y",
-                null,
-                info.rawResJson());
+                        .orElse(null);
 
-        resultRepository.save(result);
+        AuthCertResultInfo resultInfo =
+                AuthCertResultInfo.builder()
+                        .id(existingResult != null ? existingResult.id() : null)
+                        .logId(logId)
+                        .impUid(info.impUid())
+                        .requestId(info.requestId())
+                        .moid(info.moid())
+                        .uniqueKey(info.uniqueKey())
+                        .resultStatus(info.resultStatus())
+                        .resultCode(info.resultCode())
+                        .resultMsg(info.resultMsg())
+                        .certName(info.certName())
+                        .certBirthday(normalizeBirthday(info.certBirthday()))
+                        .certGender(info.certGender())
+                        .certPhone(info.certPhone())
+                        .matchedYn("Y")
+                        .matchFailReason(null)
+                        .rawResJson(info.rawResJson())
+                        .build();
+
+        resultRepository.save(resultInfo);
 
         return toResult(info);
     }
@@ -168,19 +183,21 @@ public class AuthCertWriter {
         final String snapshotType = "AUTH";
         final String method = "API";
 
-        TravelContractSnapshotEntity snap =
+        ContractSnapshot existing =
                 snapshotRepository
                         .findByContractIdAndSnapshotType(contractId, snapshotType)
-                        .orElseGet(
-                                () ->
-                                        TravelContractSnapshotEntity.builder()
-                                                .contractId(contractId)
-                                                .insurerId(insurerId)
-                                                .method(method)
-                                                .snapshotType(snapshotType)
-                                                .build());
+                        .orElse(null);
 
-        snap.updateSnapshot(jsonSnapshot);
+        ContractSnapshot snap =
+                ContractSnapshot.builder()
+                        .id(existing != null ? existing.id() : null)
+                        .contractId(contractId)
+                        .insurerId(insurerId)
+                        .method(method)
+                        .snapshotType(snapshotType)
+                        .jsonSnapshot(jsonSnapshot)
+                        .build();
+
         snapshotRepository.save(snap);
     }
 }

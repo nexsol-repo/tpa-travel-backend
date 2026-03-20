@@ -2,10 +2,10 @@ package com.nexsol.tpa.core.domain.plan;
 
 import org.springframework.stereotype.Component;
 
-import com.nexsol.tpa.storage.db.core.entity.TravelInsurancePlanEntity;
-import com.nexsol.tpa.storage.db.core.entity.TravelInsurerEntity;
-import com.nexsol.tpa.storage.db.core.repository.TravelInsurancePlanRepository;
-import com.nexsol.tpa.storage.db.core.repository.TravelInsurerRepository;
+import com.nexsol.tpa.core.domain.repository.InsurancePlanRepository;
+import com.nexsol.tpa.core.domain.repository.InsurerRepository;
+import com.nexsol.tpa.core.error.CoreException;
+import com.nexsol.tpa.core.error.CoreErrorType;
 
 import lombok.RequiredArgsConstructor;
 
@@ -13,22 +13,24 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class PlanReader {
 
-    private final TravelInsurancePlanRepository planRepository;
+    private final InsurancePlanRepository planRepository;
 
-    private final TravelInsurerRepository insurerRepository;
+    private final InsurerRepository insurerRepository;
 
-    public TravelInsurancePlanEntity getById(Long planId) {
+    public InsurancePlan getById(Long planId) {
         return planRepository
                 .findById(planId)
-                .orElseThrow(() -> new IllegalStateException("plan not found. planId=" + planId));
+                .orElseThrow(() -> new CoreException(
+                        CoreErrorType.NOT_FOUND_DATA,
+                        "plan not found. planId=" + planId));
     }
 
-    public TravelInsurerEntity getInsurerById(Long insurerId) {
+    public Insurer getInsurerById(Long insurerId) {
         return insurerRepository
                 .findById(insurerId)
                 .orElseThrow(
-                        () ->
-                                new IllegalStateException(
-                                        "insurer not found. insurerId=" + insurerId));
+                        () -> new CoreException(
+                                CoreErrorType.NOT_FOUND_DATA,
+                                "insurer not found. insurerId=" + insurerId));
     }
 }

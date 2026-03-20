@@ -2,8 +2,9 @@ package com.nexsol.tpa.core.domain.payment;
 
 import org.springframework.stereotype.Component;
 
-import com.nexsol.tpa.storage.db.core.entity.TravelPaymentEntity;
-import com.nexsol.tpa.storage.db.core.repository.TravelInsurePaymentRepository;
+import com.nexsol.tpa.core.domain.repository.PaymentRepository;
+import com.nexsol.tpa.core.error.CoreException;
+import com.nexsol.tpa.core.error.CoreErrorType;
 
 import lombok.RequiredArgsConstructor;
 
@@ -11,15 +12,15 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class PaymentReader {
 
-    private final TravelInsurePaymentRepository paymentRepository;
+    private final PaymentRepository paymentRepository;
 
-    public TravelPaymentEntity getByContractId(Long contractId) {
+    public Payment getByContractId(Long contractId) {
         return paymentRepository
                 .findByContractId(contractId)
                 .orElseThrow(
-                        () ->
-                                new IllegalStateException(
-                                        "payment not found. contractId=" + contractId));
+                        () -> new CoreException(
+                                CoreErrorType.NOT_FOUND_DATA,
+                                "payment not found. contractId=" + contractId));
     }
 
     public boolean existsByContractId(Long contractId) {

@@ -4,11 +4,12 @@ import org.springframework.stereotype.Service;
 
 import com.nexsol.tpa.client.meritz.contract.SubscriptionApiResult;
 import com.nexsol.tpa.core.domain.certificate.CertificateLinkIssuer;
+import com.nexsol.tpa.core.domain.contract.ContractInfo;
 import com.nexsol.tpa.core.domain.contract.ContractReader;
+import com.nexsol.tpa.core.domain.contract.ContractUpdater;
 import com.nexsol.tpa.core.domain.contract.ContractValidator;
-import com.nexsol.tpa.storage.db.core.entity.TravelContractEntity;
+import com.nexsol.tpa.core.domain.contract.ContractWriter;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -26,10 +27,12 @@ public class SubscriptionService {
     private final SubscriptionAlimtalkAppender subscriptionAlimtalkAppender;
     private final SubscriptionResultReader subscriptionResultReader;
     private final CertificateLinkIssuer certificateLinkIssuer;
+    private final ContractUpdater contractUpdater;
+    private final ContractWriter contractWriter;
 
-    @Transactional
+
     public SubscriptionResult subscribe(String company, SubscriptionCommand cmd) {
-        TravelContractEntity contract = contractReader.getById(cmd.contractId());
+        ContractInfo contract = contractReader.getById(cmd.contractId());
         contractValidator.requirePending(contract);
         subscriptionValidator.validate(cmd, contract);
 
@@ -40,25 +43,28 @@ public class SubscriptionService {
             return SubscriptionResult.fail(apiResult.errCd(), apiResult.errMsg());
         }
 
-        subscriptionWriter.updateSubscription(contract, apiResult);
-        issueCertificateLink(company, contract);
-        subscriptionWriter.complete(contract);
+        contract = subscriptionWriter.updateSubscription(contract, apiResult);
+        contract = issueCertificateLink(company, contract);
+        contract = subscriptionWriter.complete(contract);
         subscriptionWriter.createCompletedPayment(contract);
         subscriptionSnapshotAppender.appendSuccess(contract, apiResult.rawData());
         subscriptionAlimtalkAppender.appendCompleted(contract);
         return subscriptionResultReader.read(contract);
     }
 
-    private void issueCertificateLink(String company, TravelContractEntity contract) {
+    private ContractInfo issueCertificateLink(String company, ContractInfo contract) {
         try {
-            String policyLink = certificateLinkIssuer.issue(company, contract.getId(), "A", "V");
-            contract.updatePolicyLink(policyLink);
+            String policyLink = certificateLinkIssuer.issue(company, contract.id(), "A", "V");
+            ContractInfo updated = contractUpdater.updatePolicyLink(contract, policyLink);
+            contractWriter.writerContract(updated);
+            return updated;
         } catch (Exception e) {
             log.warn(
                     "joinCertificate failed. contractId={}, msg={}",
-                    contract.getId(),
+                    contract.id(),
                     e.getMessage(),
                     e);
+            return contract;
         }
     }
 }

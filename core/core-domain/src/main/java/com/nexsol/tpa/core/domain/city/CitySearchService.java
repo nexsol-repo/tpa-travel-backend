@@ -7,8 +7,8 @@ import org.springframework.stereotype.Service;
 
 import com.nexsol.tpa.client.meritz.bridge.dto.MeritzBridgeApiResponse;
 import com.nexsol.tpa.client.meritz.reference.MeritzReferenceClient;
-import com.nexsol.tpa.core.support.error.CoreApiErrorType;
-import com.nexsol.tpa.core.support.error.CoreApiException;
+import com.nexsol.tpa.core.error.CoreErrorType;
+import com.nexsol.tpa.core.error.CoreException;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,8 +31,8 @@ public class CitySearchService {
         MeritzBridgeApiResponse res = referenceClient.getCityNationCodes(keyword, type);
 
         if (!res.isSuccess()) {
-            throw new CoreApiException(
-                    CoreApiErrorType.REFERENCE_API_FAILED,
+            throw new CoreException(
+                    CoreErrorType.REFERENCE_API_FAILED,
                     "도시코드조회 실패. errCd=" + res.getErrCd() + ", errMsg=" + res.getErrMsg());
         }
 
@@ -64,7 +64,7 @@ public class CitySearchService {
             return result;
         } catch (Exception e) {
             log.error("[CITY_SEARCH] 응답 파싱 실패", e);
-            throw new CoreApiException(CoreApiErrorType.REFERENCE_PARSE_FAILED, "도시코드 응답 파싱 실패");
+            throw new CoreException(CoreErrorType.REFERENCE_PARSE_FAILED, "도시코드 응답 파싱 실패");
         }
     }
 }

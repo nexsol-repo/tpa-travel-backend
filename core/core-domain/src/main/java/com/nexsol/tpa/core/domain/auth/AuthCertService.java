@@ -1,13 +1,12 @@
 package com.nexsol.tpa.core.domain.auth;
 
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
+import com.nexsol.tpa.core.domain.contract.ContractInfo;
 import com.nexsol.tpa.core.domain.contract.ContractPeopleFinder;
 import com.nexsol.tpa.core.domain.contract.ContractReader;
-import com.nexsol.tpa.core.support.error.CoreApiErrorType;
-import com.nexsol.tpa.core.support.error.CoreApiException;
-import com.nexsol.tpa.storage.db.core.entity.TravelContractEntity;
+import com.nexsol.tpa.core.error.CoreErrorType;
+import com.nexsol.tpa.core.error.CoreException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -25,17 +24,17 @@ public class AuthCertService {
             AuthCertification cmd, String userAgent, String clientIp, String referer) {
 
         if (cmd.contractId() == null) {
-            throw new CoreApiException(
-                    CoreApiErrorType.INVALID_AUTH_REQUEST, "contractId is required");
+            throw new CoreException(
+                    CoreErrorType.INVALID_AUTH_REQUEST, "contractId is required");
         }
         if (cmd.impUid() == null || cmd.impUid().isBlank()) {
-            throw new CoreApiException(CoreApiErrorType.INVALID_AUTH_REQUEST, "impUid is required");
+            throw new CoreException(CoreErrorType.INVALID_AUTH_REQUEST, "impUid is required");
         }
 
         Long contractId = cmd.contractId();
         String provider = defaultProvider(cmd.provider());
 
-        TravelContractEntity contract = contractReader.getById(contractId);
+        ContractInfo contract = contractReader.getById(contractId);
 
         var logInfo =
                 AuthCertLogInfo.builder()
@@ -79,12 +78,12 @@ public class AuthCertService {
         return authCertWriter.saveResultAndUpdateContract(contractId, resultInfo);
     }
 
-    @Transactional
+
     public AuthCertResult historyComplete(
             AuthCertHistory cmd, String userAgent, String clientIp, String referer) {
 
         if (cmd.impUid() == null || cmd.impUid().isBlank()) {
-            throw new CoreApiException(CoreApiErrorType.INVALID_AUTH_REQUEST, "impUid is required");
+            throw new CoreException(CoreErrorType.INVALID_AUTH_REQUEST, "impUid is required");
         }
 
         String provider = defaultProvider(cmd.provider());

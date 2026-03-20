@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 
 import com.nexsol.tpa.core.domain.plan.TravelPlanReader.PlanFamily;
 import com.nexsol.tpa.core.domain.premium.PlanCondition;
-import com.nexsol.tpa.storage.db.core.entity.TravelInsurancePlanEntity;
 
 /**
  * 견적 플랜 선택 정책 도구 (Tool Layer).
@@ -79,10 +78,10 @@ public class QuotePlanPolicy {
     /**
      * 패밀리의 플랜 중 ageGroupId에 해당하는 플랜을 찾는다.
      */
-    public TravelInsurancePlanEntity findPlanForAge(
-            List<TravelInsurancePlanEntity> familyPlans, int ageGroupId) {
+    public InsurancePlan findPlanForAge(
+            List<InsurancePlan> familyPlans, int ageGroupId) {
         return familyPlans.stream()
-                .filter(p -> Objects.equals(p.getAgeGroupId(), ageGroupId))
+                .filter(p -> Objects.equals(p.ageGroupId(), ageGroupId))
                 .findFirst()
                 .orElse(null);
     }

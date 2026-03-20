@@ -2,8 +2,8 @@ package com.nexsol.tpa.core.domain.apply;
 
 import org.springframework.stereotype.Component;
 
-import com.nexsol.tpa.core.support.error.CoreApiErrorType;
-import com.nexsol.tpa.core.support.error.CoreApiException;
+import com.nexsol.tpa.core.error.CoreErrorType;
+import com.nexsol.tpa.core.error.CoreException;
 
 @Component
 public class ApplyValidator {
@@ -45,7 +45,7 @@ public class ApplyValidator {
         }
     }
 
-    private CoreApiException invalid(String message) {
-        return new CoreApiException(CoreApiErrorType.INVALID_CONTRACT_REQUEST, message);
+    private CoreException invalid(String message) {
+        return new CoreException(CoreErrorType.INVALID_CONTRACT_REQUEST, message);
     }
 }

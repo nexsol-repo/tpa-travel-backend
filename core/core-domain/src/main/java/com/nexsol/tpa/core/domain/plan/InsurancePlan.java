@@ -11,4 +11,5 @@ public record InsurancePlan(
         String productCode,
         String unitProductCode,
         String planGroupCode,
-        String planCode) {}
+        String planCode,
+        Integer ageGroupId) {}

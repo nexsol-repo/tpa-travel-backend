@@ -4,12 +4,12 @@ import org.springframework.stereotype.Component;
 
 import com.nexsol.tpa.client.meritz.contract.CertificateApiResult;
 import com.nexsol.tpa.client.meritz.contract.MeritzContractClient;
+import com.nexsol.tpa.core.domain.contract.ContractInfo;
 import com.nexsol.tpa.core.domain.contract.ContractReader;
 import com.nexsol.tpa.core.domain.contract.ContractValidator;
+import com.nexsol.tpa.core.domain.plan.InsurancePlan;
 import com.nexsol.tpa.core.domain.snapshot.SnapshotAppender;
 import com.nexsol.tpa.core.domain.subscription.SubscriptionInsuredReader;
-import com.nexsol.tpa.storage.db.core.entity.TravelContractEntity;
-import com.nexsol.tpa.storage.db.core.entity.TravelInsurancePlanEntity;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,13 +30,13 @@ public class CertificateLinkIssuer {
         String div = normalizeOrDefault(otptDiv, "A");
         String tp = normalizeOrDefault(otptTpCd, "V");
 
-        TravelContractEntity contract = contractReader.getById(contractId);
-        TravelInsurancePlanEntity plan = subscriptionInsuredReader.findRepPlan(contractId);
+        ContractInfo contract = contractReader.getById(contractId);
+        InsurancePlan plan = subscriptionInsuredReader.findRepPlan(contractId);
 
-        String polNo = contract.getPolicyNumber();
-        String pdCd = plan.getProductCode();
-        String quotGrpNo = contract.getMeritzQuoteGroupNumber();
-        String quotReqNo = contract.getMeritzQuoteRequestNumber();
+        String polNo = contract.policyNumber();
+        String pdCd = plan.productCode();
+        String quotGrpNo = contract.meritzQuote().groupNumber();
+        String quotReqNo = contract.meritzQuote().requestNumber();
 
         ContractValidator.requireNotBlank(polNo, "policyNumber(polNo) is required");
         ContractValidator.requireNotBlank(quotGrpNo, "quotGrpNo is required");
@@ -46,7 +46,7 @@ public class CertificateLinkIssuer {
         CertificateApiResult result =
                 meritzClient.issueCertificate(company, polNo, pdCd, quotGrpNo, quotReqNo, div, tp);
 
-        snapshotAppender.append(contractId, contract.getInsurerId(), "CERTIFICATE", toJson(result));
+        snapshotAppender.append(contractId, contract.insurerId(), "CERTIFICATE", toJson(result));
 
         return result.linkUrl();
     }

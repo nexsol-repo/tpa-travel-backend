@@ -8,6 +8,7 @@ import lombok.Builder;
 @Builder
 public record Payment(
         Long id,
+        Long contractId,
         String paymentMethod,
         String status,
         BigDecimal paidAmount,

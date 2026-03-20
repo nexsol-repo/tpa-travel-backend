@@ -1,11 +1,12 @@
 package com.nexsol.tpa.core.domain.contract;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
-import com.nexsol.tpa.storage.db.core.entity.TravelContractEntity;
-import com.nexsol.tpa.storage.db.core.repository.TravelContractRepository;
+import com.nexsol.tpa.core.domain.repository.ContractRepository;
+import com.nexsol.tpa.core.error.CoreErrorType;
+import com.nexsol.tpa.core.error.CoreException;
+import com.nexsol.tpa.core.support.PageResult;
+import com.nexsol.tpa.core.support.SortPage;
 
 import lombok.RequiredArgsConstructor;
 
@@ -13,18 +14,18 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ContractFinder {
 
-    private final TravelContractRepository contractRepository;
+    private final ContractRepository contractRepository;
 
-    public Page<TravelContractEntity> find(String authUniqueKey, Pageable pageable) {
+    public PageResult<ContractInfo> find(String authUniqueKey, SortPage sortPage) {
         if (authUniqueKey != null && !authUniqueKey.isBlank()) {
-            return contractRepository.findByAuthUniqueKey(authUniqueKey, pageable);
+            return contractRepository.findByAuthUniqueKey(authUniqueKey, sortPage);
         }
-        return contractRepository.findAllOrderByAuthUniqueKeyDesc(pageable);
+        return contractRepository.findAllOrderByAuthUniqueKeyDesc(sortPage);
     }
 
-    public TravelContractEntity findById(Long id) {
+    public ContractInfo findById(Long id) {
         return contractRepository
                 .findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("contract not found: " + id));
+                .orElseThrow(() -> new CoreException(CoreErrorType.NOT_FOUND_DATA, "contract not found: " + id));
     }
 }

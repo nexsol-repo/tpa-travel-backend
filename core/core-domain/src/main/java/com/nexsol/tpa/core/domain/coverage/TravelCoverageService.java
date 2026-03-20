@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import com.nexsol.tpa.core.domain.plan.TravelPlanReader;
 import com.nexsol.tpa.core.domain.plan.TravelPlanReader.PlanFamily;
 import com.nexsol.tpa.core.domain.premium.QuoteResult;
-import com.nexsol.tpa.storage.db.core.repository.projection.TravelPlanCoverageRow;
+import com.nexsol.tpa.core.domain.repository.projection.TravelPlanCoverageRow;
 
 import lombok.RequiredArgsConstructor;
 

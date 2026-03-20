@@ -2,8 +2,6 @@ package com.nexsol.tpa.core.domain.coverage;
 
 import org.springframework.stereotype.Service;
 
-import com.nexsol.tpa.storage.db.core.entity.TravelInsuranceCoverageEntity;
-
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -13,17 +11,17 @@ public class CoverageService {
     private final CoverageReader coverageReader;
 
     public CoverageResult getCoverage(Long insurerId, String coverageCode) {
-        TravelInsuranceCoverageEntity entity =
+        InsuranceCoverage coverage =
                 coverageReader.getByInsurerIdAndCoverageCode(insurerId, coverageCode);
 
         return new CoverageResult(
-                entity.getId(),
-                entity.getCoverageCode(),
-                entity.getCoverageName(),
-                entity.getGroupCode(),
-                entity.getClaimReason(),
-                entity.getClaimContent(),
-                entity.getSubTitle(),
-                entity.getSubContent());
+                coverage.id(),
+                coverage.coverageCode(),
+                coverage.coverageName(),
+                coverage.groupCode(),
+                coverage.claimReason(),
+                coverage.claimContent(),
+                coverage.subTitle(),
+                coverage.subContent());
     }
 }

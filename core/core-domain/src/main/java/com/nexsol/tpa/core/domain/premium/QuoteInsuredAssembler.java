@@ -8,10 +8,10 @@ import java.util.stream.IntStream;
 import org.springframework.stereotype.Component;
 
 import com.nexsol.tpa.client.meritz.quote.MeritzQuoteClient.PremiumRequest;
+import com.nexsol.tpa.core.domain.plan.InsurancePlan;
 import com.nexsol.tpa.core.domain.plan.QuotePlanPolicy;
-import com.nexsol.tpa.core.support.error.CoreApiErrorType;
-import com.nexsol.tpa.core.support.error.CoreApiException;
-import com.nexsol.tpa.storage.db.core.entity.TravelInsurancePlanEntity;
+import com.nexsol.tpa.core.error.CoreErrorType;
+import com.nexsol.tpa.core.error.CoreException;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,11 +40,11 @@ public class QuoteInsuredAssembler {
      * 가족 중 해당 ageGroup의 플랜이 없으면 null을 반환한다.
      * PremiumRequest 는 외부 연동사 이므로 레이어에 포함안됨 개념에도 포함안됨 횡단관심사 영역임
      */
-    public PremiumRequest assemble(PlanCondition cmd, List<TravelInsurancePlanEntity> familyPlans) {
+    public PremiumRequest assemble(PlanCondition cmd, List<InsurancePlan> familyPlans) {
         validateAges(cmd);
 
-        Map<Integer, TravelInsurancePlanEntity> planByAgeGroup = indexByAgeGroup(familyPlans);
-        TravelInsurancePlanEntity repPlan = selectRepresentativePlan(familyPlans);
+        Map<Integer, InsurancePlan> planByAgeGroup = indexByAgeGroup(familyPlans);
+        InsurancePlan repPlan = selectRepresentativePlan(familyPlans);
 
         List<PremiumRequest.InsuredPerson> insuredPersons =
                 cmd.insuredList().stream()
@@ -57,14 +57,14 @@ public class QuoteInsuredAssembler {
         if (insuredPersons.contains(null)) {
             log.debug(
                     "[PREMIUM] family has no plan for some ageGroup, repPlanCd={} → skip",
-                    repPlan.getPlanCode());
+                    repPlan.planCode());
             return null;
         }
 
         return new PremiumRequest(
                 DEFAULT_COMPANY,
-                repPlan.getProductCode(),
-                repPlan.getUnitProductCode(),
+                repPlan.productCode(),
+                repPlan.unitProductCode(),
                 LocalDate.now().format(YYYYMMDD),
                 cmd.insBgnDt(),
                 cmd.insEdDt(),
@@ -77,17 +77,17 @@ public class QuoteInsuredAssembler {
     private PremiumRequest.InsuredPerson resolveInsuredPerson(
             PlanCondition.Insured insured,
             String insBgnDt,
-            Map<Integer, TravelInsurancePlanEntity> planByAgeGroup) {
+            Map<Integer, InsurancePlan> planByAgeGroup) {
 
         int ageGroupId = policy.resolveAgeGroupId(policy.calcAge(insured.birth(), insBgnDt));
-        TravelInsurancePlanEntity plan = planByAgeGroup.get(ageGroupId);
+        InsurancePlan plan = planByAgeGroup.get(ageGroupId);
         if (plan == null) {
             return null;
         }
 
         return new PremiumRequest.InsuredPerson(
-                plan.getPlanGroupCode(),
-                plan.getPlanCode(),
+                plan.planGroupCode(),
+                plan.planCode(),
                 insured.birth(),
                 insured.gender(),
                 PLACEHOLDER_NAME,
@@ -101,28 +101,28 @@ public class QuoteInsuredAssembler {
                         i -> {
                             int age = policy.calcAge(insuredList.get(i).birth(), cmd.insBgnDt());
                             if (policy.resolveAgeGroupId(age) == null) {
-                                throw new CoreApiException(
-                                        CoreApiErrorType.INVALID_QUOTE_REQUEST,
+                                throw new CoreException(
+                                        CoreErrorType.INVALID_QUOTE_REQUEST,
                                         "unsupported age. index=" + i + ", age=" + age);
                             }
                         });
     }
 
-    private Map<Integer, TravelInsurancePlanEntity> indexByAgeGroup(
-            List<TravelInsurancePlanEntity> familyPlans) {
-        Map<Integer, TravelInsurancePlanEntity> map = new HashMap<>();
-        for (TravelInsurancePlanEntity p : familyPlans) {
-            if (p.getAgeGroupId() != null) {
-                map.put(p.getAgeGroupId(), p);
+    private Map<Integer, InsurancePlan> indexByAgeGroup(
+            List<InsurancePlan> familyPlans) {
+        Map<Integer, InsurancePlan> map = new HashMap<>();
+        for (InsurancePlan p : familyPlans) {
+            if (p.ageGroupId() != null) {
+                map.put(p.ageGroupId(), p);
             }
         }
         return map;
     }
 
-    private TravelInsurancePlanEntity selectRepresentativePlan(
-            List<TravelInsurancePlanEntity> familyPlans) {
+    private InsurancePlan selectRepresentativePlan(
+            List<InsurancePlan> familyPlans) {
         return familyPlans.stream()
-                .filter(p -> Objects.equals(p.getAgeGroupId(), 2))
+                .filter(p -> Objects.equals(p.ageGroupId(), 2))
                 .findFirst()
                 .orElse(familyPlans.getFirst());
     }

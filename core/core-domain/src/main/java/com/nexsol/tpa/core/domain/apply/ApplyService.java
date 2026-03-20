@@ -3,12 +3,12 @@ package com.nexsol.tpa.core.domain.apply;
 import org.springframework.stereotype.Service;
 
 import com.nexsol.tpa.client.meritz.config.CompaniesConfigsProperties;
+import com.nexsol.tpa.core.domain.contract.ContractCreator;
+import com.nexsol.tpa.core.domain.contract.ContractInfo;
 import com.nexsol.tpa.core.domain.contract.ContractPeopleWriter;
 import com.nexsol.tpa.core.domain.contract.ContractWriter;
 import com.nexsol.tpa.core.domain.snapshot.SnapshotAppender;
-import com.nexsol.tpa.storage.db.core.entity.TravelContractEntity;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import tools.jackson.databind.ObjectMapper;
@@ -19,41 +19,24 @@ import tools.jackson.databind.ObjectMapper;
 public class ApplyService {
 
     private final ApplyValidator applyValidator;
+    private final ContractCreator contractCreator;
     private final ContractWriter contractWriter;
     private final ContractPeopleWriter peopleWriter;
     private final SnapshotAppender snapshotAppender;
     private final CompaniesConfigsProperties companies;
     private final ObjectMapper objectMapper;
 
-    @Transactional
+
     public Long apply(ContractApply cmd) {
         applyValidator.validate(cmd);
 
-        TravelContractEntity contract =
-                TravelContractEntity.create(
-                        cmd.insurerId(),
-                        "MERITZ",
-                        cmd.partnerId(),
-                        "TPA KOREA",
-                        cmd.channelId(),
-                        "TPA KOREA",
-                        cmd.familyId());
+        ContractInfo contract = contractCreator.create(cmd, companies.getTpa().getPolNo());
+        ContractInfo saved = contractWriter.save(contract);
 
-        contract.applyInsurePeriod(
-                cmd.insureBeginDate(), cmd.insureEndDate(),
-                cmd.countryCode(), cmd.countryName());
-        contract.applyMeritzQuote(
-                companies.getTpa().getPolNo(),
-                cmd.meritzQuoteGroupNumber(),
-                cmd.meritzQuoteRequestNumber());
-        contract.applyPremium(cmd.totalPremium());
-        contract.applyMarketingConsent(cmd.marketingConsentUsed());
+        peopleWriter.register(saved.id(), cmd.people());
+        snapshotAppender.append(saved.id(), cmd.insurerId(), "QUOTE", toJson(saved.id()));
 
-        TravelContractEntity saved = contractWriter.save(contract);
-        peopleWriter.register(saved.getId(), cmd.people());
-        snapshotAppender.append(saved.getId(), cmd.insurerId(), "QUOTE", toJson(saved.getId()));
-
-        return saved.getId();
+        return saved.id();
     }
 
     private String toJson(Object obj) {

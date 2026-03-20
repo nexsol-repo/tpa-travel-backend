@@ -9,8 +9,8 @@ import org.springframework.stereotype.Component;
 import com.nexsol.tpa.client.meritz.contract.MeritzContractClient;
 import com.nexsol.tpa.client.meritz.contract.MeritzContractClient.EstimateSaveRequest;
 import com.nexsol.tpa.client.meritz.contract.SubscriptionApiResult;
-import com.nexsol.tpa.storage.db.core.entity.TravelContractEntity;
-import com.nexsol.tpa.storage.db.core.entity.TravelInsurancePlanEntity;
+import com.nexsol.tpa.core.domain.contract.ContractInfo;
+import com.nexsol.tpa.core.domain.plan.InsurancePlan;
 
 import lombok.RequiredArgsConstructor;
 
@@ -24,24 +24,24 @@ public class SubscriptionEstimateSaver {
     private final SubscriptionInsuredReader subscriptionInsuredReader;
 
     public SubscriptionApiResult save(
-            String company, TravelContractEntity contract, SubscriptionCommand cmd) {
+            String company, ContractInfo contract, SubscriptionCommand cmd) {
 
-        TravelInsurancePlanEntity repPlan = subscriptionInsuredReader.findRepPlan(contract.getId());
+        InsurancePlan repPlan = subscriptionInsuredReader.findRepPlan(contract.id());
         String sbcpDt = LocalDate.now().format(YYYYMMDD);
 
         List<EstimateSaveRequest.InsuredPerson> insuredPeople =
-                subscriptionInsuredReader.findEstimateSaveInsuredPeople(contract.getId());
+                subscriptionInsuredReader.findEstimateSaveInsuredPeople(contract.id());
 
         EstimateSaveRequest req =
                 new EstimateSaveRequest(
                         company,
-                        contract.getPolicyNumber(),
-                        repPlan.getProductCode(),
-                        repPlan.getUnitProductCode(),
+                        contract.policyNumber(),
+                        repPlan.productCode(),
+                        repPlan.unitProductCode(),
                         sbcpDt,
-                        contract.getInsureStartDate().format(YYYYMMDD),
-                        contract.getInsureEndDate().format(YYYYMMDD),
-                        contract.getCountryCode(),
+                        contract.insurePeriod().startDate().format(YYYYMMDD),
+                        contract.insurePeriod().endDate().format(YYYYMMDD),
+                        contract.insurePeriod().countryCode(),
                         null,
                         cmd.cardNo(),
                         cmd.efctPrd(),

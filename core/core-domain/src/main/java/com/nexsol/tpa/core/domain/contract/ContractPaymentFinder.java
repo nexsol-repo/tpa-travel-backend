@@ -6,8 +6,8 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
-import com.nexsol.tpa.storage.db.core.entity.TravelPaymentEntity;
-import com.nexsol.tpa.storage.db.core.repository.TravelInsurePaymentRepository;
+import com.nexsol.tpa.core.domain.payment.Payment;
+import com.nexsol.tpa.core.domain.repository.PaymentRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -15,14 +15,14 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ContractPaymentFinder {
 
-    private final TravelInsurePaymentRepository paymentRepository;
+    private final PaymentRepository paymentRepository;
 
-    public TravelPaymentEntity findByContractId(Long contractId) {
+    public Payment findByContractId(Long contractId) {
         return paymentRepository.findByContractId(contractId).orElse(null);
     }
 
-    public Map<Long, TravelPaymentEntity> findMapByContractIds(List<Long> contractIds) {
+    public Map<Long, Payment> findMapByContractIds(List<Long> contractIds) {
         return paymentRepository.findByContractIdIn(contractIds).stream()
-                .collect(Collectors.toMap(TravelPaymentEntity::getContractId, p -> p));
+                .collect(Collectors.toMap(Payment::contractId, p -> p));
     }
 }

@@ -4,11 +4,10 @@ import java.util.*;
 
 import org.springframework.stereotype.Component;
 
-import com.nexsol.tpa.storage.db.core.entity.TravelInsurancePlanEntity;
-import com.nexsol.tpa.storage.db.core.repository.TravelInsurancePlanRepository;
-import com.nexsol.tpa.storage.db.core.repository.TravelPlanCoverageRepository;
-import com.nexsol.tpa.storage.db.core.repository.projection.PlanFamilyPlanRow;
-import com.nexsol.tpa.storage.db.core.repository.projection.TravelPlanCoverageRow;
+import com.nexsol.tpa.core.domain.repository.InsurancePlanRepository;
+import com.nexsol.tpa.core.domain.repository.PlanCoverageRepository;
+import com.nexsol.tpa.core.domain.repository.projection.PlanFamilyPlanRow;
+import com.nexsol.tpa.core.domain.repository.projection.TravelPlanCoverageRow;
 
 import lombok.RequiredArgsConstructor;
 
@@ -20,15 +19,15 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class TravelPlanReader {
 
-    private final TravelInsurancePlanRepository planRepository;
-    private final TravelPlanCoverageRepository coverageRepository;
+    private final InsurancePlanRepository planRepository;
+    private final PlanCoverageRepository coverageRepository;
 
     public record PlanFamily(
             Long familyId,
             String familyName,
             boolean isLoss,
-            TravelInsurancePlanEntity repPlan,
-            List<TravelInsurancePlanEntity> plans) {}
+            InsurancePlan repPlan,
+            List<InsurancePlan> plans) {}
 
     /**
      * 보험사의 전체 활성 패밀리 + 플랜을 조회한다.
@@ -38,15 +37,15 @@ public class TravelPlanReader {
         List<PlanFamilyPlanRow> rows = planRepository.findActiveFamilyPlans(insurerId);
         if (rows.isEmpty()) return List.of();
 
-        Map<Long, TravelInsurancePlanEntity> planById = loadPlanEntities(rows);
+        Map<Long, InsurancePlan> planById = loadPlanEntities(rows);
         if (planById.isEmpty()) return List.of();
 
-        Map<Long, List<TravelInsurancePlanEntity>> familyPlans = new LinkedHashMap<>();
+        Map<Long, List<InsurancePlan>> familyPlans = new LinkedHashMap<>();
         Map<Long, String> familyNames = new LinkedHashMap<>();
         Map<Long, Boolean> familyLossFlags = new LinkedHashMap<>();
 
         for (PlanFamilyPlanRow r : rows) {
-            TravelInsurancePlanEntity p = planById.get(r.getPlanId());
+            InsurancePlan p = planById.get(r.getPlanId());
             if (p == null) continue;
             familyPlans.computeIfAbsent(r.getFamilyId(), k -> new ArrayList<>()).add(p);
             familyNames.putIfAbsent(r.getFamilyId(), r.getFamilyName());
@@ -58,8 +57,8 @@ public class TravelPlanReader {
             String name = familyNames.get(e.getKey());
             if (name == null) continue;
 
-            List<TravelInsurancePlanEntity> plans = e.getValue();
-            TravelInsurancePlanEntity repPlan = pickRepPlan(plans);
+            List<InsurancePlan> plans = e.getValue();
+            InsurancePlan repPlan = pickRepPlan(plans);
             boolean isLoss = familyLossFlags.getOrDefault(e.getKey(), false);
             result.add(new PlanFamily(e.getKey(), name, isLoss, repPlan, plans));
         }
@@ -75,21 +74,21 @@ public class TravelPlanReader {
 
     // ── internal ──
 
-    private Map<Long, TravelInsurancePlanEntity> loadPlanEntities(List<PlanFamilyPlanRow> rows) {
+    private Map<Long, InsurancePlan> loadPlanEntities(List<PlanFamilyPlanRow> rows) {
         Set<Long> planIds = new LinkedHashSet<>();
         for (PlanFamilyPlanRow r : rows) {
             planIds.add(r.getPlanId());
         }
-        Map<Long, TravelInsurancePlanEntity> map = new HashMap<>();
-        for (TravelInsurancePlanEntity p : planRepository.findAllById(planIds)) {
-            map.put(p.getId(), p);
+        Map<Long, InsurancePlan> map = new HashMap<>();
+        for (InsurancePlan p : planRepository.findByIdIn(planIds)) {
+            map.put(p.id(), p);
         }
         return map;
     }
 
-    private TravelInsurancePlanEntity pickRepPlan(List<TravelInsurancePlanEntity> plans) {
+    private InsurancePlan pickRepPlan(List<InsurancePlan> plans) {
         return plans.stream()
-                .filter(p -> Objects.equals(p.getAgeGroupId(), 2))
+                .filter(p -> Objects.equals(p.ageGroupId(), 2))
                 .findFirst()
                 .orElse(plans.getFirst());
     }

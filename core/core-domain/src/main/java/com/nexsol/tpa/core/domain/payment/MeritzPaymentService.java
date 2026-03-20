@@ -4,8 +4,8 @@ import org.springframework.stereotype.Service;
 
 import com.nexsol.tpa.client.meritz.bridge.dto.MeritzBridgeApiResponse;
 import com.nexsol.tpa.client.meritz.payment.MeritzPaymentClient;
-import com.nexsol.tpa.core.support.error.CoreApiErrorType;
-import com.nexsol.tpa.core.support.error.CoreApiException;
+import com.nexsol.tpa.core.error.CoreErrorType;
+import com.nexsol.tpa.core.error.CoreException;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,8 +44,8 @@ public class MeritzPaymentService {
                         rcptPrem);
 
         if (!res.isSuccess()) {
-            throw new CoreApiException(
-                    CoreApiErrorType.DEFAULT_ERROR,
+            throw new CoreException(
+                    CoreErrorType.DEFAULT_ERROR,
                     "카드승인 실패. errCd=" + res.getErrCd() + ", errMsg=" + res.getErrMsg());
         }
         return res;
@@ -59,8 +59,8 @@ public class MeritzPaymentService {
                 paymentClient.cancelCard(resolvedCompany, polNo, estNo, orgApvNo, cncAmt);
 
         if (!res.isSuccess()) {
-            throw new CoreApiException(
-                    CoreApiErrorType.DEFAULT_ERROR,
+            throw new CoreException(
+                    CoreErrorType.DEFAULT_ERROR,
                     "카드취소 실패. errCd=" + res.getErrCd() + ", errMsg=" + res.getErrMsg());
         }
         return res;
@@ -73,6 +73,6 @@ public class MeritzPaymentService {
         if ("INSBOON".equalsIgnoreCase(company)) {
             return "insboon";
         }
-        throw new CoreApiException(CoreApiErrorType.INVALID_REQUEST, "Unknown company: " + company);
+        throw new CoreException(CoreErrorType.INVALID_REQUEST, "Unknown company: " + company);
     }
 }

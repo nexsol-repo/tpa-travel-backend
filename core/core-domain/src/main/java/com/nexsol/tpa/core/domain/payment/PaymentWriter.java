@@ -7,8 +7,7 @@ import org.springframework.stereotype.Component;
 
 import com.nexsol.tpa.core.enums.TravelPaymentMethod;
 import com.nexsol.tpa.core.enums.TravelPaymentStatus;
-import com.nexsol.tpa.storage.db.core.entity.TravelPaymentEntity;
-import com.nexsol.tpa.storage.db.core.repository.TravelInsurePaymentRepository;
+import com.nexsol.tpa.core.domain.repository.PaymentRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -16,21 +15,29 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class PaymentWriter {
 
-    private final TravelInsurePaymentRepository paymentRepository;
+    private final PaymentRepository paymentRepository;
 
-    public TravelPaymentEntity createCompleted(Long contractId, BigDecimal amount) {
+    public Payment createCompleted(Long contractId, BigDecimal amount) {
         return paymentRepository.save(
-                TravelPaymentEntity.builder()
+                Payment.builder()
                         .contractId(contractId)
-                        .paymentMethod(TravelPaymentMethod.CARD)
+                        .paymentMethod(TravelPaymentMethod.CARD.name())
                         .paidAmount(amount)
-                        .status(TravelPaymentStatus.COMPLETED)
+                        .status(TravelPaymentStatus.COMPLETED.name())
                         .paymentDate(LocalDateTime.now())
                         .build());
     }
 
-    public void markCanceled(TravelPaymentEntity payment) {
-        payment.markCanceled(LocalDateTime.now());
-        paymentRepository.save(payment);
+    public void markCanceled(Payment payment) {
+        paymentRepository.save(
+                Payment.builder()
+                        .id(payment.id())
+                        .contractId(payment.contractId())
+                        .paymentMethod(payment.paymentMethod())
+                        .paidAmount(payment.paidAmount())
+                        .status(TravelPaymentStatus.CANCELED.name())
+                        .paymentDate(payment.paymentDate())
+                        .cancelDate(LocalDateTime.now())
+                        .build());
     }
 }

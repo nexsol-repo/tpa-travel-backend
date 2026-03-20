@@ -7,8 +7,8 @@ import org.springframework.stereotype.Service;
 import com.nexsol.tpa.client.meritz.quote.MeritzQuoteClient;
 import com.nexsol.tpa.client.meritz.quote.MeritzQuoteClient.PremiumRequest;
 import com.nexsol.tpa.core.domain.plan.TravelPlanReader.PlanFamily;
-import com.nexsol.tpa.core.support.error.CoreApiErrorType;
-import com.nexsol.tpa.core.support.error.CoreApiException;
+import com.nexsol.tpa.core.error.CoreErrorType;
+import com.nexsol.tpa.core.error.CoreException;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -59,8 +59,8 @@ public class PremiumService {
     public PremiumResult calculateSingle(PlanCondition cmd, PlanFamily family, int repIdx) {
         JsonNode rawData = callApi(cmd, family);
         if (rawData == null) {
-            throw new CoreApiException(
-                    CoreApiErrorType.PREMIUM_CALCULATION_FAILED,
+            throw new CoreException(
+                    CoreErrorType.PREMIUM_CALCULATION_FAILED,
                     "familyId=" + family.familyId() + ", planCd=" + family.repPlan().getPlanCode());
         }
         return quoteResultComposer.compose(rawData, cmd, repIdx);

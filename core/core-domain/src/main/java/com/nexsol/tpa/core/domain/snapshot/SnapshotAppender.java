@@ -2,8 +2,7 @@ package com.nexsol.tpa.core.domain.snapshot;
 
 import org.springframework.stereotype.Component;
 
-import com.nexsol.tpa.storage.db.core.entity.TravelContractSnapshotEntity;
-import com.nexsol.tpa.storage.db.core.repository.TravelContractSnapshotRepository;
+import com.nexsol.tpa.core.domain.repository.ContractSnapshotRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -11,11 +10,11 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SnapshotAppender {
 
-    private final TravelContractSnapshotRepository snapshotRepository;
+    private final ContractSnapshotRepository snapshotRepository;
 
     public void append(Long contractId, Long insurerId, String snapshotType, String jsonSnapshot) {
         snapshotRepository.save(
-                TravelContractSnapshotEntity.builder()
+                ContractSnapshot.builder()
                         .contractId(contractId)
                         .insurerId(insurerId)
                         .method("api")

@@ -9,10 +9,10 @@ import org.springframework.stereotype.Component;
 
 import com.nexsol.tpa.client.meritz.contract.MeritzContractClient.EstimateSaveRequest;
 import com.nexsol.tpa.core.domain.contract.ContractPeopleFinder;
+import com.nexsol.tpa.core.domain.contract.InsuredPerson;
 import com.nexsol.tpa.core.domain.contract.ResidentNumberParser;
+import com.nexsol.tpa.core.domain.plan.InsurancePlan;
 import com.nexsol.tpa.core.domain.plan.PlanReader;
-import com.nexsol.tpa.storage.db.core.entity.TravelInsurancePlanEntity;
-import com.nexsol.tpa.storage.db.core.entity.TravelInsuredEntity;
 
 import lombok.RequiredArgsConstructor;
 
@@ -24,11 +24,11 @@ public class SubscriptionInsuredReader {
     private final PlanReader planReader;
 
     public List<EstimateSaveRequest.InsuredPerson> findEstimateSaveInsuredPeople(Long contractId) {
-        List<TravelInsuredEntity> people = contractPeopleFinder.findByContractId(contractId);
+        List<InsuredPerson> people = contractPeopleFinder.findByContractId(contractId);
 
-        Map<Long, TravelInsurancePlanEntity> planCache =
+        Map<Long, InsurancePlan> planCache =
                 people.stream()
-                        .map(TravelInsuredEntity::getPlanId)
+                        .map(InsuredPerson::planId)
                         .filter(id -> id != null)
                         .distinct()
                         .collect(Collectors.toMap(Function.identity(), planReader::getById));
@@ -36,16 +36,16 @@ public class SubscriptionInsuredReader {
         return people.stream()
                 .map(
                         person -> {
-                            TravelInsurancePlanEntity plan = planCache.get(person.getPlanId());
+                            InsurancePlan plan = planCache.get(person.planId());
                             return new EstimateSaveRequest.InsuredPerson(
                                     ResidentNumberParser.extractBirthYmd(
-                                            person.getResidentNumber()),
+                                            person.residentNumber()),
                                     ResidentNumberParser.normalizeGenderToMeritz(
-                                            person.getGender(), person.getResidentNumber()),
-                                    person.getName(),
-                                    person.getEnglishName(),
-                                    plan.getPlanGroupCode(),
-                                    plan.getPlanCode());
+                                            person.gender(), person.residentNumber()),
+                                    person.name(),
+                                    person.englishName(),
+                                    plan.planGroupCode(),
+                                    plan.planCode());
                         })
                 .toList();
     }
@@ -53,9 +53,9 @@ public class SubscriptionInsuredReader {
     /**
      * 첫번째 피보험자의 plan을 반환한다. (대표 plan — productCode/unitProductCode 용)
      */
-    public TravelInsurancePlanEntity findRepPlan(Long contractId) {
+    public InsurancePlan findRepPlan(Long contractId) {
         return contractPeopleFinder.findByContractId(contractId).stream()
-                .map(TravelInsuredEntity::getPlanId)
+                .map(InsuredPerson::planId)
                 .filter(id -> id != null)
                 .findFirst()
                 .map(planReader::getById)

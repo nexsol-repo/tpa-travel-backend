@@ -2,8 +2,9 @@ package com.nexsol.tpa.core.domain.refund;
 
 import org.springframework.stereotype.Component;
 
-import com.nexsol.tpa.storage.db.core.entity.TravelRefundEntity;
-import com.nexsol.tpa.storage.db.core.repository.TravelInsureRefundRepository;
+import com.nexsol.tpa.core.domain.repository.RefundRepository;
+import com.nexsol.tpa.core.error.CoreException;
+import com.nexsol.tpa.core.error.CoreErrorType;
 
 import lombok.RequiredArgsConstructor;
 
@@ -11,23 +12,23 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class RefundReader {
 
-    private final TravelInsureRefundRepository refundRepository;
+    private final RefundRepository refundRepository;
 
-    public TravelRefundEntity getByContractId(Long contractId) {
+    public Refund getByContractId(Long contractId) {
         return refundRepository
                 .findByContractId(contractId)
                 .orElseThrow(
-                        () ->
-                                new IllegalStateException(
-                                        "refund not found. contractId=" + contractId));
+                        () -> new CoreException(
+                                CoreErrorType.NOT_FOUND_DATA,
+                                "refund not found. contractId=" + contractId));
     }
 
-    public TravelRefundEntity getByPaymentId(Long paymentId) {
+    public Refund getByPaymentId(Long paymentId) {
         return refundRepository
                 .findByPaymentId(paymentId)
                 .orElseThrow(
-                        () ->
-                                new IllegalStateException(
-                                        "refund not found. paymentId=" + paymentId));
+                        () -> new CoreException(
+                                CoreErrorType.NOT_FOUND_DATA,
+                                "refund not found. paymentId=" + paymentId));
     }
 }
