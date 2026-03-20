@@ -17,8 +17,6 @@ public class ApplyValidator {
         requireNotNull(cmd.insureEndDate(), "insureEndDate");
         requireNotBlank(cmd.countryCode(), "countryCode");
         requireNotNull(cmd.totalPremium(), "totalPremium");
-        requireNotBlank(cmd.meritzQuoteGroupNumber(), "meritzQuoteGroupNumber");
-        requireNotBlank(cmd.meritzQuoteRequestNumber(), "meritzQuoteRequestNumber");
 
         if (cmd.people() == null || cmd.people().isEmpty()) {
             throw invalid("people is required");
@@ -35,7 +33,7 @@ public class ApplyValidator {
         requireNotBlank(p.residentNumber(), "people[" + index + "].residentNumber");
     }
 
-    private void  requireNotNull(Object value, String fieldName) {
+    private void requireNotNull(Object value, String fieldName) {
         if (value == null) {
             throw invalid(fieldName + " is required");
         }

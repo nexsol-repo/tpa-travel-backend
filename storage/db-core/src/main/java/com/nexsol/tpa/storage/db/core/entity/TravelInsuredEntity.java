@@ -72,9 +72,18 @@ public class TravelInsuredEntity extends BaseEntity {
             String policyNumber,
             BigDecimal insurePremium) {
         return new TravelInsuredEntity(
-                contractId, planId, isContractor, name, gender,
-                residentNumber, englishName, passportNumber,
-                phone, email, policyNumber, insurePremium);
+                contractId,
+                planId,
+                isContractor,
+                name,
+                gender,
+                residentNumber,
+                englishName,
+                passportNumber,
+                phone,
+                email,
+                policyNumber,
+                insurePremium);
     }
 
     @Builder

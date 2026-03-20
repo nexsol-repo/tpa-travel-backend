@@ -19,15 +19,23 @@ public class ContractPeopleWriter {
 
     public void register(Long contractId, List<ApplyCommand.InsuredPerson> people) {
         IntStream.range(0, people.size())
-                .mapToObj(i -> {
-                    var p = people.get(i);
-                    return TravelInsuredEntity.create(
-                            contractId, p.planId(), i == 0,
-                            p.name(), p.gender(), p.residentNumber(),
-                            p.englishName(), p.passportNumber(),
-                            p.phone(), p.email(),
-                            p.insureNumber(), p.insurePremium());
-                })
+                .mapToObj(
+                        i -> {
+                            var p = people.get(i);
+                            return TravelInsuredEntity.create(
+                                    contractId,
+                                    p.planId(),
+                                    i == 0,
+                                    p.name(),
+                                    p.gender(),
+                                    p.residentNumber(),
+                                    p.englishName(),
+                                    p.passportNumber(),
+                                    p.phone(),
+                                    p.email(),
+                                    p.insureNumber(),
+                                    p.insurePremium());
+                        })
                 .forEach(insuredRepository::save);
     }
 }

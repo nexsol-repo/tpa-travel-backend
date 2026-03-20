@@ -335,8 +335,14 @@ class MeritzContractControllerDocsTest extends RestDocsTest {
             fieldWithPath("channelId").type(NUMBER).description("채널 ID"),
             fieldWithPath("channelName").type(STRING).description("채널명"),
             fieldWithPath("familyId").type(NUMBER).description("플랜 패밀리 ID"),
-            fieldWithPath("meritzQuoteGroupNumber").type(STRING).description("메리츠 견적그룹번호"),
-            fieldWithPath("meritzQuoteRequestNumber").type(STRING).description("메리츠 견적요청번호"),
+            fieldWithPath("meritzQuoteGroupNumber")
+                    .type(STRING)
+                    .description("메리츠 견적그룹번호")
+                    .optional(),
+            fieldWithPath("meritzQuoteRequestNumber")
+                    .type(STRING)
+                    .description("메리츠 견적요청번호")
+                    .optional(),
             fieldWithPath("countryCode").type(STRING).description("국가코드"),
             fieldWithPath("countryName").type(STRING).description("국가명"),
             fieldWithPath("insureBeginDate").type(STRING).description("보험시작일 (YYYY-MM-DD)"),
