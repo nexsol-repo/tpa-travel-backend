@@ -2,6 +2,8 @@ package com.nexsol.tpa.storage.db.core.entity;
 
 import java.time.LocalDate;
 
+import com.nexsol.tpa.core.domain.plan.InsurancePlan;
+
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -92,5 +94,20 @@ public class TravelInsurancePlanEntity extends BaseEntity {
         this.effectiveTo = effectiveTo;
         this.isActive = isActive == null ? true : isActive;
         this.sortOrder = sortOrder == null ? 0 : sortOrder;
+    }
+
+    public InsurancePlan toDomain() {
+        return InsurancePlan.builder()
+                .id(id)
+                .familyId(familyId)
+                .insuranceProductName(insuranceProductName)
+                .planName(planFullName != null ? planFullName : planName)
+                .planFullName(planFullName)
+                .productCode(productCode)
+                .unitProductCode(unitProductCode)
+                .planGroupCode(planGroupCode)
+                .planCode(planCode)
+                .ageGroupId(ageGroupId)
+                .build();
     }
 }

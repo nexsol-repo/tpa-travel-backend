@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import lombok.RequiredArgsConstructor;
 
+import com.nexsol.tpa.core.domain.payment.Payment;
 import com.nexsol.tpa.core.domain.repository.PaymentRepository;
 import com.nexsol.tpa.storage.db.core.entity.TravelPaymentEntity;
 import com.nexsol.tpa.storage.db.core.repository.JpaPaymentRepository;
@@ -19,13 +20,14 @@ public class DefaultPaymentRepository implements PaymentRepository {
     private final JpaPaymentRepository jpaRepository;
 
     @Override
-    public TravelPaymentEntity save(TravelPaymentEntity entity) {
-        return jpaRepository.save(entity);
+    public Payment save(Payment payment) {
+        TravelPaymentEntity entity = TravelPaymentEntity.fromDomain(payment);
+        return jpaRepository.save(entity).toDomain();
     }
 
     @Override
-    public Optional<TravelPaymentEntity> findByContractId(Long contractId) {
-        return jpaRepository.findByContractId(contractId);
+    public Optional<Payment> findByContractId(Long contractId) {
+        return jpaRepository.findByContractId(contractId).map(TravelPaymentEntity::toDomain);
     }
 
     @Override
@@ -34,7 +36,8 @@ public class DefaultPaymentRepository implements PaymentRepository {
     }
 
     @Override
-    public List<TravelPaymentEntity> findByContractIdIn(Collection<Long> contractIds) {
-        return jpaRepository.findByContractIdIn(contractIds);
+    public List<Payment> findByContractIdIn(Collection<Long> contractIds) {
+        return jpaRepository.findByContractIdIn(contractIds)
+                .stream().map(TravelPaymentEntity::toDomain).toList();
     }
 }

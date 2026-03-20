@@ -2,6 +2,8 @@ package com.nexsol.tpa.storage.db.core.entity;
 
 import java.time.LocalDateTime;
 
+import com.nexsol.tpa.core.domain.city.FavoriteCity;
+
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -67,5 +69,30 @@ public class FavoriteCityEntity extends BaseEntity {
 
     public void softDelete(String actor) {
         this.updatedAt = LocalDateTime.now();
+    }
+
+    public FavoriteCity toDomain() {
+        return FavoriteCity.builder()
+                .id(id)
+                .countryCode(countryCode)
+                .countryNameKorean(countryNameKorean)
+                .countryNameEnglish(countryNameEnglish)
+                .cityNameKorean(cityNameKorean)
+                .cityNameEnglish(cityNameEnglish)
+                .travelRiskGradeCode(travelRiskGradeCode)
+                .sortOrder(sortOrder)
+                .build();
+    }
+
+    public static FavoriteCityEntity fromDomain(FavoriteCity c) {
+        return FavoriteCityEntity.builder()
+                .countryCode(c.countryCode())
+                .countryNameKorean(c.countryNameKorean())
+                .countryNameEnglish(c.countryNameEnglish())
+                .cityNameKorean(c.cityNameKorean())
+                .cityNameEnglish(c.cityNameEnglish())
+                .travelRiskGradeCode(c.travelRiskGradeCode())
+                .sortOrder(c.sortOrder())
+                .build();
     }
 }

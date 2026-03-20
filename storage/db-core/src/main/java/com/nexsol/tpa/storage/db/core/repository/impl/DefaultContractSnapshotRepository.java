@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import lombok.RequiredArgsConstructor;
 
+import com.nexsol.tpa.core.domain.snapshot.ContractSnapshot;
 import com.nexsol.tpa.core.domain.repository.ContractSnapshotRepository;
 import com.nexsol.tpa.storage.db.core.entity.TravelContractSnapshotEntity;
 import com.nexsol.tpa.storage.db.core.repository.JpaContractSnapshotRepository;
@@ -17,13 +18,15 @@ public class DefaultContractSnapshotRepository implements ContractSnapshotReposi
     private final JpaContractSnapshotRepository jpaRepository;
 
     @Override
-    public TravelContractSnapshotEntity save(TravelContractSnapshotEntity entity) {
-        return jpaRepository.save(entity);
+    public ContractSnapshot save(ContractSnapshot snapshot) {
+        TravelContractSnapshotEntity entity = TravelContractSnapshotEntity.fromDomain(snapshot);
+        return jpaRepository.save(entity).toDomain();
     }
 
     @Override
-    public Optional<TravelContractSnapshotEntity> findByContractIdAndSnapshotType(
+    public Optional<ContractSnapshot> findByContractIdAndSnapshotType(
             Long contractId, String snapshotType) {
-        return jpaRepository.findByContractIdAndSnapshotType(contractId, snapshotType);
+        return jpaRepository.findByContractIdAndSnapshotType(contractId, snapshotType)
+                .map(TravelContractSnapshotEntity::toDomain);
     }
 }

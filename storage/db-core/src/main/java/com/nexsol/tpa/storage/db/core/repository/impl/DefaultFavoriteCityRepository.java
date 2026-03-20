@@ -7,27 +7,31 @@ import org.springframework.stereotype.Repository;
 
 import lombok.RequiredArgsConstructor;
 
+import com.nexsol.tpa.core.domain.city.FavoriteCity;
 import com.nexsol.tpa.core.domain.repository.FavoriteCityRepository;
 import com.nexsol.tpa.storage.db.core.entity.FavoriteCityEntity;
+import com.nexsol.tpa.storage.db.core.repository.JpaFavoriteCityRepository;
 
 @Repository
 @RequiredArgsConstructor
 public class DefaultFavoriteCityRepository implements FavoriteCityRepository {
 
-    private final com.nexsol.tpa.storage.db.core.repository.JpaFavoriteCityRepository jpaRepository;
+    private final JpaFavoriteCityRepository jpaRepository;
 
     @Override
-    public FavoriteCityEntity save(FavoriteCityEntity entity) {
-        return jpaRepository.save(entity);
+    public FavoriteCity save(FavoriteCity city) {
+        FavoriteCityEntity entity = FavoriteCityEntity.fromDomain(city);
+        return jpaRepository.save(entity).toDomain();
     }
 
     @Override
-    public List<FavoriteCityEntity> findAllActive() {
-        return jpaRepository.findByDeletedAtIsNullOrderBySortOrderAsc();
+    public List<FavoriteCity> findAllActive() {
+        return jpaRepository.findByDeletedAtIsNullOrderBySortOrderAsc()
+                .stream().map(FavoriteCityEntity::toDomain).toList();
     }
 
     @Override
-    public Optional<FavoriteCityEntity> findActiveById(Long id) {
-        return jpaRepository.findByIdAndDeletedAtIsNull(id);
+    public Optional<FavoriteCity> findActiveById(Long id) {
+        return jpaRepository.findByIdAndDeletedAtIsNull(id).map(FavoriteCityEntity::toDomain);
     }
 }

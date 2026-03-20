@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import lombok.RequiredArgsConstructor;
 
+import com.nexsol.tpa.core.domain.contract.Partner;
 import com.nexsol.tpa.core.domain.repository.PartnerRepository;
 import com.nexsol.tpa.storage.db.core.entity.TpaPartnerEntity;
 import com.nexsol.tpa.storage.db.core.repository.JpaPartnerRepository;
@@ -18,17 +19,18 @@ public class DefaultPartnerRepository implements PartnerRepository {
     private final JpaPartnerRepository jpaRepository;
 
     @Override
-    public Optional<TpaPartnerEntity> findById(Long id) {
-        return jpaRepository.findById(id);
+    public Optional<Partner> findById(Long id) {
+        return jpaRepository.findById(id).map(TpaPartnerEntity::toDomain);
     }
 
     @Override
-    public Optional<TpaPartnerEntity> findByPartnerCode(String code) {
-        return jpaRepository.findByPartnerCode(code);
+    public Optional<Partner> findByPartnerCode(String code) {
+        return jpaRepository.findByPartnerCode(code).map(TpaPartnerEntity::toDomain);
     }
 
     @Override
-    public List<TpaPartnerEntity> findAllActive() {
-        return jpaRepository.findAllByIsActiveTrueOrderByIdAsc();
+    public List<Partner> findAllActive() {
+        return jpaRepository.findAllByIsActiveTrueOrderByIdAsc()
+                .stream().map(TpaPartnerEntity::toDomain).toList();
     }
 }

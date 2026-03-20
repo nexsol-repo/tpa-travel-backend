@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import lombok.RequiredArgsConstructor;
 
+import com.nexsol.tpa.core.domain.contract.Channel;
 import com.nexsol.tpa.core.domain.repository.ChannelRepository;
 import com.nexsol.tpa.storage.db.core.entity.TpaChannelEntity;
 import com.nexsol.tpa.storage.db.core.repository.JpaChannelRepository;
@@ -18,22 +19,24 @@ public class DefaultChannelRepository implements ChannelRepository {
     private final JpaChannelRepository jpaRepository;
 
     @Override
-    public Optional<TpaChannelEntity> findById(Long id) {
-        return jpaRepository.findById(id);
+    public Optional<Channel> findById(Long id) {
+        return jpaRepository.findById(id).map(TpaChannelEntity::toDomain);
     }
 
     @Override
-    public Optional<TpaChannelEntity> findByChannelCode(String code) {
-        return jpaRepository.findByChannelCode(code);
+    public Optional<Channel> findByChannelCode(String code) {
+        return jpaRepository.findByChannelCode(code).map(TpaChannelEntity::toDomain);
     }
 
     @Override
-    public List<TpaChannelEntity> findAllActive() {
-        return jpaRepository.findAllByIsActiveTrueOrderByIdAsc();
+    public List<Channel> findAllActive() {
+        return jpaRepository.findAllByIsActiveTrueOrderByIdAsc()
+                .stream().map(TpaChannelEntity::toDomain).toList();
     }
 
     @Override
-    public List<TpaChannelEntity> findActiveByPartnerId(Long partnerId) {
-        return jpaRepository.findAllByPartnerIdAndIsActiveTrueOrderByIdAsc(partnerId);
+    public List<Channel> findActiveByPartnerId(Long partnerId) {
+        return jpaRepository.findAllByPartnerIdAndIsActiveTrueOrderByIdAsc(partnerId)
+                .stream().map(TpaChannelEntity::toDomain).toList();
     }
 }

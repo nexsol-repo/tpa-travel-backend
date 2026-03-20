@@ -3,6 +3,8 @@ package com.nexsol.tpa.storage.db.core.entity;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import com.nexsol.tpa.core.domain.contract.InsuredPerson;
+
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -105,5 +107,38 @@ public class TravelInsuredEntity extends BaseEntity {
         this.phone = phone;
         this.email = email;
         this.insurePremium = insurePremium == null ? BigDecimal.ZERO : insurePremium;
+    }
+
+    public InsuredPerson toDomain() {
+        return InsuredPerson.builder()
+                .id(id)
+                .contractId(contractId)
+                .planId(planId)
+                .isContractor(Boolean.TRUE.equals(isContractor))
+                .name(name)
+                .englishName(englishName)
+                .gender(gender)
+                .residentNumber(residentNumber)
+                .passportNumber(passportNumber)
+                .phone(phone)
+                .email(email)
+                .insurePremium(insurePremium)
+                .build();
+    }
+
+    public static TravelInsuredEntity fromDomain(InsuredPerson p) {
+        return TravelInsuredEntity.builder()
+                .contractId(p.contractId())
+                .planId(p.planId())
+                .isContractor(p.isContractor())
+                .name(p.name())
+                .gender(p.gender())
+                .residentNumber(p.residentNumber())
+                .englishName(p.englishName())
+                .passportNumber(p.passportNumber())
+                .phone(p.phone())
+                .email(p.email())
+                .insurePremium(p.insurePremium())
+                .build();
     }
 }

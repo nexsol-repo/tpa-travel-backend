@@ -2,6 +2,8 @@ package com.nexsol.tpa.storage.db.core.entity;
 
 import java.time.LocalDateTime;
 
+import com.nexsol.tpa.core.domain.coverage.InsuranceCoverage;
+
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -65,5 +67,19 @@ public class TravelInsuranceCoverageEntity extends BaseEntity {
         this.claimContent = claimContent;
         this.subTitle = subTitle;
         this.subContent = subContent;
+    }
+
+    public InsuranceCoverage toDomain() {
+        return InsuranceCoverage.builder()
+                .id(id)
+                .insurerId(insurerId)
+                .coverageCode(coverageCode)
+                .coverageName(coverageName)
+                .groupCode(groupCode)
+                .claimReason(claimReason)
+                .claimContent(claimContent)
+                .subTitle(subTitle)
+                .subContent(subContent)
+                .build();
     }
 }

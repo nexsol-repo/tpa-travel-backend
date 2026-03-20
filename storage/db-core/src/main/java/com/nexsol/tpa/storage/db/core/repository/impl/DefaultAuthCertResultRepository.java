@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import lombok.RequiredArgsConstructor;
 
+import com.nexsol.tpa.core.domain.auth.AuthCertResultInfo;
 import com.nexsol.tpa.core.domain.repository.AuthCertResultRepository;
 import com.nexsol.tpa.storage.db.core.entity.TpaAuthCertResultEntity;
 import com.nexsol.tpa.storage.db.core.repository.JpaAuthCertResultRepository;
@@ -17,17 +18,18 @@ public class DefaultAuthCertResultRepository implements AuthCertResultRepository
     private final JpaAuthCertResultRepository jpaRepository;
 
     @Override
-    public TpaAuthCertResultEntity save(TpaAuthCertResultEntity entity) {
-        return jpaRepository.save(entity);
+    public AuthCertResultInfo save(AuthCertResultInfo resultInfo) {
+        TpaAuthCertResultEntity entity = TpaAuthCertResultEntity.fromDomain(resultInfo);
+        return jpaRepository.save(entity).toDomain();
     }
 
     @Override
-    public Optional<TpaAuthCertResultEntity> findByImpUid(String impUid) {
-        return jpaRepository.findByImpUid(impUid);
+    public Optional<AuthCertResultInfo> findByImpUid(String impUid) {
+        return jpaRepository.findByImpUid(impUid).map(TpaAuthCertResultEntity::toDomain);
     }
 
     @Override
-    public Optional<TpaAuthCertResultEntity> findLatestByMoid(String moid) {
-        return jpaRepository.findTop1ByMoidOrderByCreatedAtDesc(moid);
+    public Optional<AuthCertResultInfo> findLatestByMoid(String moid) {
+        return jpaRepository.findTop1ByMoidOrderByCreatedAtDesc(moid).map(TpaAuthCertResultEntity::toDomain);
     }
 }

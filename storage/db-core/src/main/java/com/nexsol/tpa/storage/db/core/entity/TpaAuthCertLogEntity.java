@@ -1,5 +1,7 @@
 package com.nexsol.tpa.storage.db.core.entity;
 
+import com.nexsol.tpa.core.domain.auth.AuthCertLogInfo;
+
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -127,5 +129,37 @@ public class TpaAuthCertLogEntity extends BaseEntity {
         this.userAgent = userAgent;
         this.clientIp = clientIp;
         this.referer = referer;
+    }
+
+    public AuthCertLogInfo toDomain() {
+        return AuthCertLogInfo.builder()
+                .id(id)
+                .contractId(null)
+                .bizNum(bizNum)
+                .impUid(impUid)
+                .requestId(requestId)
+                .pathRoot(pathRoot)
+                .moid(moid)
+                .pg(pg)
+                .provider(provider)
+                .userAgent(userAgent)
+                .clientIp(clientIp)
+                .referer(referer)
+                .build();
+    }
+
+    public static TpaAuthCertLogEntity fromDomain(AuthCertLogInfo info) {
+        return TpaAuthCertLogEntity.builder()
+                .bizNum(info.bizNum())
+                .impUid(info.impUid())
+                .requestId(info.requestId())
+                .pathRoot(info.pathRoot())
+                .moid(info.moid())
+                .pg(info.pg())
+                .provider(info.provider())
+                .userAgent(info.userAgent())
+                .clientIp(info.clientIp())
+                .referer(info.referer())
+                .build();
     }
 }

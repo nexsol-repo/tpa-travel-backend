@@ -2,6 +2,8 @@ package com.nexsol.tpa.storage.db.core.entity;
 
 import java.time.LocalDateTime;
 
+import com.nexsol.tpa.core.domain.contract.Channel;
+
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -59,5 +61,13 @@ public class TpaChannelEntity extends BaseEntity {
         this.channelName = channelName;
         this.isActive = isActive == null ? true : isActive;
         this.serviceType = serviceType;
+    }
+
+    public Channel toDomain() {
+        return Channel.builder()
+                .id(id)
+                .code(channelCode)
+                .name(channelName)
+                .build();
     }
 }

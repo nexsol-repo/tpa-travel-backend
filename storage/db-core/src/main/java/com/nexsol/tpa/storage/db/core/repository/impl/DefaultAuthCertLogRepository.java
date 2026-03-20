@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import lombok.RequiredArgsConstructor;
 
+import com.nexsol.tpa.core.domain.auth.AuthCertLogInfo;
 import com.nexsol.tpa.core.domain.repository.AuthCertLogRepository;
 import com.nexsol.tpa.storage.db.core.entity.TpaAuthCertLogEntity;
 import com.nexsol.tpa.storage.db.core.repository.JpaAuthCertLogRepository;
@@ -17,17 +18,18 @@ public class DefaultAuthCertLogRepository implements AuthCertLogRepository {
     private final JpaAuthCertLogRepository jpaRepository;
 
     @Override
-    public TpaAuthCertLogEntity save(TpaAuthCertLogEntity entity) {
-        return jpaRepository.save(entity);
+    public AuthCertLogInfo save(AuthCertLogInfo logInfo) {
+        TpaAuthCertLogEntity entity = TpaAuthCertLogEntity.fromDomain(logInfo);
+        return jpaRepository.save(entity).toDomain();
     }
 
     @Override
-    public Optional<TpaAuthCertLogEntity> findByImpUid(String impUid) {
-        return jpaRepository.findByImpUid(impUid);
+    public Optional<AuthCertLogInfo> findByImpUid(String impUid) {
+        return jpaRepository.findByImpUid(impUid).map(TpaAuthCertLogEntity::toDomain);
     }
 
     @Override
-    public Optional<TpaAuthCertLogEntity> findByMoid(String moid) {
-        return jpaRepository.findByMoid(moid);
+    public Optional<AuthCertLogInfo> findByMoid(String moid) {
+        return jpaRepository.findByMoid(moid).map(TpaAuthCertLogEntity::toDomain);
     }
 }
