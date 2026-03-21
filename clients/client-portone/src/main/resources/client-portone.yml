@@ -1,0 +1,6 @@
+portone:
+  v1:
+    base-url: ${PORTONE_BASE_URL:https://api.iamport.kr}
+    api-key: ${PORTONE_API_KEY:}
+    api-secret: ${PORTONE_API_SECRET:}
+    timeout-ms: ${PORTONE_TIMEOUT_MS:5000}

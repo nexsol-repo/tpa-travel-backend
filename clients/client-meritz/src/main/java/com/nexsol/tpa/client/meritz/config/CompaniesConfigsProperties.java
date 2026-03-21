@@ -2,8 +2,10 @@ package com.nexsol.tpa.client.meritz.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+import com.nexsol.tpa.core.domain.client.InsuranceConfig;
+
 @ConfigurationProperties(prefix = "companies.configs")
-public class CompaniesConfigsProperties {
+public class CompaniesConfigsProperties implements InsuranceConfig {
 
     private final CompanyConfig tpa;
 
@@ -12,10 +14,6 @@ public class CompaniesConfigsProperties {
     public CompaniesConfigsProperties(CompanyConfig tpa, CompanyConfig insboon) {
         this.tpa = tpa;
         this.insboon = insboon;
-    }
-
-    public CompanyConfig getTpa() {
-        return tpa;
     }
 
     public CompanyConfig getInsboon() {
@@ -30,6 +28,21 @@ public class CompaniesConfigsProperties {
             return insboon;
         }
         throw new IllegalArgumentException("Unknown company: " + company);
+    }
+
+    @Override
+    public CompanyInfo resolveInfo(String company) {
+        CompanyConfig cfg = resolve(company);
+        return new CompanyInfo(cfg.getCompanyCode(), cfg.getPolNo());
+    }
+
+    @Override
+    public CompanyInfo getTpaInfo() {
+        return new CompanyInfo(tpa.getCompanyCode(), tpa.getPolNo());
+    }
+
+    public CompanyConfig getTpa() {
+        return tpa;
     }
 
     public static class CompanyConfig {
