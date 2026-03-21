@@ -4,11 +4,11 @@ import java.util.List;
 
 import org.springframework.stereotype.Repository;
 
-import lombok.RequiredArgsConstructor;
-
 import com.nexsol.tpa.core.domain.plan.PlanFamily;
 import com.nexsol.tpa.core.domain.repository.PlanFamilyRepository;
 import com.nexsol.tpa.storage.db.core.repository.JpaInsurancePlanFamilyRepository;
+
+import lombok.RequiredArgsConstructor;
 
 @Repository
 @RequiredArgsConstructor

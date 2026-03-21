@@ -4,12 +4,12 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
 
-import lombok.RequiredArgsConstructor;
-
 import com.nexsol.tpa.core.domain.coverage.InsuranceCoverage;
 import com.nexsol.tpa.core.domain.repository.InsuranceCoverageRepository;
 import com.nexsol.tpa.storage.db.core.entity.TravelInsuranceCoverageEntity;
 import com.nexsol.tpa.storage.db.core.repository.JpaInsuranceCoverageRepository;
+
+import lombok.RequiredArgsConstructor;
 
 @Repository
 @RequiredArgsConstructor
@@ -20,7 +20,8 @@ public class DefaultInsuranceCoverageRepository implements InsuranceCoverageRepo
     @Override
     public Optional<InsuranceCoverage> findByInsurerIdAndCoverageCode(
             Long insurerId, String coverageCode) {
-        return jpaRepository.findByInsurerIdAndCoverageCodeAndDeletedAtIsNull(
-                insurerId, coverageCode).map(TravelInsuranceCoverageEntity::toDomain);
+        return jpaRepository
+                .findByInsurerIdAndCoverageCodeAndDeletedAtIsNull(insurerId, coverageCode)
+                .map(TravelInsuranceCoverageEntity::toDomain);
     }
 }

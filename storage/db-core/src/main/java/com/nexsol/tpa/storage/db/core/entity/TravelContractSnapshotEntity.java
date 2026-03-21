@@ -71,13 +71,14 @@ public class TravelContractSnapshotEntity {
     }
 
     public static TravelContractSnapshotEntity fromDomain(ContractSnapshot s) {
-        TravelContractSnapshotEntity entity = TravelContractSnapshotEntity.builder()
-                .contractId(s.contractId())
-                .insurerId(s.insurerId())
-                .method(s.method())
-                .snapshotType(s.snapshotType())
-                .jsonSnapshot(s.jsonSnapshot())
-                .build();
+        TravelContractSnapshotEntity entity =
+                TravelContractSnapshotEntity.builder()
+                        .contractId(s.contractId())
+                        .insurerId(s.insurerId())
+                        .method(s.method())
+                        .snapshotType(s.snapshotType())
+                        .jsonSnapshot(s.jsonSnapshot())
+                        .build();
         return entity;
     }
 }

@@ -75,10 +75,6 @@ public class TpaPartnerEntity extends BaseEntity {
     }
 
     public Partner toDomain() {
-        return Partner.builder()
-                .id(id)
-                .code(partnerCode)
-                .name(partnerName)
-                .build();
+        return Partner.builder().id(id).code(partnerCode).name(partnerName).build();
     }
 }

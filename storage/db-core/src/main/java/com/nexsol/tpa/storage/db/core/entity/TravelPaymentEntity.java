@@ -92,9 +92,16 @@ public class TravelPaymentEntity extends BaseEntity {
     public static TravelPaymentEntity fromDomain(Payment p) {
         return TravelPaymentEntity.builder()
                 .contractId(p.contractId())
-                .paymentMethod(p.paymentMethod() != null ? com.nexsol.tpa.core.enums.TravelPaymentMethod.valueOf(p.paymentMethod()) : null)
+                .paymentMethod(
+                        p.paymentMethod() != null
+                                ? com.nexsol.tpa.core.enums.TravelPaymentMethod.valueOf(
+                                        p.paymentMethod())
+                                : null)
                 .paidAmount(p.paidAmount())
-                .status(p.status() != null ? com.nexsol.tpa.core.enums.TravelPaymentStatus.valueOf(p.status()) : null)
+                .status(
+                        p.status() != null
+                                ? com.nexsol.tpa.core.enums.TravelPaymentStatus.valueOf(p.status())
+                                : null)
                 .build();
     }
 }

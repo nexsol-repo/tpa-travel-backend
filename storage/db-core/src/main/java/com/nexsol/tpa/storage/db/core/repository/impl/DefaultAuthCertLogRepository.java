@@ -4,12 +4,12 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
 
-import lombok.RequiredArgsConstructor;
-
 import com.nexsol.tpa.core.domain.auth.AuthCertLogInfo;
 import com.nexsol.tpa.core.domain.repository.AuthCertLogRepository;
 import com.nexsol.tpa.storage.db.core.entity.TpaAuthCertLogEntity;
 import com.nexsol.tpa.storage.db.core.repository.JpaAuthCertLogRepository;
+
+import lombok.RequiredArgsConstructor;
 
 @Repository
 @RequiredArgsConstructor

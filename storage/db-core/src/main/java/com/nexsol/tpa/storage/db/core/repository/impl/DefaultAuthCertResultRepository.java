@@ -4,12 +4,12 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
 
-import lombok.RequiredArgsConstructor;
-
 import com.nexsol.tpa.core.domain.auth.AuthCertResultInfo;
 import com.nexsol.tpa.core.domain.repository.AuthCertResultRepository;
 import com.nexsol.tpa.storage.db.core.entity.TpaAuthCertResultEntity;
 import com.nexsol.tpa.storage.db.core.repository.JpaAuthCertResultRepository;
+
+import lombok.RequiredArgsConstructor;
 
 @Repository
 @RequiredArgsConstructor
@@ -30,6 +30,8 @@ public class DefaultAuthCertResultRepository implements AuthCertResultRepository
 
     @Override
     public Optional<AuthCertResultInfo> findLatestByMoid(String moid) {
-        return jpaRepository.findTop1ByMoidOrderByCreatedAtDesc(moid).map(TpaAuthCertResultEntity::toDomain);
+        return jpaRepository
+                .findTop1ByMoidOrderByCreatedAtDesc(moid)
+                .map(TpaAuthCertResultEntity::toDomain);
     }
 }

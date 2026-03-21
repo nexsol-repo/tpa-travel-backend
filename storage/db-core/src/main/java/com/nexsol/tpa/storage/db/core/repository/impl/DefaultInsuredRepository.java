@@ -6,12 +6,12 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
 
-import lombok.RequiredArgsConstructor;
-
 import com.nexsol.tpa.core.domain.contract.InsuredPerson;
 import com.nexsol.tpa.core.domain.repository.InsuredRepository;
 import com.nexsol.tpa.storage.db.core.entity.TravelInsuredEntity;
 import com.nexsol.tpa.storage.db.core.repository.JpaInsuredRepository;
+
+import lombok.RequiredArgsConstructor;
 
 @Repository
 @RequiredArgsConstructor
@@ -27,20 +27,23 @@ public class DefaultInsuredRepository implements InsuredRepository {
 
     @Override
     public List<InsuredPerson> findByContractId(Long contractId) {
-        return jpaRepository.findByContractIdAndDeletedAtIsNullOrderByIdAsc(contractId)
-                .stream().map(TravelInsuredEntity::toDomain).toList();
+        return jpaRepository.findByContractIdAndDeletedAtIsNullOrderByIdAsc(contractId).stream()
+                .map(TravelInsuredEntity::toDomain)
+                .toList();
     }
 
     @Override
     public Optional<InsuredPerson> findContractorByContractId(Long contractId) {
         return Optional.ofNullable(
-                jpaRepository.findByContractIdAndIsContractorTrueAndDeletedAtIsNull(contractId))
+                        jpaRepository.findByContractIdAndIsContractorTrueAndDeletedAtIsNull(
+                                contractId))
                 .map(TravelInsuredEntity::toDomain);
     }
 
     @Override
     public List<InsuredPerson> findByContractIds(Collection<Long> contractIds) {
-        return jpaRepository.findByContractIds(contractIds)
-                .stream().map(TravelInsuredEntity::toDomain).toList();
+        return jpaRepository.findByContractIds(contractIds).stream()
+                .map(TravelInsuredEntity::toDomain)
+                .toList();
     }
 }

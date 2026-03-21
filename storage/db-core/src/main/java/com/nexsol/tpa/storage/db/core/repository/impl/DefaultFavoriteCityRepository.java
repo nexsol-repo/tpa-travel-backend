@@ -5,12 +5,12 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
 
-import lombok.RequiredArgsConstructor;
-
 import com.nexsol.tpa.core.domain.city.FavoriteCity;
 import com.nexsol.tpa.core.domain.repository.FavoriteCityRepository;
 import com.nexsol.tpa.storage.db.core.entity.FavoriteCityEntity;
 import com.nexsol.tpa.storage.db.core.repository.JpaFavoriteCityRepository;
+
+import lombok.RequiredArgsConstructor;
 
 @Repository
 @RequiredArgsConstructor
@@ -26,8 +26,9 @@ public class DefaultFavoriteCityRepository implements FavoriteCityRepository {
 
     @Override
     public List<FavoriteCity> findAllActive() {
-        return jpaRepository.findByDeletedAtIsNullOrderBySortOrderAsc()
-                .stream().map(FavoriteCityEntity::toDomain).toList();
+        return jpaRepository.findByDeletedAtIsNullOrderBySortOrderAsc().stream()
+                .map(FavoriteCityEntity::toDomain)
+                .toList();
     }
 
     @Override

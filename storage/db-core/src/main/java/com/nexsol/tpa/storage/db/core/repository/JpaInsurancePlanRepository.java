@@ -10,8 +10,7 @@ import org.springframework.data.repository.query.Param;
 import com.nexsol.tpa.storage.db.core.entity.TravelInsurancePlanEntity;
 import com.nexsol.tpa.storage.db.core.repository.projection.PlanFamilyPlanRow;
 
-public interface JpaInsurancePlanRepository
-        extends JpaRepository<TravelInsurancePlanEntity, Long> {
+public interface JpaInsurancePlanRepository extends JpaRepository<TravelInsurancePlanEntity, Long> {
 
     @Query(
             """

@@ -65,10 +65,6 @@ public class TravelInsurerEntity extends BaseEntity {
     }
 
     public Insurer toDomain() {
-        return Insurer.builder()
-                .id(id)
-                .code(insurerCode)
-                .name(insurerName)
-                .build();
+        return Insurer.builder().id(id).code(insurerCode).name(insurerName).build();
     }
 }

@@ -5,12 +5,12 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
 
-import lombok.RequiredArgsConstructor;
-
 import com.nexsol.tpa.core.domain.contract.Channel;
 import com.nexsol.tpa.core.domain.repository.ChannelRepository;
 import com.nexsol.tpa.storage.db.core.entity.TpaChannelEntity;
 import com.nexsol.tpa.storage.db.core.repository.JpaChannelRepository;
+
+import lombok.RequiredArgsConstructor;
 
 @Repository
 @RequiredArgsConstructor
@@ -30,13 +30,15 @@ public class DefaultChannelRepository implements ChannelRepository {
 
     @Override
     public List<Channel> findAllActive() {
-        return jpaRepository.findAllByIsActiveTrueOrderByIdAsc()
-                .stream().map(TpaChannelEntity::toDomain).toList();
+        return jpaRepository.findAllByIsActiveTrueOrderByIdAsc().stream()
+                .map(TpaChannelEntity::toDomain)
+                .toList();
     }
 
     @Override
     public List<Channel> findActiveByPartnerId(Long partnerId) {
-        return jpaRepository.findAllByPartnerIdAndIsActiveTrueOrderByIdAsc(partnerId)
-                .stream().map(TpaChannelEntity::toDomain).toList();
+        return jpaRepository.findAllByPartnerIdAndIsActiveTrueOrderByIdAsc(partnerId).stream()
+                .map(TpaChannelEntity::toDomain)
+                .toList();
     }
 }

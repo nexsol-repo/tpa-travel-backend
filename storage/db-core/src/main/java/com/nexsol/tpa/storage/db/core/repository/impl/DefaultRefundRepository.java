@@ -6,12 +6,12 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
 
-import lombok.RequiredArgsConstructor;
-
 import com.nexsol.tpa.core.domain.refund.Refund;
 import com.nexsol.tpa.core.domain.repository.RefundRepository;
 import com.nexsol.tpa.storage.db.core.entity.TravelRefundEntity;
 import com.nexsol.tpa.storage.db.core.repository.JpaRefundRepository;
+
+import lombok.RequiredArgsConstructor;
 
 @Repository
 @RequiredArgsConstructor
@@ -37,7 +37,8 @@ public class DefaultRefundRepository implements RefundRepository {
 
     @Override
     public List<Refund> findByContractIdIn(Collection<Long> contractIds) {
-        return jpaRepository.findByContractIdIn(contractIds)
-                .stream().map(TravelRefundEntity::toDomain).toList();
+        return jpaRepository.findByContractIdIn(contractIds).stream()
+                .map(TravelRefundEntity::toDomain)
+                .toList();
     }
 }

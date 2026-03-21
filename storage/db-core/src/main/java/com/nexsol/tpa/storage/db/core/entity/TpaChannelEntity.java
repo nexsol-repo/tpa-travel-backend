@@ -64,10 +64,6 @@ public class TpaChannelEntity extends BaseEntity {
     }
 
     public Channel toDomain() {
-        return Channel.builder()
-                .id(id)
-                .code(channelCode)
-                .name(channelName)
-                .build();
+        return Channel.builder().id(id).code(channelCode).name(channelName).build();
     }
 }

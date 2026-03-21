@@ -6,12 +6,12 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
 
-import lombok.RequiredArgsConstructor;
-
 import com.nexsol.tpa.core.domain.payment.Payment;
 import com.nexsol.tpa.core.domain.repository.PaymentRepository;
 import com.nexsol.tpa.storage.db.core.entity.TravelPaymentEntity;
 import com.nexsol.tpa.storage.db.core.repository.JpaPaymentRepository;
+
+import lombok.RequiredArgsConstructor;
 
 @Repository
 @RequiredArgsConstructor
@@ -37,7 +37,8 @@ public class DefaultPaymentRepository implements PaymentRepository {
 
     @Override
     public List<Payment> findByContractIdIn(Collection<Long> contractIds) {
-        return jpaRepository.findByContractIdIn(contractIds)
-                .stream().map(TravelPaymentEntity::toDomain).toList();
+        return jpaRepository.findByContractIdIn(contractIds).stream()
+                .map(TravelPaymentEntity::toDomain)
+                .toList();
     }
 }

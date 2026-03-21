@@ -5,12 +5,12 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
 
-import lombok.RequiredArgsConstructor;
-
 import com.nexsol.tpa.core.domain.contract.Partner;
 import com.nexsol.tpa.core.domain.repository.PartnerRepository;
 import com.nexsol.tpa.storage.db.core.entity.TpaPartnerEntity;
 import com.nexsol.tpa.storage.db.core.repository.JpaPartnerRepository;
+
+import lombok.RequiredArgsConstructor;
 
 @Repository
 @RequiredArgsConstructor
@@ -30,7 +30,8 @@ public class DefaultPartnerRepository implements PartnerRepository {
 
     @Override
     public List<Partner> findAllActive() {
-        return jpaRepository.findAllByIsActiveTrueOrderByIdAsc()
-                .stream().map(TpaPartnerEntity::toDomain).toList();
+        return jpaRepository.findAllByIsActiveTrueOrderByIdAsc().stream()
+                .map(TpaPartnerEntity::toDomain)
+                .toList();
     }
 }

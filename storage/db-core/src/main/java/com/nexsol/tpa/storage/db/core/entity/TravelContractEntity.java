@@ -191,25 +191,28 @@ public class TravelContractEntity extends BaseEntity {
                 .channelName(channelName)
                 .familyId(familyId)
                 .policyNumber(policyNumber)
-                .meritzQuote(MeritzQuote.builder()
-                        .groupNumber(meritzQuoteGroupNumber)
-                        .requestNumber(meritzQuoteRequestNumber)
-                        .build())
+                .meritzQuote(
+                        MeritzQuote.builder()
+                                .groupNumber(meritzQuoteGroupNumber)
+                                .requestNumber(meritzQuoteRequestNumber)
+                                .build())
                 .totalPremium(totalPremium)
                 .policyLink(policyLink)
                 .status(status != null ? status.name() : null)
                 .applyDate(applyDate)
-                .insurePeriod(InsurePeriod.builder()
-                        .startDate(insureStartDate)
-                        .endDate(insureEndDate)
-                        .countryCode(countryCode)
-                        .countryName(countryName)
-                        .build())
-                .auth(AuthInfo.builder()
-                        .uniqueKey(authUniqueKey)
-                        .status(authStatus)
-                        .date(authDate)
-                        .build())
+                .insurePeriod(
+                        InsurePeriod.builder()
+                                .startDate(insureStartDate)
+                                .endDate(insureEndDate)
+                                .countryCode(countryCode)
+                                .countryName(countryName)
+                                .build())
+                .auth(
+                        AuthInfo.builder()
+                                .uniqueKey(authUniqueKey)
+                                .status(authStatus)
+                                .date(authDate)
+                                .build())
                 .marketingConsentUsed(Boolean.TRUE.equals(marketingConsentUsed))
                 .employeeId(employeeId)
                 .build();
@@ -230,7 +233,8 @@ public class TravelContractEntity extends BaseEntity {
             entity.meritzQuoteGroupNumber = info.meritzQuote().groupNumber();
             entity.meritzQuoteRequestNumber = info.meritzQuote().requestNumber();
         }
-        entity.totalPremium = info.totalPremium() != null ? info.totalPremium() : java.math.BigDecimal.ZERO;
+        entity.totalPremium =
+                info.totalPremium() != null ? info.totalPremium() : java.math.BigDecimal.ZERO;
         entity.policyLink = info.policyLink();
         if (info.status() != null) {
             entity.status = com.nexsol.tpa.core.enums.TravelContractStatus.valueOf(info.status());

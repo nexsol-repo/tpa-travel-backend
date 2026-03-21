@@ -4,12 +4,12 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
 
-import lombok.RequiredArgsConstructor;
-
 import com.nexsol.tpa.core.domain.plan.Insurer;
 import com.nexsol.tpa.core.domain.repository.InsurerRepository;
 import com.nexsol.tpa.storage.db.core.entity.TravelInsurerEntity;
 import com.nexsol.tpa.storage.db.core.repository.JpaInsurerRepository;
+
+import lombok.RequiredArgsConstructor;
 
 @Repository
 @RequiredArgsConstructor
