@@ -10,6 +10,7 @@ pluginManagement {
 rootProject.name = 'tpa-travel-api'
 
 include 'core:core-enum'
+include 'core:core-domain'
 include 'core:core-api'
 include 'storage:db-core'
 include 'tests:api-docs'
