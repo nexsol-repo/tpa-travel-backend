@@ -2,6 +2,8 @@ package com.nexsol.tpa.storage.db.core.entity;
 
 import java.time.LocalDateTime;
 
+import com.nexsol.tpa.core.domain.contract.Partner;
+
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -70,5 +72,9 @@ public class TpaPartnerEntity extends BaseEntity {
         this.memo = memo;
         this.serviceType = serviceType;
         this.isActive = isActive == null ? true : isActive;
+    }
+
+    public Partner toDomain() {
+        return Partner.builder().id(id).code(partnerCode).name(partnerName).build();
     }
 }

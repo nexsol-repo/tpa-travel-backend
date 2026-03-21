@@ -1,6 +1,10 @@
 package com.nexsol.tpa.storage.db.core.entity;
 
 import java.time.LocalDateTime;
+import java.util.List;
+
+import com.nexsol.tpa.core.domain.plan.InsurancePlan;
+import com.nexsol.tpa.core.domain.plan.PlanFamily;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -64,5 +68,14 @@ public class TravelInsurancePlanFamilyEntity extends BaseEntity {
         this.sortOrder = sortOrder == null ? 0 : sortOrder;
         this.isActive = isActive == null ? true : isActive;
         this.isLoss = isLoss == null ? false : isLoss;
+    }
+
+    public PlanFamily toDomain(List<InsurancePlan> plans) {
+        return PlanFamily.builder()
+                .familyId(id)
+                .familyName(familyName)
+                .isLoss(Boolean.TRUE.equals(isLoss))
+                .plans(plans)
+                .build();
     }
 }

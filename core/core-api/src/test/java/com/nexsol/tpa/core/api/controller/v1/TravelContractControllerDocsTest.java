@@ -17,8 +17,6 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 
 import com.nexsol.tpa.core.api.controller.v1.response.ContractQueryResponse;
@@ -27,6 +25,7 @@ import com.nexsol.tpa.core.domain.contract.TravelContractQueryService;
 import com.nexsol.tpa.core.domain.payment.Payment;
 import com.nexsol.tpa.core.domain.plan.InsurancePlan;
 import com.nexsol.tpa.core.domain.plan.Insurer;
+import com.nexsol.tpa.core.support.PageResult;
 import com.nexsol.tpa.test.api.RestDocsTest;
 
 @Tag("restdocs")
@@ -63,7 +62,7 @@ class TravelContractControllerDocsTest extends RestDocsTest {
                                         .build())
                         .auth(AuthInfo.builder().build())
                         .contractor(
-                                Contractor.builder()
+                                ContractQueryResponse.Contractor.builder()
                                         .name("홍길동")
                                         .phone("01012345678")
                                         .email("hong@test.com")
@@ -78,7 +77,7 @@ class TravelContractControllerDocsTest extends RestDocsTest {
                         .people(List.of(new PersonSummary(1L, "홍길동")))
                         .build();
 
-        var page = new PageImpl<>(List.of(item), PageRequest.of(0, 20), 1);
+        var page = PageResult.of(List.of(item), 1, 20, 0);
         when(queryService.list(eq("unique_key_abc"), eq(0), eq(20))).thenReturn(page);
 
         mockMvc.perform(
@@ -177,20 +176,11 @@ class TravelContractControllerDocsTest extends RestDocsTest {
             // People
             fieldWithPath("data.content[].people[].id").type(NUMBER).description("피보험자 ID"),
             fieldWithPath("data.content[].people[].name").type(STRING).description("피보험자 이름"),
-            // Page metadata
-            subsectionWithPath("data.pageable").description("페이지 정보"),
+            // PageResult metadata
             fieldWithPath("data.totalElements").type(NUMBER).description("전체 건수"),
             fieldWithPath("data.totalPages").type(NUMBER).description("전체 페이지 수"),
-            fieldWithPath("data.size").type(NUMBER).description("페이지 크기"),
-            fieldWithPath("data.number").type(NUMBER).description("현재 페이지"),
-            fieldWithPath("data.sort").type(OBJECT).description("정렬 정보"),
-            fieldWithPath("data.sort.empty").type(BOOLEAN).description("정렬 비어있음"),
-            fieldWithPath("data.sort.sorted").type(BOOLEAN).description("정렬됨"),
-            fieldWithPath("data.sort.unsorted").type(BOOLEAN).description("미정렬"),
-            fieldWithPath("data.first").type(BOOLEAN).description("첫 페이지 여부"),
-            fieldWithPath("data.last").type(BOOLEAN).description("마지막 페이지 여부"),
-            fieldWithPath("data.numberOfElements").type(NUMBER).description("현재 페이지 건수"),
-            fieldWithPath("data.empty").type(BOOLEAN).description("비어있음"),
+            fieldWithPath("data.currentPage").type(NUMBER).description("현재 페이지"),
+            fieldWithPath("data.hasNext").type(BOOLEAN).description("다음 페이지 존재 여부"),
         };
     }
 
@@ -248,12 +238,6 @@ class TravelContractControllerDocsTest extends RestDocsTest {
                                                 .countryCode("JP")
                                                 .countryName("일본")
                                                 .build())
-                                .contractor(
-                                        Contractor.builder()
-                                                .name("홍길동")
-                                                .phone("01012345678")
-                                                .email("hong@test.com")
-                                                .build())
                                 .auth(AuthInfo.builder().build())
                                 .build())
                 .insurer(Insurer.builder().id(1L).code("MERITZ").name("메리츠화재").build())
@@ -275,14 +259,14 @@ class TravelContractControllerDocsTest extends RestDocsTest {
                                 .build())
                 .people(
                         List.of(
-                                InsuredPerson.builder()
+                                ContractQueryResponse.InsuredPersonView.builder()
                                         .id(1L)
                                         .name("홍길동")
                                         .gender("1")
                                         .isContractor(true)
                                         .residentNumberMasked("900101-*******")
                                         .build(),
-                                InsuredPerson.builder()
+                                ContractQueryResponse.InsuredPersonView.builder()
                                         .id(2L)
                                         .name("김영희")
                                         .gender("2")

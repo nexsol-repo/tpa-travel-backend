@@ -1,7 +1,5 @@
 package com.nexsol.tpa.client.meritz.quote;
 
-import java.util.List;
-
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -10,6 +8,7 @@ import com.nexsol.tpa.client.meritz.bridge.dto.MeritzBridgeApiResponse;
 import com.nexsol.tpa.client.meritz.config.CompaniesConfigsProperties;
 import com.nexsol.tpa.client.meritz.config.CompaniesConfigsProperties.CompanyConfig;
 import com.nexsol.tpa.client.meritz.dto.quote.MeritzHndyPremCmptBody;
+import com.nexsol.tpa.core.domain.client.InsuranceQuoteClient;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class MeritzQuoteClient {
+public class MeritzQuoteClient implements InsuranceQuoteClient {
 
     private final MeritzBridgeFeignClient bridgeClient;
     private final CompaniesConfigsProperties companies;
@@ -26,8 +25,9 @@ public class MeritzQuoteClient {
     /**
      * 보험료 산출 API 호출. 성공 시 raw JSON 문자열 반환, 실패 시 null 반환.
      */
-    public String calculatePremium(PremiumRequest request) {
-        CompanyConfig cfg = companies.resolve(request.company());
+    @Override
+    public String calculatePremium(PremiumCommand command) {
+        CompanyConfig cfg = companies.resolve(command.company());
 
         MeritzHndyPremCmptBody body =
                 new MeritzHndyPremCmptBody(
@@ -36,14 +36,14 @@ public class MeritzQuoteClient {
                         cfg.getAflcoDivCd(),
                         cfg.getBizpeNo(),
                         cfg.getPolNo(),
-                        request.productCode(),
-                        request.unitProductCode(),
-                        request.sbcpDt(),
-                        request.insBgnDt(),
-                        request.insEdDt(),
-                        request.trvArCd(),
-                        request.insuredList().size(),
-                        request.insuredList().stream()
+                        command.productCode(),
+                        command.unitProductCode(),
+                        command.sbcpDt(),
+                        command.insBgnDt(),
+                        command.insEdDt(),
+                        command.trvArCd(),
+                        command.insuredList().size(),
+                        command.insuredList().stream()
                                 .map(
                                         i ->
                                                 new MeritzHndyPremCmptBody.Insured(
@@ -75,24 +75,5 @@ public class MeritzQuoteClient {
             log.error("[QUOTE] 응답 파싱 실패", e);
             return null;
         }
-    }
-
-    public record PremiumRequest(
-            String company,
-            String productCode,
-            String unitProductCode,
-            String sbcpDt,
-            String insBgnDt,
-            String insEdDt,
-            String trvArCd,
-            List<InsuredPerson> insuredList) {
-
-        public record InsuredPerson(
-                String planGroupCode,
-                String planCode,
-                String birth,
-                String gender,
-                String name,
-                String nameEng) {}
     }
 }

@@ -2,6 +2,8 @@ package com.nexsol.tpa.storage.db.core.entity;
 
 import java.time.LocalDateTime;
 
+import com.nexsol.tpa.core.domain.snapshot.ContractSnapshot;
+
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -54,5 +56,29 @@ public class TravelContractSnapshotEntity {
 
     public void updateSnapshot(String jsonSnapshot) {
         this.jsonSnapshot = jsonSnapshot;
+    }
+
+    public ContractSnapshot toDomain() {
+        return ContractSnapshot.builder()
+                .id(id)
+                .contractId(contractId)
+                .insurerId(insurerId)
+                .method(method)
+                .snapshotType(snapshotType)
+                .jsonSnapshot(jsonSnapshot)
+                .createdAt(createdAt)
+                .build();
+    }
+
+    public static TravelContractSnapshotEntity fromDomain(ContractSnapshot s) {
+        TravelContractSnapshotEntity entity =
+                TravelContractSnapshotEntity.builder()
+                        .contractId(s.contractId())
+                        .insurerId(s.insurerId())
+                        .method(s.method())
+                        .snapshotType(s.snapshotType())
+                        .jsonSnapshot(s.jsonSnapshot())
+                        .build();
+        return entity;
     }
 }

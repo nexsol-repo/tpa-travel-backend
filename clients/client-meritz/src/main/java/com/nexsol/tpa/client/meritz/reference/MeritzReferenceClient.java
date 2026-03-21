@@ -9,6 +9,8 @@ import com.nexsol.tpa.client.meritz.bridge.MeritzBridgeFeignClient;
 import com.nexsol.tpa.client.meritz.bridge.dto.MeritzBridgeApiResponse;
 import com.nexsol.tpa.client.meritz.config.CompaniesConfigsProperties;
 import com.nexsol.tpa.client.meritz.config.CompaniesConfigsProperties.CompanyConfig;
+import com.nexsol.tpa.core.domain.client.InsuranceContractClient.BridgeApiResult;
+import com.nexsol.tpa.core.domain.client.InsuranceReferenceClient;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,12 +18,13 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class MeritzReferenceClient {
+public class MeritzReferenceClient implements InsuranceReferenceClient {
 
     private final MeritzBridgeFeignClient bridgeClient;
     private final CompaniesConfigsProperties companies;
 
-    public MeritzBridgeApiResponse getPlans(String stdDt) {
+    @Override
+    public BridgeApiResult getPlans(String stdDt) {
         CompanyConfig cfg = companies.getTpa();
 
         Map<String, Object> body = new LinkedHashMap<>();
@@ -34,10 +37,11 @@ public class MeritzReferenceClient {
 
         MeritzBridgeApiResponse res = bridgeClient.planInquiry(body);
         log.info("[REFERENCE][PLAN_INQUIRY] success={}, errCd={}", res.isSuccess(), res.getErrCd());
-        return res;
+        return new BridgeApiResult(res.isSuccess(), res.getErrCd(), res.getErrMsg(), res.getData());
     }
 
-    public MeritzBridgeApiResponse getCityNationCodes(String keyword, String type) {
+    @Override
+    public BridgeApiResult getCityNationCodes(String keyword, String type) {
         CompanyConfig cfg = companies.getTpa();
 
         Map<String, Object> body = new LinkedHashMap<>();
@@ -50,6 +54,6 @@ public class MeritzReferenceClient {
 
         MeritzBridgeApiResponse res = bridgeClient.cityCountryCode(body);
         log.info("[REFERENCE][CITY_NATION] success={}, errCd={}", res.isSuccess(), res.getErrCd());
-        return res;
+        return new BridgeApiResult(res.isSuccess(), res.getErrCd(), res.getErrMsg(), res.getData());
     }
 }

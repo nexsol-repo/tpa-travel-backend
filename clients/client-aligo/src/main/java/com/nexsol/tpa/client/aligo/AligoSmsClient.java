@@ -1,10 +1,8 @@
 package com.nexsol.tpa.client.aligo;
 
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import lombok.RequiredArgsConstructor;
 
@@ -12,20 +10,10 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AligoSmsClient {
 
-    private static final String SEND_URL = "https://apis.aligo.in/send/";
-
-    private final @org.springframework.beans.factory.annotation.Qualifier("aligoWebClient")
-    WebClient webClient;
+    private final AligoSmsFeign aligoSmsFeign;
 
     public String send(MultiValueMap<String, String> form) {
-        return webClient
-                .post()
-                .uri(SEND_URL)
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .bodyValue(form)
-                .retrieve()
-                .bodyToMono(String.class)
-                .block();
+        return aligoSmsFeign.send(form);
     }
 
     public static MultiValueMap<String, String> form() {

@@ -21,7 +21,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 
-import com.nexsol.tpa.client.meritz.bridge.dto.MeritzBridgeApiResponse;
 import com.nexsol.tpa.core.api.controller.v1.request.ContractInquiryRequest;
 import com.nexsol.tpa.core.api.controller.v1.request.ContractListRequest;
 import com.nexsol.tpa.core.domain.apply.ApplyService;
@@ -29,6 +28,7 @@ import com.nexsol.tpa.core.domain.apply.ContractApply;
 import com.nexsol.tpa.core.domain.cancel.CancelService;
 import com.nexsol.tpa.core.domain.certificate.CertificateCommand;
 import com.nexsol.tpa.core.domain.certificate.CertificateService;
+import com.nexsol.tpa.core.domain.client.InsuranceContractClient.BridgeApiResult;
 import com.nexsol.tpa.core.domain.inquiry.InquiryService;
 import com.nexsol.tpa.core.domain.refund.ContractRefund;
 import com.nexsol.tpa.core.domain.subscription.SubscriptionCommand;
@@ -62,14 +62,16 @@ class MeritzContractControllerDocsTest extends RestDocsTest {
 
     @Test
     void contractList() throws Exception {
-        var response = new MeritzBridgeApiResponse();
-        response.setSuccess(true);
-        response.setData(
-                List.of(
-                        Map.of(
-                                "polNo", "POL001",
-                                "ctrStDt", "20260301",
-                                "ctrEdDt", "20260310")));
+        var response =
+                new BridgeApiResult(
+                        true,
+                        null,
+                        null,
+                        List.of(
+                                Map.of(
+                                        "polNo", "POL001",
+                                        "ctrStDt", "20260301",
+                                        "ctrEdDt", "20260310")));
 
         when(inquiryService.contractList(eq("TPA"), any(ContractListRequest.class)))
                 .thenReturn(response);
@@ -102,9 +104,8 @@ class MeritzContractControllerDocsTest extends RestDocsTest {
 
     @Test
     void contractInquiry() throws Exception {
-        var response = new MeritzBridgeApiResponse();
-        response.setSuccess(true);
-        response.setData(Map.of("polNo", "POL001", "ctrNo", "CTR001"));
+        var response =
+                new BridgeApiResult(true, null, null, Map.of("polNo", "POL001", "ctrNo", "CTR001"));
 
         when(inquiryService.contractDetail(eq("TPA"), any(ContractInquiryRequest.class)))
                 .thenReturn(response);
@@ -136,9 +137,9 @@ class MeritzContractControllerDocsTest extends RestDocsTest {
 
     @Test
     void joinCertificate() throws Exception {
-        var response = new MeritzBridgeApiResponse();
-        response.setSuccess(true);
-        response.setData(Map.of("rltLinkUrl", "https://example.com/cert"));
+        var response =
+                new BridgeApiResult(
+                        true, null, null, Map.of("rltLinkUrl", "https://example.com/cert"));
 
         when(certificateService.issue(eq("TPA"), any(CertificateCommand.class)))
                 .thenReturn(response);

@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import com.nexsol.tpa.core.domain.contract.*;
 import com.nexsol.tpa.core.enums.TravelContractStatus;
 
 import jakarta.persistence.*;
@@ -177,5 +178,80 @@ public class TravelContractEntity extends BaseEntity {
         this.authUniqueKey = uniqueKey;
         this.authStatus = status;
         this.authDate = LocalDateTime.now();
+    }
+
+    public ContractInfo toDomain() {
+        return ContractInfo.builder()
+                .id(id)
+                .insurerId(insurerId)
+                .insurerName(insurerName)
+                .partnerId(partnerId)
+                .partnerName(partnerName)
+                .channelId(channelId)
+                .channelName(channelName)
+                .familyId(familyId)
+                .policyNumber(policyNumber)
+                .meritzQuote(
+                        MeritzQuote.builder()
+                                .groupNumber(meritzQuoteGroupNumber)
+                                .requestNumber(meritzQuoteRequestNumber)
+                                .build())
+                .totalPremium(totalPremium)
+                .policyLink(policyLink)
+                .status(status != null ? status.name() : null)
+                .applyDate(applyDate)
+                .insurePeriod(
+                        InsurePeriod.builder()
+                                .startDate(insureStartDate)
+                                .endDate(insureEndDate)
+                                .countryCode(countryCode)
+                                .countryName(countryName)
+                                .build())
+                .auth(
+                        AuthInfo.builder()
+                                .uniqueKey(authUniqueKey)
+                                .status(authStatus)
+                                .date(authDate)
+                                .build())
+                .marketingConsentUsed(Boolean.TRUE.equals(marketingConsentUsed))
+                .employeeId(employeeId)
+                .build();
+    }
+
+    public static TravelContractEntity fromDomain(ContractInfo info) {
+        TravelContractEntity entity = new TravelContractEntity();
+        entity.id = info.id();
+        entity.insurerId = info.insurerId();
+        entity.insurerName = info.insurerName();
+        entity.partnerId = info.partnerId();
+        entity.partnerName = info.partnerName();
+        entity.channelId = info.channelId();
+        entity.channelName = info.channelName();
+        entity.familyId = info.familyId();
+        entity.policyNumber = info.policyNumber();
+        if (info.meritzQuote() != null) {
+            entity.meritzQuoteGroupNumber = info.meritzQuote().groupNumber();
+            entity.meritzQuoteRequestNumber = info.meritzQuote().requestNumber();
+        }
+        entity.totalPremium =
+                info.totalPremium() != null ? info.totalPremium() : java.math.BigDecimal.ZERO;
+        entity.policyLink = info.policyLink();
+        if (info.status() != null) {
+            entity.status = com.nexsol.tpa.core.enums.TravelContractStatus.valueOf(info.status());
+        }
+        if (info.insurePeriod() != null) {
+            entity.insureStartDate = info.insurePeriod().startDate();
+            entity.insureEndDate = info.insurePeriod().endDate();
+            entity.countryCode = info.insurePeriod().countryCode();
+            entity.countryName = info.insurePeriod().countryName();
+        }
+        if (info.auth() != null) {
+            entity.authUniqueKey = info.auth().uniqueKey();
+            entity.authStatus = info.auth().status();
+            entity.authDate = info.auth().date();
+        }
+        entity.marketingConsentUsed = info.marketingConsentUsed();
+        entity.employeeId = info.employeeId();
+        return entity;
     }
 }

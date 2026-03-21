@@ -3,9 +3,11 @@ plugins {
 }
 
 dependencies {
+    implementation project(':core:core-domain')
     implementation "org.springframework.boot:spring-boot-autoconfigure"
     implementation "org.springframework.boot:spring-boot"
-    implementation "org.springframework.boot:spring-boot-starter-webflux"
+    implementation "org.springframework:spring-web"
+    implementation "org.springframework.cloud:spring-cloud-starter-openfeign"
     implementation "org.springframework.boot:spring-boot-starter-validation"
 
     annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"

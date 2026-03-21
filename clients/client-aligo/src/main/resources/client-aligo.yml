@@ -1,0 +1,4 @@
+aligo:
+  api-key: ${ALIGO_API_KEY:}
+  user-id: ${ALIGO_USER_ID:}
+  sender: ${ALIGO_SENDER:}

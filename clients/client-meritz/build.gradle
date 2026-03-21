@@ -3,6 +3,7 @@ plugins {
 }
 
 dependencies {
+    implementation project(':core:core-domain')
     implementation "org.springframework.boot:spring-boot-autoconfigure"
     implementation "org.springframework.boot:spring-boot"
     implementation "org.springframework:spring-web"

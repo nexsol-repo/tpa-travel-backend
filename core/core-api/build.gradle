@@ -3,16 +3,18 @@ jar.enabled = false
 
 dependencies {
     implementation project(":core:core-enum")
+    implementation project(":core:core-domain")
     implementation project(":support:monitoring")
     implementation project(":support:logging")
-    implementation project(":storage:db-core")
 
+    runtimeOnly project(":storage:db-core")
+
+    // TODO: client 인터페이스 분리 후 runtimeOnly로 변경
     implementation project(":clients:client-meritz")
     implementation project(":clients:client-aligo")
     implementation project(":clients:client-portone")
 
-    implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("org.springframework.boot:spring-boot-starter-webflux")
+    implementation ("org.springframework.boot:spring-boot-starter-webmvc")
 
     testImplementation project(":tests:api-docs")
 

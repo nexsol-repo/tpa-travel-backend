@@ -3,6 +3,7 @@ package com.nexsol.tpa.storage.db.core.entity;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import com.nexsol.tpa.core.domain.payment.Payment;
 import com.nexsol.tpa.core.enums.TravelPaymentMethod;
 import com.nexsol.tpa.core.enums.TravelPaymentStatus;
 
@@ -74,5 +75,33 @@ public class TravelPaymentEntity extends BaseEntity {
     public void markCanceled(LocalDateTime canceledAt) {
         this.status = TravelPaymentStatus.CANCELED;
         this.cancelDate = canceledAt == null ? LocalDateTime.now() : canceledAt;
+    }
+
+    public Payment toDomain() {
+        return Payment.builder()
+                .id(id)
+                .contractId(contractId)
+                .paymentMethod(paymentMethod != null ? paymentMethod.name() : null)
+                .status(status != null ? status.name() : null)
+                .paidAmount(paidAmount)
+                .paymentDate(paymentDate)
+                .cancelDate(cancelDate)
+                .build();
+    }
+
+    public static TravelPaymentEntity fromDomain(Payment p) {
+        return TravelPaymentEntity.builder()
+                .contractId(p.contractId())
+                .paymentMethod(
+                        p.paymentMethod() != null
+                                ? com.nexsol.tpa.core.enums.TravelPaymentMethod.valueOf(
+                                        p.paymentMethod())
+                                : null)
+                .paidAmount(p.paidAmount())
+                .status(
+                        p.status() != null
+                                ? com.nexsol.tpa.core.enums.TravelPaymentStatus.valueOf(p.status())
+                                : null)
+                .build();
     }
 }

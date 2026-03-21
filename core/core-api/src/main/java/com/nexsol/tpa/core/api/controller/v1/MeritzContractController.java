@@ -2,7 +2,6 @@ package com.nexsol.tpa.core.api.controller.v1;
 
 import org.springframework.web.bind.annotation.*;
 
-import com.nexsol.tpa.client.meritz.bridge.dto.MeritzBridgeApiResponse;
 import com.nexsol.tpa.core.api.controller.v1.request.ContractApplyRequest;
 import com.nexsol.tpa.core.api.controller.v1.request.ContractCancelRequest;
 import com.nexsol.tpa.core.api.controller.v1.request.ContractCompletedRequest;
@@ -13,6 +12,7 @@ import com.nexsol.tpa.core.api.controller.v1.response.ContractCompletedResponse;
 import com.nexsol.tpa.core.domain.apply.ApplyService;
 import com.nexsol.tpa.core.domain.cancel.CancelService;
 import com.nexsol.tpa.core.domain.certificate.CertificateService;
+import com.nexsol.tpa.core.domain.client.InsuranceContractClient.BridgeApiResult;
 import com.nexsol.tpa.core.domain.inquiry.InquiryService;
 import com.nexsol.tpa.core.domain.subscription.SubscriptionService;
 import com.nexsol.tpa.core.support.response.ApiResponse;
@@ -32,7 +32,7 @@ public class MeritzContractController {
 
     /** 계약 목록 조회 (Meritz: /ctrLstInq) */
     @GetMapping("/contracts/list")
-    public MeritzBridgeApiResponse contractList(
+    public BridgeApiResult contractList(
             @RequestParam(defaultValue = "TPA") String company,
             @RequestBody ContractListRequest request) {
         return inquiryService.contractList(company, request);
@@ -40,7 +40,7 @@ public class MeritzContractController {
 
     /** 계약 조회 (Meritz: /trvCtrInq) */
     @PostMapping("/contracts/inquiry")
-    public MeritzBridgeApiResponse contractInquiry(
+    public BridgeApiResult contractInquiry(
             @RequestParam(defaultValue = "TPA") String company,
             @RequestBody ContractInquiryRequest request) {
         return inquiryService.contractDetail(company, request);
@@ -48,7 +48,7 @@ public class MeritzContractController {
 
     /** 가입증명서 출력 */
     @PostMapping("/contracts/certificate")
-    public MeritzBridgeApiResponse joinCertificate(
+    public BridgeApiResult joinCertificate(
             @RequestParam(defaultValue = "TPA") String company,
             @RequestBody MeritzCertRequest request) {
         return certificateService.issue(company, request.toCertificateCommand());
