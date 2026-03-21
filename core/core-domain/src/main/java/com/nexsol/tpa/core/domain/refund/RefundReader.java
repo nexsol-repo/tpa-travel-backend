@@ -3,8 +3,8 @@ package com.nexsol.tpa.core.domain.refund;
 import org.springframework.stereotype.Component;
 
 import com.nexsol.tpa.core.domain.repository.RefundRepository;
-import com.nexsol.tpa.core.error.CoreException;
 import com.nexsol.tpa.core.error.CoreErrorType;
+import com.nexsol.tpa.core.error.CoreException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -18,17 +18,19 @@ public class RefundReader {
         return refundRepository
                 .findByContractId(contractId)
                 .orElseThrow(
-                        () -> new CoreException(
-                                CoreErrorType.NOT_FOUND_DATA,
-                                "refund not found. contractId=" + contractId));
+                        () ->
+                                new CoreException(
+                                        CoreErrorType.NOT_FOUND_DATA,
+                                        "refund not found. contractId=" + contractId));
     }
 
     public Refund getByPaymentId(Long paymentId) {
         return refundRepository
                 .findByPaymentId(paymentId)
                 .orElseThrow(
-                        () -> new CoreException(
-                                CoreErrorType.NOT_FOUND_DATA,
-                                "refund not found. paymentId=" + paymentId));
+                        () ->
+                                new CoreException(
+                                        CoreErrorType.NOT_FOUND_DATA,
+                                        "refund not found. paymentId=" + paymentId));
     }
 }

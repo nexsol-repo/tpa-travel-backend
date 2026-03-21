@@ -24,11 +24,7 @@ public class CancelWriter {
     private final SnapshotAppender snapshotAppender;
     private final ObjectMapper objectMapper;
 
-
-    public void save(
-            ContractInfo contract,
-            Payment payment,
-            ContractRefund contractRefund) {
+    public void save(ContractInfo contract, Payment payment, ContractRefund contractRefund) {
 
         paymentWriter.markCanceled(payment);
 
@@ -43,8 +39,7 @@ public class CancelWriter {
                         contractRefund.depositorName(),
                         contractRefund.refundReason()));
 
-        snapshotAppender.append(
-                contract.id(), contract.insurerId(), "CANCEL", toJson("CANCELED"));
+        snapshotAppender.append(contract.id(), contract.insurerId(), "CANCEL", toJson("CANCELED"));
     }
 
     private String toJson(Object obj) {

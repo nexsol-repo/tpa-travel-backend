@@ -2,7 +2,8 @@ package com.nexsol.tpa.core.domain.auth;
 
 import org.springframework.stereotype.Component;
 
-import com.nexsol.tpa.client.portone.PortOneClient;
+import com.nexsol.tpa.core.domain.client.CertificationClient;
+import com.nexsol.tpa.core.domain.client.CertificationClient.CertificationResult;
 
 import lombok.RequiredArgsConstructor;
 
@@ -10,9 +11,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class PortOneCertificationReader {
 
-    private final PortOneClient portOneClient;
+    private final CertificationClient certificationClient;
 
-    public PortOneClient.CertificationResponse getCertification(String impUid) {
-        return portOneClient.getCertification(impUid);
+    public CertificationResult getCertification(String impUid) {
+        return certificationClient.getCertification(impUid);
     }
 }

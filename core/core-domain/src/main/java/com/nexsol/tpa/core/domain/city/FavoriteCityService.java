@@ -5,8 +5,8 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.nexsol.tpa.core.domain.repository.FavoriteCityRepository;
-import com.nexsol.tpa.core.error.CoreException;
 import com.nexsol.tpa.core.error.CoreErrorType;
+import com.nexsol.tpa.core.error.CoreException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -40,8 +40,10 @@ public class FavoriteCityService {
     public FavoriteCity getFavoriteCity(Long id) {
         return favoriteCityRepository
                 .findActiveById(id)
-                .orElseThrow(() -> new CoreException(
-                        CoreErrorType.NOT_FOUND_DATA,
-                        "자주가는 도시 정보가 없습니다. id=" + id));
+                .orElseThrow(
+                        () ->
+                                new CoreException(
+                                        CoreErrorType.NOT_FOUND_DATA,
+                                        "자주가는 도시 정보가 없습니다. id=" + id));
     }
 }

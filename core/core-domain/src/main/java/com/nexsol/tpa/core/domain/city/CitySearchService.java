@@ -5,8 +5,8 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.nexsol.tpa.client.meritz.bridge.dto.MeritzBridgeApiResponse;
-import com.nexsol.tpa.client.meritz.reference.MeritzReferenceClient;
+import com.nexsol.tpa.core.domain.client.InsuranceContractClient.BridgeApiResult;
+import com.nexsol.tpa.core.domain.client.InsuranceReferenceClient;
 import com.nexsol.tpa.core.error.CoreErrorType;
 import com.nexsol.tpa.core.error.CoreException;
 
@@ -24,19 +24,19 @@ import tools.jackson.databind.ObjectMapper;
 @RequiredArgsConstructor
 public class CitySearchService {
 
-    private final MeritzReferenceClient referenceClient;
+    private final InsuranceReferenceClient referenceClient;
     private final ObjectMapper objectMapper;
 
     public List<CityInfo> search(String keyword, String type) {
-        MeritzBridgeApiResponse res = referenceClient.getCityNationCodes(keyword, type);
+        BridgeApiResult res = referenceClient.getCityNationCodes(keyword, type);
 
-        if (!res.isSuccess()) {
+        if (!res.success()) {
             throw new CoreException(
                     CoreErrorType.REFERENCE_API_FAILED,
-                    "도시코드조회 실패. errCd=" + res.getErrCd() + ", errMsg=" + res.getErrMsg());
+                    "도시코드조회 실패. errCd=" + res.errCd() + ", errMsg=" + res.errMsg());
         }
 
-        return parseCityList(res.getData());
+        return parseCityList(res.data());
     }
 
     private List<CityInfo> parseCityList(Object data) {

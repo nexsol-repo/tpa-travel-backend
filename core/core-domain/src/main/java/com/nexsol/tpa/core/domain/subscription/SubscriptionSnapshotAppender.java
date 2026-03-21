@@ -23,8 +23,7 @@ public class SubscriptionSnapshotAppender {
     }
 
     public void appendSuccess(ContractInfo contract, Object rawData) {
-        snapshotAppender.append(
-                contract.id(), contract.insurerId(), "PAYMENT", toJson(rawData));
+        snapshotAppender.append(contract.id(), contract.insurerId(), "PAYMENT", toJson(rawData));
     }
 
     private String toJson(Object obj) {

@@ -35,17 +35,30 @@ public class ContractUpdater {
     }
 
     public ContractInfo updateMeritzResult(
-            ContractInfo contract, BigDecimal ttPrem, String polNo, String quotGrpNo, String quotReqNo) {
+            ContractInfo contract,
+            BigDecimal ttPrem,
+            String polNo,
+            String quotGrpNo,
+            String quotReqNo) {
         var builder = copyWith(contract);
         if (ttPrem != null) builder.totalPremium(ttPrem);
         if (polNo != null && !polNo.isBlank()) builder.policyNumber(polNo);
         if (quotGrpNo != null || quotReqNo != null) {
-            builder.meritzQuote(MeritzQuote.builder()
-                    .groupNumber(quotGrpNo != null && !quotGrpNo.isBlank()
-                            ? quotGrpNo : contract.meritzQuote() != null ? contract.meritzQuote().groupNumber() : null)
-                    .requestNumber(quotReqNo != null && !quotReqNo.isBlank()
-                            ? quotReqNo : contract.meritzQuote() != null ? contract.meritzQuote().requestNumber() : null)
-                    .build());
+            builder.meritzQuote(
+                    MeritzQuote.builder()
+                            .groupNumber(
+                                    quotGrpNo != null && !quotGrpNo.isBlank()
+                                            ? quotGrpNo
+                                            : contract.meritzQuote() != null
+                                                    ? contract.meritzQuote().groupNumber()
+                                                    : null)
+                            .requestNumber(
+                                    quotReqNo != null && !quotReqNo.isBlank()
+                                            ? quotReqNo
+                                            : contract.meritzQuote() != null
+                                                    ? contract.meritzQuote().requestNumber()
+                                                    : null)
+                            .build());
         }
         return builder.build();
     }
@@ -56,13 +69,14 @@ public class ContractUpdater {
     }
 
     public ContractInfo updateAuth(
-            ContractInfo contract, String provider, String impUid, String requestId,
-            String uniqueKey, String status) {
+            ContractInfo contract,
+            String provider,
+            String impUid,
+            String requestId,
+            String uniqueKey,
+            String status) {
         return copyWith(contract)
-                .auth(AuthInfo.builder()
-                        .uniqueKey(uniqueKey)
-                        .status(status)
-                        .build())
+                .auth(AuthInfo.builder().uniqueKey(uniqueKey).status(status).build())
                 .build();
     }
 

@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
-import com.nexsol.tpa.client.meritz.contract.MeritzContractClient.EstimateSaveRequest;
+import com.nexsol.tpa.core.domain.client.InsuranceContractClient.EstimateSaveCommand.InsuredPersonCommand;
 import com.nexsol.tpa.core.domain.contract.ContractPeopleFinder;
 import com.nexsol.tpa.core.domain.contract.InsuredPerson;
 import com.nexsol.tpa.core.domain.contract.ResidentNumberParser;
@@ -23,7 +23,7 @@ public class SubscriptionInsuredReader {
     private final ContractPeopleFinder contractPeopleFinder;
     private final PlanReader planReader;
 
-    public List<EstimateSaveRequest.InsuredPerson> findEstimateSaveInsuredPeople(Long contractId) {
+    public List<InsuredPersonCommand> findEstimateSaveInsuredPeople(Long contractId) {
         List<InsuredPerson> people = contractPeopleFinder.findByContractId(contractId);
 
         Map<Long, InsurancePlan> planCache =
@@ -37,9 +37,8 @@ public class SubscriptionInsuredReader {
                 .map(
                         person -> {
                             InsurancePlan plan = planCache.get(person.planId());
-                            return new EstimateSaveRequest.InsuredPerson(
-                                    ResidentNumberParser.extractBirthYmd(
-                                            person.residentNumber()),
+                            return new InsuredPersonCommand(
+                                    ResidentNumberParser.extractBirthYmd(person.residentNumber()),
                                     ResidentNumberParser.normalizeGenderToMeritz(
                                             person.gender(), person.residentNumber()),
                                     person.name(),

@@ -26,6 +26,9 @@ public class ContractFinder {
     public ContractInfo findById(Long id) {
         return contractRepository
                 .findById(id)
-                .orElseThrow(() -> new CoreException(CoreErrorType.NOT_FOUND_DATA, "contract not found: " + id));
+                .orElseThrow(
+                        () ->
+                                new CoreException(
+                                        CoreErrorType.NOT_FOUND_DATA, "contract not found: " + id));
     }
 }

@@ -6,7 +6,6 @@ import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
-import com.nexsol.tpa.core.domain.plan.PlanFamily;
 import com.nexsol.tpa.core.domain.premium.PlanCondition;
 import com.nexsol.tpa.core.error.CoreErrorType;
 import com.nexsol.tpa.core.error.CoreException;
@@ -99,12 +98,10 @@ public class TravelPlanService {
 
     private void validateQuoteCommand(PlanCondition cmd) {
         if (cmd.insuredList() == null || cmd.insuredList().isEmpty()) {
-            throw new CoreException(
-                    CoreErrorType.INVALID_QUOTE_REQUEST, "insuredList is empty");
+            throw new CoreException(CoreErrorType.INVALID_QUOTE_REQUEST, "insuredList is empty");
         }
         if (cmd.insurerId() == null) {
-            throw new CoreException(
-                    CoreErrorType.INVALID_QUOTE_REQUEST, "insurerId is required");
+            throw new CoreException(CoreErrorType.INVALID_QUOTE_REQUEST, "insurerId is required");
         }
         int repIdx = cmd.representativeIndex() == null ? 0 : cmd.representativeIndex();
         if (repIdx < 0 || repIdx >= cmd.insuredList().size()) {

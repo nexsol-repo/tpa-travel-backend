@@ -4,8 +4,8 @@ import java.util.*;
 
 import org.springframework.stereotype.Service;
 
-import com.nexsol.tpa.client.meritz.quote.MeritzQuoteClient;
-import com.nexsol.tpa.client.meritz.quote.MeritzQuoteClient.PremiumRequest;
+import com.nexsol.tpa.core.domain.client.InsuranceQuoteClient;
+import com.nexsol.tpa.core.domain.client.InsuranceQuoteClient.PremiumCommand;
 import com.nexsol.tpa.core.domain.plan.PlanFamily;
 import com.nexsol.tpa.core.error.CoreErrorType;
 import com.nexsol.tpa.core.error.CoreException;
@@ -24,7 +24,7 @@ import tools.jackson.databind.ObjectMapper;
 @RequiredArgsConstructor
 public class PremiumService {
 
-    private final MeritzQuoteClient quoteClient;
+    private final InsuranceQuoteClient quoteClient;
     private final QuoteInsuredAssembler quoteAssembler;
     private final QuoteResultComposer quoteResultComposer;
     private final ObjectMapper objectMapper;
@@ -46,8 +46,7 @@ public class PremiumService {
                         family.repPlan().planCode());
                 continue;
             }
-            results.put(
-                    family.repPlan().id(), quoteResultComposer.compose(rawData, cmd, repIdx));
+            results.put(family.repPlan().id(), quoteResultComposer.compose(rawData, cmd, repIdx));
         }
         return results;
     }
@@ -69,7 +68,7 @@ public class PremiumService {
     // ── internal ──
 
     private JsonNode callApi(PlanCondition cmd, PlanFamily family) {
-        PremiumRequest request = quoteAssembler.assemble(cmd, family.plans());
+        PremiumCommand request = quoteAssembler.assemble(cmd, family.plans());
         if (request == null) {
             return null;
         }

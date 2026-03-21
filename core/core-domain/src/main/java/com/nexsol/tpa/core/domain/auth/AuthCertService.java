@@ -24,8 +24,7 @@ public class AuthCertService {
             AuthCertification cmd, String userAgent, String clientIp, String referer) {
 
         if (cmd.contractId() == null) {
-            throw new CoreException(
-                    CoreErrorType.INVALID_AUTH_REQUEST, "contractId is required");
+            throw new CoreException(CoreErrorType.INVALID_AUTH_REQUEST, "contractId is required");
         }
         if (cmd.impUid() == null || cmd.impUid().isBlank()) {
             throw new CoreException(CoreErrorType.INVALID_AUTH_REQUEST, "impUid is required");
@@ -61,23 +60,22 @@ public class AuthCertService {
         var resultInfo =
                 AuthCertResultInfo.builder()
                         .provider(provider)
-                        .moid(firstNonBlank(cmd.moid(), cert.getMerchantUid()))
-                        .impUid(cert.getImpUid())
+                        .moid(firstNonBlank(cmd.moid(), cert.merchantUid()))
+                        .impUid(cert.impUid())
                         .requestId(cmd.requestId())
-                        .uniqueKey(cert.getUniqueKey())
+                        .uniqueKey(cert.uniqueKey())
                         .resultStatus("SUCCESS")
-                        .certName(cert.getName())
-                        .certBirthday(cert.getBirthday())
-                        .certGender(authCertMatcher.normalizeGender(cert.getGender()))
-                        .certPhone(cert.getPhone())
+                        .certName(cert.name())
+                        .certBirthday(cert.birthday())
+                        .certGender(authCertMatcher.normalizeGender(cert.gender()))
+                        .certPhone(cert.phone())
                         .matched(matched)
                         .matchFailReason(matchFailReason)
-                        .rawResJson(cert.getRawJson())
+                        .rawResJson(cert.rawJson())
                         .build();
 
         return authCertWriter.saveResultAndUpdateContract(contractId, resultInfo);
     }
-
 
     public AuthCertResult historyComplete(
             AuthCertHistory cmd, String userAgent, String clientIp, String referer) {
@@ -107,24 +105,24 @@ public class AuthCertService {
 
         var cert = certificationReader.getCertification(cmd.impUid());
 
-        String moid = firstNonBlank(cmd.moid(), cert.getMerchantUid());
-        String uniqueKey = cert.getUniqueKey();
+        String moid = firstNonBlank(cmd.moid(), cert.merchantUid());
+        String uniqueKey = cert.uniqueKey();
 
         if (uniqueKey == null || uniqueKey.isBlank()) {
             var failInfo =
                     AuthCertResultInfo.builder()
                             .provider(provider)
                             .moid(moid)
-                            .impUid(cert.getImpUid())
+                            .impUid(cert.impUid())
                             .requestId(cmd.requestId())
                             .resultStatus("FAIL")
                             .resultCode("NO_UNIQUE_KEY")
                             .resultMsg("본인인증 uniqueKey가 없습니다.")
-                            .certName(cert.getName())
-                            .certBirthday(cert.getBirthday())
-                            .certGender(authCertMatcher.normalizeGender(cert.getGender()))
-                            .certPhone(cert.getPhone())
-                            .rawResJson(cert.getRawJson())
+                            .certName(cert.name())
+                            .certBirthday(cert.birthday())
+                            .certGender(authCertMatcher.normalizeGender(cert.gender()))
+                            .certPhone(cert.phone())
+                            .rawResJson(cert.rawJson())
                             .build();
             return authCertWriter.saveHistoryResult(failInfo);
         }
@@ -133,16 +131,16 @@ public class AuthCertService {
                 AuthCertResultInfo.builder()
                         .provider(provider)
                         .moid(moid)
-                        .impUid(cert.getImpUid())
+                        .impUid(cert.impUid())
                         .requestId(cmd.requestId())
                         .uniqueKey(uniqueKey)
                         .resultStatus("SUCCESS")
-                        .certName(cert.getName())
-                        .certBirthday(cert.getBirthday())
-                        .certGender(authCertMatcher.normalizeGender(cert.getGender()))
-                        .certPhone(cert.getPhone())
+                        .certName(cert.name())
+                        .certBirthday(cert.birthday())
+                        .certGender(authCertMatcher.normalizeGender(cert.gender()))
+                        .certPhone(cert.phone())
                         .matched(true)
-                        .rawResJson(cert.getRawJson())
+                        .rawResJson(cert.rawJson())
                         .build();
 
         return authCertWriter.saveHistoryResult(resultInfo);

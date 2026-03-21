@@ -2,8 +2,8 @@ package com.nexsol.tpa.core.domain.certificate;
 
 import org.springframework.stereotype.Component;
 
-import com.nexsol.tpa.client.meritz.contract.CertificateApiResult;
-import com.nexsol.tpa.client.meritz.contract.MeritzContractClient;
+import com.nexsol.tpa.core.domain.client.InsuranceContractClient;
+import com.nexsol.tpa.core.domain.client.InsuranceContractClient.CertificateLinkResult;
 import com.nexsol.tpa.core.domain.contract.ContractInfo;
 import com.nexsol.tpa.core.domain.contract.ContractReader;
 import com.nexsol.tpa.core.domain.contract.ContractValidator;
@@ -20,7 +20,7 @@ import tools.jackson.databind.ObjectMapper;
 @RequiredArgsConstructor
 public class CertificateLinkIssuer {
 
-    private final MeritzContractClient meritzClient;
+    private final InsuranceContractClient meritzClient;
     private final ContractReader contractReader;
     private final SubscriptionInsuredReader subscriptionInsuredReader;
     private final SnapshotAppender snapshotAppender;
@@ -43,7 +43,7 @@ public class CertificateLinkIssuer {
         ContractValidator.requireNotBlank(quotReqNo, "quotReqNo is required");
         ContractValidator.requireNotBlank(pdCd, "pdCd(productCode) is required");
 
-        CertificateApiResult result =
+        CertificateLinkResult result =
                 meritzClient.issueCertificate(company, polNo, pdCd, quotGrpNo, quotReqNo, div, tp);
 
         snapshotAppender.append(contractId, contract.insurerId(), "CERTIFICATE", toJson(result));

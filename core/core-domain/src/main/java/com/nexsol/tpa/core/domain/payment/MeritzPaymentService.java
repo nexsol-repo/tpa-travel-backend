@@ -2,8 +2,8 @@ package com.nexsol.tpa.core.domain.payment;
 
 import org.springframework.stereotype.Service;
 
-import com.nexsol.tpa.client.meritz.bridge.dto.MeritzBridgeApiResponse;
-import com.nexsol.tpa.client.meritz.payment.MeritzPaymentClient;
+import com.nexsol.tpa.core.domain.client.InsuranceContractClient.BridgeApiResult;
+import com.nexsol.tpa.core.domain.client.InsurancePaymentClient;
 import com.nexsol.tpa.core.error.CoreErrorType;
 import com.nexsol.tpa.core.error.CoreException;
 
@@ -17,9 +17,9 @@ public class MeritzPaymentService {
 
     private static final String DEFAULT_COMPANY = "tpa";
 
-    private final MeritzPaymentClient paymentClient;
+    private final InsurancePaymentClient paymentClient;
 
-    public MeritzBridgeApiResponse approveCard(
+    public BridgeApiResult approveCard(
             String company,
             String polNo,
             String quotGrpNo,
@@ -31,7 +31,7 @@ public class MeritzPaymentService {
             String rcptPrem) {
 
         String resolvedCompany = resolveCompany(company);
-        MeritzBridgeApiResponse res =
+        BridgeApiResult res =
                 paymentClient.approveCard(
                         resolvedCompany,
                         polNo,
@@ -43,25 +43,25 @@ public class MeritzPaymentService {
                         dporCd,
                         rcptPrem);
 
-        if (!res.isSuccess()) {
+        if (!res.success()) {
             throw new CoreException(
                     CoreErrorType.DEFAULT_ERROR,
-                    "카드승인 실패. errCd=" + res.getErrCd() + ", errMsg=" + res.getErrMsg());
+                    "카드승인 실패. errCd=" + res.errCd() + ", errMsg=" + res.errMsg());
         }
         return res;
     }
 
-    public MeritzBridgeApiResponse cancelCard(
+    public BridgeApiResult cancelCard(
             String company, String polNo, String estNo, String orgApvNo, String cncAmt) {
 
         String resolvedCompany = resolveCompany(company);
-        MeritzBridgeApiResponse res =
+        BridgeApiResult res =
                 paymentClient.cancelCard(resolvedCompany, polNo, estNo, orgApvNo, cncAmt);
 
-        if (!res.isSuccess()) {
+        if (!res.success()) {
             throw new CoreException(
                     CoreErrorType.DEFAULT_ERROR,
-                    "카드취소 실패. errCd=" + res.getErrCd() + ", errMsg=" + res.getErrMsg());
+                    "카드취소 실패. errCd=" + res.errCd() + ", errMsg=" + res.errMsg());
         }
         return res;
     }

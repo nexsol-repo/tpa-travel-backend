@@ -30,13 +30,15 @@ public class TravelCoverageService {
     public List<QuoteResult.DbCoverage> findCoverages(Long planId) {
         return planReader.loadCoverages(planId).stream()
                 .filter(PlanCoverage::included)
-                .map(pc -> new QuoteResult.DbCoverage(
-                        pc.coverageCode(),
-                        (pc.displayName() != null && !pc.displayName().isBlank())
-                                ? pc.displayName()
-                                : pc.coverageName(),
-                        pc.titleYn(),
-                        pc.categoryCode()))
+                .map(
+                        pc ->
+                                new QuoteResult.DbCoverage(
+                                        pc.coverageCode(),
+                                        (pc.displayName() != null && !pc.displayName().isBlank())
+                                                ? pc.displayName()
+                                                : pc.coverageName(),
+                                        pc.titleYn(),
+                                        pc.categoryCode()))
                 .toList();
     }
 }

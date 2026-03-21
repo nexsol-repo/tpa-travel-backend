@@ -2,7 +2,7 @@ package com.nexsol.tpa.core.domain.apply;
 
 import org.springframework.stereotype.Service;
 
-import com.nexsol.tpa.client.meritz.config.CompaniesConfigsProperties;
+import com.nexsol.tpa.core.domain.client.InsuranceConfig;
 import com.nexsol.tpa.core.domain.contract.ContractCreator;
 import com.nexsol.tpa.core.domain.contract.ContractInfo;
 import com.nexsol.tpa.core.domain.contract.ContractPeopleWriter;
@@ -23,14 +23,13 @@ public class ApplyService {
     private final ContractWriter contractWriter;
     private final ContractPeopleWriter peopleWriter;
     private final SnapshotAppender snapshotAppender;
-    private final CompaniesConfigsProperties companies;
+    private final InsuranceConfig companies;
     private final ObjectMapper objectMapper;
-
 
     public Long apply(ContractApply cmd) {
         applyValidator.validate(cmd);
 
-        ContractInfo contract = contractCreator.create(cmd, companies.getTpa().getPolNo());
+        ContractInfo contract = contractCreator.create(cmd, companies.getTpaInfo().polNo());
         ContractInfo saved = contractWriter.writerContract(contract);
 
         peopleWriter.register(saved.id(), cmd.people());

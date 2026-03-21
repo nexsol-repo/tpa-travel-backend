@@ -24,9 +24,11 @@ public class PlanReader {
     public InsurancePlan getById(Long planId) {
         return planRepository
                 .findById(planId)
-                .orElseThrow(() -> new CoreException(
-                        CoreErrorType.NOT_FOUND_DATA,
-                        "plan not found. planId=" + planId));
+                .orElseThrow(
+                        () ->
+                                new CoreException(
+                                        CoreErrorType.NOT_FOUND_DATA,
+                                        "plan not found. planId=" + planId));
     }
 
     public List<InsurancePlan> findActiveByInsurerId(Long insurerId) {
@@ -56,17 +58,19 @@ public class PlanReader {
         }
 
         return families.stream()
-                .map(f -> {
-                    List<InsurancePlan> familyPlans = grouped.getOrDefault(f.familyId(), List.of());
-                    if (familyPlans.isEmpty()) return null;
-                    return PlanFamily.builder()
-                            .familyId(f.familyId())
-                            .familyName(f.familyName())
-                            .isLoss(f.isLoss())
-                            .repPlan(pickRepPlan(familyPlans))
-                            .plans(familyPlans)
-                            .build();
-                })
+                .map(
+                        f -> {
+                            List<InsurancePlan> familyPlans =
+                                    grouped.getOrDefault(f.familyId(), List.of());
+                            if (familyPlans.isEmpty()) return null;
+                            return PlanFamily.builder()
+                                    .familyId(f.familyId())
+                                    .familyName(f.familyName())
+                                    .isLoss(f.isLoss())
+                                    .repPlan(pickRepPlan(familyPlans))
+                                    .plans(familyPlans)
+                                    .build();
+                        })
                 .filter(Objects::nonNull)
                 .toList();
     }

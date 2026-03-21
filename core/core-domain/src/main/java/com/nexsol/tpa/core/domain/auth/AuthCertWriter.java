@@ -26,12 +26,8 @@ public class AuthCertWriter {
     private final ContractUpdater contractUpdater;
     private final ContractWriter contractWriter;
 
-
     public Long createOrUpdateLog(AuthCertLogInfo info) {
-        AuthCertLogInfo existing =
-                logRepository
-                        .findByImpUid(info.impUid())
-                        .orElse(null);
+        AuthCertLogInfo existing = logRepository.findByImpUid(info.impUid()).orElse(null);
 
         AuthCertLogInfo logInfo =
                 AuthCertLogInfo.builder()
@@ -52,7 +48,6 @@ public class AuthCertWriter {
         return logRepository.save(logInfo).id();
     }
 
-
     public AuthCertResult saveResultAndUpdateContract(Long contractId, AuthCertResultInfo info) {
         ContractInfo contract =
                 contractRepository
@@ -63,25 +58,21 @@ public class AuthCertWriter {
                                                 CoreErrorType.AUTH_CONTRACT_NOT_FOUND,
                                                 "contractId=" + contractId));
 
-        ContractInfo updatedContract = contractUpdater.updateAuth(
-                contract,
-                info.provider(),
-                info.impUid(),
-                info.requestId(),
-                info.uniqueKey(),
-                "SUCCESS".equalsIgnoreCase(info.resultStatus()) ? "SUCCESS" : "FAIL");
+        ContractInfo updatedContract =
+                contractUpdater.updateAuth(
+                        contract,
+                        info.provider(),
+                        info.impUid(),
+                        info.requestId(),
+                        info.uniqueKey(),
+                        "SUCCESS".equalsIgnoreCase(info.resultStatus()) ? "SUCCESS" : "FAIL");
         contractWriter.writerContract(updatedContract);
 
         Long logId =
-                logRepository
-                        .findByImpUid(info.impUid())
-                        .map(AuthCertLogInfo::id)
-                        .orElse(null);
+                logRepository.findByImpUid(info.impUid()).map(AuthCertLogInfo::id).orElse(null);
 
         AuthCertResultInfo existingResult =
-                resultRepository
-                        .findByImpUid(info.impUid())
-                        .orElse(null);
+                resultRepository.findByImpUid(info.impUid()).orElse(null);
 
         AuthCertResultInfo resultInfo =
                 AuthCertResultInfo.builder()
@@ -114,18 +105,12 @@ public class AuthCertWriter {
         return toResult(info);
     }
 
-
     public AuthCertResult saveHistoryResult(AuthCertResultInfo info) {
         Long logId =
-                logRepository
-                        .findByImpUid(info.impUid())
-                        .map(AuthCertLogInfo::id)
-                        .orElse(null);
+                logRepository.findByImpUid(info.impUid()).map(AuthCertLogInfo::id).orElse(null);
 
         AuthCertResultInfo existingResult =
-                resultRepository
-                        .findByImpUid(info.impUid())
-                        .orElse(null);
+                resultRepository.findByImpUid(info.impUid()).orElse(null);
 
         AuthCertResultInfo resultInfo =
                 AuthCertResultInfo.builder()

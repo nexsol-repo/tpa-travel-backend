@@ -2,7 +2,7 @@ package com.nexsol.tpa.core.domain.cancel;
 
 import org.springframework.stereotype.Service;
 
-import com.nexsol.tpa.client.meritz.contract.MeritzContractClient;
+import com.nexsol.tpa.core.domain.client.InsuranceContractClient;
 import com.nexsol.tpa.core.domain.contract.ContractInfo;
 import com.nexsol.tpa.core.domain.contract.ContractReader;
 import com.nexsol.tpa.core.domain.contract.ContractValidator;
@@ -16,7 +16,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CancelService {
 
-    private final MeritzContractClient meritzClient;
+    private final InsuranceContractClient meritzClient;
     private final ContractReader contractReader;
     private final ContractValidator contractValidator;
     private final PaymentReader paymentReader;

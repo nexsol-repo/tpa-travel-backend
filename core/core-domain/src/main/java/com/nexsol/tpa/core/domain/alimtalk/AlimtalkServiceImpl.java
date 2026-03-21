@@ -1,10 +1,11 @@
 package com.nexsol.tpa.core.domain.alimtalk;
 
-import org.springframework.stereotype.Service;
-import org.springframework.util.MultiValueMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
-import com.nexsol.tpa.client.aligo.AligoProperties;
-import com.nexsol.tpa.client.aligo.AligoSmsClient;
+import org.springframework.stereotype.Service;
+
+import com.nexsol.tpa.core.domain.client.NotificationClient;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,9 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class AlimtalkServiceImpl implements AlimtalkService {
 
-    private final AligoProperties props;
-
-    private final AligoSmsClient client;
+    private final NotificationClient notificationClient;
 
     @Override
     public void sendTravelContractCompleted(AlimtalkCompletedCommand cmd) {
@@ -47,22 +46,22 @@ public class AlimtalkServiceImpl implements AlimtalkService {
                                 nvl(cmd.termsUrl()))
                         .trim();
 
-        MultiValueMap<String, String> form = AligoSmsClient.form();
-        form.add("key", props.getApiKey());
-        form.add("user_id", props.getUserId());
-        form.add("sender", normalizeHp(props.getSender()));
+        Map<String, String> params = new LinkedHashMap<>();
+        params.put("key", notificationClient.getApiKey());
+        params.put("user_id", notificationClient.getUserId());
+        params.put("sender", normalizeHp(notificationClient.getSender()));
 
-        form.add("receiver", normalizeHp(cmd.receiverHp()));
+        params.put("receiver", normalizeHp(cmd.receiverHp()));
 
         if (cmd.receiverHp() != null && cmd.receiverName() != null) {
-            form.add("destination", normalizeHp(cmd.receiverHp()) + "|" + cmd.receiverName());
+            params.put("destination", normalizeHp(cmd.receiverHp()) + "|" + cmd.receiverName());
         }
 
-        form.add("msg", msg);
-        form.add("title", "[가입 완료 안내]");
+        params.put("msg", msg);
+        params.put("title", "[가입 완료 안내]");
 
         try {
-            String res = client.send(form);
+            String res = notificationClient.sendSms(params);
             log.info(
                     "[ALIGO-SMS] send ok. receiver={}, res={}", normalizeHp(cmd.receiverHp()), res);
         } catch (Exception e) {

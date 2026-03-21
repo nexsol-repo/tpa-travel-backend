@@ -6,7 +6,6 @@ import java.util.*;
 
 import org.springframework.stereotype.Component;
 
-import com.nexsol.tpa.core.domain.plan.PlanFamily;
 import com.nexsol.tpa.core.domain.premium.PlanCondition;
 
 /**
@@ -78,8 +77,7 @@ public class QuotePlanPolicy {
     /**
      * 패밀리의 플랜 중 ageGroupId에 해당하는 플랜을 찾는다.
      */
-    public InsurancePlan findPlanForAge(
-            List<InsurancePlan> familyPlans, int ageGroupId) {
+    public InsurancePlan findPlanForAge(List<InsurancePlan> familyPlans, int ageGroupId) {
         return familyPlans.stream()
                 .filter(p -> Objects.equals(p.ageGroupId(), ageGroupId))
                 .findFirst()

@@ -9,9 +9,9 @@ import org.springframework.stereotype.Component;
 import com.nexsol.tpa.core.domain.plan.InsurancePlan;
 import com.nexsol.tpa.core.domain.plan.Insurer;
 import com.nexsol.tpa.core.domain.repository.ChannelRepository;
-import com.nexsol.tpa.core.domain.repository.PartnerRepository;
 import com.nexsol.tpa.core.domain.repository.InsurancePlanRepository;
 import com.nexsol.tpa.core.domain.repository.InsurerRepository;
+import com.nexsol.tpa.core.domain.repository.PartnerRepository;
 
 import lombok.RequiredArgsConstructor;
 

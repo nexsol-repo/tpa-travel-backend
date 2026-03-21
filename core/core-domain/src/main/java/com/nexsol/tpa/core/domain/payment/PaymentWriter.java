@@ -5,9 +5,9 @@ import java.time.LocalDateTime;
 
 import org.springframework.stereotype.Component;
 
+import com.nexsol.tpa.core.domain.repository.PaymentRepository;
 import com.nexsol.tpa.core.enums.TravelPaymentMethod;
 import com.nexsol.tpa.core.enums.TravelPaymentStatus;
-import com.nexsol.tpa.core.domain.repository.PaymentRepository;
 
 import lombok.RequiredArgsConstructor;
 

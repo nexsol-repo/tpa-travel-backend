@@ -8,7 +8,10 @@ import com.nexsol.tpa.core.support.SortPage;
 
 public interface ContractRepository {
     ContractInfo save(ContractInfo info);
+
     Optional<ContractInfo> findById(Long id);
+
     PageResult<ContractInfo> findAllOrderByAuthUniqueKeyDesc(SortPage sortPage);
+
     PageResult<ContractInfo> findByAuthUniqueKey(String authUniqueKey, SortPage sortPage);
 }

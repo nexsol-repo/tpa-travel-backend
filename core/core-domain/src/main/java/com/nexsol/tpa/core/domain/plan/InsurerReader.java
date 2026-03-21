@@ -17,8 +17,10 @@ public class InsurerReader {
     public Insurer getById(Long insurerId) {
         return insurerRepository
                 .findById(insurerId)
-                .orElseThrow(() -> new CoreException(
-                        CoreErrorType.NOT_FOUND_DATA,
-                        "insurer not found. insurerId=" + insurerId));
+                .orElseThrow(
+                        () ->
+                                new CoreException(
+                                        CoreErrorType.NOT_FOUND_DATA,
+                                        "insurer not found. insurerId=" + insurerId));
     }
 }

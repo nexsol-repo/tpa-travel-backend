@@ -7,7 +7,7 @@ import java.util.stream.IntStream;
 
 import org.springframework.stereotype.Component;
 
-import com.nexsol.tpa.client.meritz.quote.MeritzQuoteClient.PremiumRequest;
+import com.nexsol.tpa.core.domain.client.InsuranceQuoteClient.PremiumCommand;
 import com.nexsol.tpa.core.domain.plan.InsurancePlan;
 import com.nexsol.tpa.core.domain.plan.QuotePlanPolicy;
 import com.nexsol.tpa.core.error.CoreErrorType;
@@ -36,17 +36,17 @@ public class QuoteInsuredAssembler {
     private final QuotePlanPolicy policy;
 
     /**
-     * 패밀리 플랜 목록과 조건을 기반으로 PremiumRequest를 조립한다.
+     * 패밀리 플랜 목록과 조건을 기반으로 PremiumCommand를 조립한다.
      * 가족 중 해당 ageGroup의 플랜이 없으면 null을 반환한다.
-     * PremiumRequest 는 외부 연동사 이므로 레이어에 포함안됨 개념에도 포함안됨 횡단관심사 영역임
+     * PremiumCommand 는 외부 연동사 이므로 레이어에 포함안됨 개념에도 포함안됨 횡단관심사 영역임
      */
-    public PremiumRequest assemble(PlanCondition cmd, List<InsurancePlan> familyPlans) {
+    public PremiumCommand assemble(PlanCondition cmd, List<InsurancePlan> familyPlans) {
         validateAges(cmd);
 
         Map<Integer, InsurancePlan> planByAgeGroup = indexByAgeGroup(familyPlans);
         InsurancePlan repPlan = selectRepresentativePlan(familyPlans);
 
-        List<PremiumRequest.InsuredPerson> insuredPersons =
+        List<PremiumCommand.InsuredPersonCommand> insuredPersons =
                 cmd.insuredList().stream()
                         .map(
                                 insured ->
@@ -61,7 +61,7 @@ public class QuoteInsuredAssembler {
             return null;
         }
 
-        return new PremiumRequest(
+        return new PremiumCommand(
                 DEFAULT_COMPANY,
                 repPlan.productCode(),
                 repPlan.unitProductCode(),
@@ -74,7 +74,7 @@ public class QuoteInsuredAssembler {
 
     // ── internal ──
 
-    private PremiumRequest.InsuredPerson resolveInsuredPerson(
+    private PremiumCommand.InsuredPersonCommand resolveInsuredPerson(
             PlanCondition.Insured insured,
             String insBgnDt,
             Map<Integer, InsurancePlan> planByAgeGroup) {
@@ -85,7 +85,7 @@ public class QuoteInsuredAssembler {
             return null;
         }
 
-        return new PremiumRequest.InsuredPerson(
+        return new PremiumCommand.InsuredPersonCommand(
                 plan.planGroupCode(),
                 plan.planCode(),
                 insured.birth(),
@@ -108,8 +108,7 @@ public class QuoteInsuredAssembler {
                         });
     }
 
-    private Map<Integer, InsurancePlan> indexByAgeGroup(
-            List<InsurancePlan> familyPlans) {
+    private Map<Integer, InsurancePlan> indexByAgeGroup(List<InsurancePlan> familyPlans) {
         Map<Integer, InsurancePlan> map = new HashMap<>();
         for (InsurancePlan p : familyPlans) {
             if (p.ageGroupId() != null) {
@@ -119,8 +118,7 @@ public class QuoteInsuredAssembler {
         return map;
     }
 
-    private InsurancePlan selectRepresentativePlan(
-            List<InsurancePlan> familyPlans) {
+    private InsurancePlan selectRepresentativePlan(List<InsurancePlan> familyPlans) {
         return familyPlans.stream()
                 .filter(p -> Objects.equals(p.ageGroupId(), 2))
                 .findFirst()

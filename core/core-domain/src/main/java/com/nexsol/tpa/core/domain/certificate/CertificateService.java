@@ -2,8 +2,8 @@ package com.nexsol.tpa.core.domain.certificate;
 
 import org.springframework.stereotype.Service;
 
-import com.nexsol.tpa.client.meritz.bridge.dto.MeritzBridgeApiResponse;
-import com.nexsol.tpa.client.meritz.contract.MeritzContractClient;
+import com.nexsol.tpa.core.domain.client.InsuranceContractClient;
+import com.nexsol.tpa.core.domain.client.InsuranceContractClient.BridgeApiResult;
 import com.nexsol.tpa.core.domain.contract.ContractInfo;
 import com.nexsol.tpa.core.domain.contract.ContractReader;
 import com.nexsol.tpa.core.domain.contract.ContractValidator;
@@ -22,7 +22,7 @@ import tools.jackson.databind.ObjectMapper;
 @RequiredArgsConstructor
 public class CertificateService {
 
-    private final MeritzContractClient meritzClient;
+    private final InsuranceContractClient meritzClient;
     private final ContractReader contractReader;
     private final SubscriptionInsuredReader subscriptionInsuredReader;
     private final SnapshotAppender snapshotAppender;
@@ -30,7 +30,7 @@ public class CertificateService {
     private final CertificateLinkIssuer certificateLinkIssuer;
 
     /** 증명서 원본 응답 반환 */
-    public MeritzBridgeApiResponse issue(String company, CertificateCommand cmd) {
+    public BridgeApiResult issue(String company, CertificateCommand cmd) {
         if (cmd == null || cmd.contractId() == null) {
             throw new CoreException(
                     CoreErrorType.INVALID_CONTRACT_REQUEST, "contractId is required");
@@ -42,7 +42,7 @@ public class CertificateService {
         CertificateParams params = resolveParams(cmd.contractId());
         validateParams(params);
 
-        MeritzBridgeApiResponse res =
+        BridgeApiResult res =
                 meritzClient.issueCertificateRaw(
                         company,
                         params.polNo,
