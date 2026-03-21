@@ -1,8 +1,5 @@
 package com.nexsol.tpa.core.api.controller;
 
-import com.nexsol.tpa.core.error.CoreErrorKind;
-import com.nexsol.tpa.core.error.CoreErrorType;
-import com.nexsol.tpa.core.error.CoreException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -10,10 +7,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-
+import com.nexsol.tpa.core.error.CoreErrorKind;
+import com.nexsol.tpa.core.error.CoreErrorType;
+import com.nexsol.tpa.core.error.CoreException;
 import com.nexsol.tpa.core.support.response.ApiResponse;
-
-
 
 @RestControllerAdvice
 public class ApiControllerAdvice {
@@ -58,8 +55,7 @@ public class ApiControllerAdvice {
         return switch (kind) {
             case CLIENT_ERROR -> HttpStatus.BAD_REQUEST; // 400
             case SERVER_ERROR -> HttpStatus.INTERNAL_SERVER_ERROR; // 500
-            // (향후 UNAUTHORIZED, FORBIDDEN 등 Kind가 추가되면 여기만 수정)
+                // (향후 UNAUTHORIZED, FORBIDDEN 등 Kind가 추가되면 여기만 수정)
         };
     }
-
 }

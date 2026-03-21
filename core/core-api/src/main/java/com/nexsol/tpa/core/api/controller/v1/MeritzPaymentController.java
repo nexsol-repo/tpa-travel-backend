@@ -2,9 +2,9 @@ package com.nexsol.tpa.core.api.controller.v1;
 
 import org.springframework.web.bind.annotation.*;
 
-import com.nexsol.tpa.client.meritz.bridge.dto.MeritzBridgeApiResponse;
 import com.nexsol.tpa.core.api.controller.v1.request.MeritzCardApproveRequest;
 import com.nexsol.tpa.core.api.controller.v1.request.MeritzCardCancelRequest;
+import com.nexsol.tpa.core.domain.client.InsuranceContractClient.BridgeApiResult;
 import com.nexsol.tpa.core.domain.payment.MeritzPaymentService;
 
 import lombok.RequiredArgsConstructor;
@@ -17,7 +17,7 @@ public class MeritzPaymentController {
     private final MeritzPaymentService service;
 
     @PostMapping("/payments/cards/approve")
-    public MeritzBridgeApiResponse approveCard(
+    public BridgeApiResult approveCard(
             @RequestParam(defaultValue = "TPA") String company,
             @RequestBody MeritzCardApproveRequest request) {
         return service.approveCard(
@@ -33,7 +33,7 @@ public class MeritzPaymentController {
     }
 
     @PostMapping("/payments/cards/cancel")
-    public MeritzBridgeApiResponse cancelCard(
+    public BridgeApiResult cancelCard(
             @RequestParam(defaultValue = "TPA") String company,
             @RequestBody MeritzCardCancelRequest request) {
         return service.cancelCard(

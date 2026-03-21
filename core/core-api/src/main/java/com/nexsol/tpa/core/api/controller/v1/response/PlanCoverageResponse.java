@@ -5,10 +5,10 @@ import java.util.List;
 import java.util.Map;
 
 import com.nexsol.tpa.core.domain.plan.AgeBand;
+import com.nexsol.tpa.core.domain.plan.InsurancePlan;
 import com.nexsol.tpa.core.domain.plan.PlanFamily;
 import com.nexsol.tpa.core.domain.premium.PremiumResult;
 import com.nexsol.tpa.core.domain.premium.QuoteResult;
-import com.nexsol.tpa.core.domain.plan.InsurancePlan;
 
 import lombok.Builder;
 import lombok.Getter;

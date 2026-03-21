@@ -21,10 +21,10 @@ import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 
 import com.nexsol.tpa.core.domain.coverage.TravelCoverageService;
+import com.nexsol.tpa.core.domain.plan.InsurancePlan;
 import com.nexsol.tpa.core.domain.plan.PlanFamily;
 import com.nexsol.tpa.core.domain.plan.TravelPlanService;
 import com.nexsol.tpa.core.domain.premium.PlanCondition;
-import com.nexsol.tpa.core.domain.plan.InsurancePlan;
 import com.nexsol.tpa.core.domain.premium.PremiumResult;
 import com.nexsol.tpa.core.domain.premium.PremiumService;
 import com.nexsol.tpa.core.domain.premium.QuoteResult;

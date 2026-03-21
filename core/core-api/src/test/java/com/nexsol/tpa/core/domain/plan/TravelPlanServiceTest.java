@@ -10,8 +10,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import com.nexsol.tpa.core.domain.plan.InsurancePlan;
-import com.nexsol.tpa.core.domain.plan.PlanFamily;
 import com.nexsol.tpa.core.domain.premium.PlanCondition;
 import com.nexsol.tpa.core.error.CoreException;
 
@@ -30,8 +28,7 @@ class TravelPlanServiceTest {
 
     // ── 테스트 데이터 ──
 
-    private static InsurancePlan plan(
-            Long id, int ageGroupId, String planCode, String planName) {
+    private static InsurancePlan plan(Long id, int ageGroupId, String planCode, String planName) {
         return InsurancePlan.builder()
                 .id(id)
                 .familyId(1L)

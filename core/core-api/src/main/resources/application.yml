@@ -9,6 +9,8 @@ spring:
       - logging.yml
       - db-core.yml
       - client-meritz.yml
+      - client-portone.yml
+      - client-aligo.yml
   web.resources.add-mappings: false
   jmx:
     enabled: false

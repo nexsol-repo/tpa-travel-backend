@@ -70,26 +70,26 @@ public final class ContractQueryResponse {
 
     @Builder
     public record Contractor(
-            String name,
-            String residentNumberMasked,
-            String phone,
-            String email) {}
+            String name, String residentNumberMasked, String phone, String email) {}
 
     // ── 개념객체 → Presentation 변환 ──
 
     public static ContractListItem toContractListItem(
             ContractInfo c, Payment payment, InsurancePlan plan, List<InsuredPerson> people) {
 
-        var contractor = people.stream()
-                .filter(InsuredPerson::isContractor)
-                .findFirst()
-                .map(p -> Contractor.builder()
-                        .name(p.name())
-                        .residentNumberMasked(maskRrn(p.residentNumber()))
-                        .phone(p.phone())
-                        .email(p.email())
-                        .build())
-                .orElse(null);
+        var contractor =
+                people.stream()
+                        .filter(InsuredPerson::isContractor)
+                        .findFirst()
+                        .map(
+                                p ->
+                                        Contractor.builder()
+                                                .name(p.name())
+                                                .residentNumberMasked(maskRrn(p.residentNumber()))
+                                                .phone(p.phone())
+                                                .email(p.email())
+                                                .build())
+                        .orElse(null);
 
         return ContractListItem.builder()
                 .id(c.id())
@@ -100,26 +100,26 @@ public final class ContractQueryResponse {
                 .applyDate(c.applyDate())
                 .termsUrl(TERMS_URL)
                 .policyLink(c.policyLink())
-                .insurer(Insurer.builder()
-                        .id(c.insurerId()).name(c.insurerName()).build())
-                .partner(Partner.builder()
-                        .id(c.partnerId()).name(c.partnerName()).build())
-                .channel(Channel.builder()
-                        .id(c.channelId()).name(c.channelName()).build())
+                .insurer(Insurer.builder().id(c.insurerId()).name(c.insurerName()).build())
+                .partner(Partner.builder().id(c.partnerId()).name(c.partnerName()).build())
+                .channel(Channel.builder().id(c.channelId()).name(c.channelName()).build())
                 .plan(plan)
                 .insurePeriod(c.insurePeriod())
                 .auth(c.auth())
                 .contractor(contractor)
                 .payment(payment)
-                .people(people.stream()
-                        .map(p -> new PersonSummary(p.id(), p.name()))
-                        .toList())
+                .people(people.stream().map(p -> new PersonSummary(p.id(), p.name())).toList())
                 .build();
     }
 
     public static ContractDetail toContractDetail(
-            ContractInfo contract, Payment payment, List<InsuredPerson> people,
-            InsurancePlan plan, Insurer insurer, Partner partner, Channel channel) {
+            ContractInfo contract,
+            Payment payment,
+            List<InsuredPerson> people,
+            InsurancePlan plan,
+            Insurer insurer,
+            Partner partner,
+            Channel channel) {
 
         return ContractDetail.builder()
                 .contract(contract)
@@ -130,19 +130,24 @@ public final class ContractQueryResponse {
                 .payment(payment)
                 .termsUrl(TERMS_URL)
                 .policyLink(contract.policyLink())
-                .people(people.stream()
-                        .map(p -> InsuredPersonView.builder()
-                                .id(p.id())
-                                .planId(p.planId())
-                                .isContractor(p.isContractor())
-                                .name(p.name())
-                                .englishName(p.englishName())
-                                .gender(p.gender())
-                                .residentNumberMasked(maskRrn(p.residentNumber()))
-                                .passportNumberMasked(maskPassport(p.passportNumber()))
-                                .insurePremium(p.insurePremium())
-                                .build())
-                        .toList())
+                .people(
+                        people.stream()
+                                .map(
+                                        p ->
+                                                InsuredPersonView.builder()
+                                                        .id(p.id())
+                                                        .planId(p.planId())
+                                                        .isContractor(p.isContractor())
+                                                        .name(p.name())
+                                                        .englishName(p.englishName())
+                                                        .gender(p.gender())
+                                                        .residentNumberMasked(
+                                                                maskRrn(p.residentNumber()))
+                                                        .passportNumberMasked(
+                                                                maskPassport(p.passportNumber()))
+                                                        .insurePremium(p.insurePremium())
+                                                        .build())
+                                .toList())
                 .build();
     }
 }

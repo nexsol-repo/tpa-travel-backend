@@ -19,7 +19,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 
-import com.nexsol.tpa.client.meritz.bridge.dto.MeritzBridgeApiResponse;
+import com.nexsol.tpa.core.domain.client.InsuranceContractClient.BridgeApiResult;
 import com.nexsol.tpa.core.domain.payment.MeritzPaymentService;
 import com.nexsol.tpa.test.api.RestDocsTest;
 
@@ -36,9 +36,9 @@ class MeritzPaymentControllerDocsTest extends RestDocsTest {
 
     @Test
     void approveCard() throws Exception {
-        var response = new MeritzBridgeApiResponse();
-        response.setSuccess(true);
-        response.setData(Map.of("apvNo", "APV20260312001", "apvDt", "20260312"));
+        var response =
+                new BridgeApiResult(
+                        true, null, null, Map.of("apvNo", "APV20260312001", "apvDt", "20260312"));
 
         when(service.approveCard(eq("TPA"), any(), any(), any(), any(), any(), any(), any(), any()))
                 .thenReturn(response);
@@ -90,9 +90,7 @@ class MeritzPaymentControllerDocsTest extends RestDocsTest {
 
     @Test
     void cancelCard() throws Exception {
-        var response = new MeritzBridgeApiResponse();
-        response.setSuccess(true);
-        response.setData(Map.of("cncNo", "CNC20260312001"));
+        var response = new BridgeApiResult(true, null, null, Map.of("cncNo", "CNC20260312001"));
 
         when(service.cancelCard(eq("TPA"), any(), any(), any(), any())).thenReturn(response);
 

@@ -1,9 +1,8 @@
 package com.nexsol.tpa.core.support.response;
 
-
-
 import com.nexsol.tpa.core.error.CoreErrorType;
 import com.nexsol.tpa.core.support.error.CoreApiErrorMessage;
+
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -33,5 +32,4 @@ public class ApiResponse<T> {
     public static <S> ApiResponse<S> error(CoreErrorType error) {
         return new ApiResponse<>(ResultType.ERROR, null, new CoreApiErrorMessage(error, null));
     }
-
 }

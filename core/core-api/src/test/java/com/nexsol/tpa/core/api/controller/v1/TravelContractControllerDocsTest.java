@@ -19,14 +19,13 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 
-import com.nexsol.tpa.core.support.PageResult;
-
 import com.nexsol.tpa.core.api.controller.v1.response.ContractQueryResponse;
 import com.nexsol.tpa.core.domain.contract.*;
 import com.nexsol.tpa.core.domain.contract.TravelContractQueryService;
 import com.nexsol.tpa.core.domain.payment.Payment;
 import com.nexsol.tpa.core.domain.plan.InsurancePlan;
 import com.nexsol.tpa.core.domain.plan.Insurer;
+import com.nexsol.tpa.core.support.PageResult;
 import com.nexsol.tpa.test.api.RestDocsTest;
 
 @Tag("restdocs")
@@ -177,20 +176,11 @@ class TravelContractControllerDocsTest extends RestDocsTest {
             // People
             fieldWithPath("data.content[].people[].id").type(NUMBER).description("피보험자 ID"),
             fieldWithPath("data.content[].people[].name").type(STRING).description("피보험자 이름"),
-            // Page metadata
-            subsectionWithPath("data.pageable").description("페이지 정보"),
+            // PageResult metadata
             fieldWithPath("data.totalElements").type(NUMBER).description("전체 건수"),
             fieldWithPath("data.totalPages").type(NUMBER).description("전체 페이지 수"),
-            fieldWithPath("data.size").type(NUMBER).description("페이지 크기"),
-            fieldWithPath("data.number").type(NUMBER).description("현재 페이지"),
-            fieldWithPath("data.sort").type(OBJECT).description("정렬 정보"),
-            fieldWithPath("data.sort.empty").type(BOOLEAN).description("정렬 비어있음"),
-            fieldWithPath("data.sort.sorted").type(BOOLEAN).description("정렬됨"),
-            fieldWithPath("data.sort.unsorted").type(BOOLEAN).description("미정렬"),
-            fieldWithPath("data.first").type(BOOLEAN).description("첫 페이지 여부"),
-            fieldWithPath("data.last").type(BOOLEAN).description("마지막 페이지 여부"),
-            fieldWithPath("data.numberOfElements").type(NUMBER).description("현재 페이지 건수"),
-            fieldWithPath("data.empty").type(BOOLEAN).description("비어있음"),
+            fieldWithPath("data.currentPage").type(NUMBER).description("현재 페이지"),
+            fieldWithPath("data.hasNext").type(BOOLEAN).description("다음 페이지 존재 여부"),
         };
     }
 
