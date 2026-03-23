@@ -111,7 +111,12 @@ public enum CoreErrorType {
             CoreErrorKind.SERVER_ERROR,
             CoreErrorCode.T6002,
             "본인인증 처리에 실패했습니다.",
-            CoreErrorLevel.ERROR);
+            CoreErrorLevel.ERROR),
+    AUTH_NOT_COMPLETED(
+            CoreErrorKind.CLIENT_ERROR,
+            CoreErrorCode.T6003,
+            "본인인증이 완료되지 않았습니다.",
+            CoreErrorLevel.INFO);
 
     private final CoreErrorKind kind;
 

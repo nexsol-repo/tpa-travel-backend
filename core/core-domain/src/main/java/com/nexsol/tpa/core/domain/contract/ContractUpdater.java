@@ -76,7 +76,14 @@ public class ContractUpdater {
             String uniqueKey,
             String status) {
         return copyWith(contract)
-                .auth(AuthInfo.builder().uniqueKey(uniqueKey).status(status).build())
+                .auth(
+                        AuthInfo.builder()
+                                .provider(provider)
+                                .impUid(impUid)
+                                .requestId(requestId)
+                                .uniqueKey(uniqueKey)
+                                .status(status)
+                                .build())
                 .build();
     }
 

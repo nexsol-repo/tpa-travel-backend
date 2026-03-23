@@ -17,9 +17,10 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @RequiredArgsConstructor
 public class SubscriptionService {
-
     private final ContractReader contractReader;
     private final ContractValidator contractValidator;
+    private final ContractUpdater contractUpdater;
+    private final ContractWriter contractWriter;
     private final SubscriptionValidator subscriptionValidator;
     private final SubscriptionEstimateSaver subscriptionEstimateSaver;
     private final SubscriptionWriter subscriptionWriter;
@@ -27,8 +28,6 @@ public class SubscriptionService {
     private final SubscriptionAlimtalkAppender subscriptionAlimtalkAppender;
     private final SubscriptionResultReader subscriptionResultReader;
     private final CertificateLinkIssuer certificateLinkIssuer;
-    private final ContractUpdater contractUpdater;
-    private final ContractWriter contractWriter;
 
     public SubscriptionResult subscribe(String company, SubscriptionCommand cmd) {
         ContractInfo contract = contractReader.getById(cmd.contractId());

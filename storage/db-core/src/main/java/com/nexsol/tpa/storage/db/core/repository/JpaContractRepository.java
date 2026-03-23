@@ -13,7 +13,8 @@ public interface JpaContractRepository extends JpaRepository<TravelContractEntit
             """
                 select c
                 from TravelContractEntity c
-                where c.status <> com.nexsol.tpa.core.enums.TravelContractStatus.PENDING
+                where c.deletedAt is null
+                  and c.status <> com.nexsol.tpa.core.enums.TravelContractStatus.PENDING
                 order by
                   case when c.authUniqueKey is null then 1 else 0 end asc,
                   c.authUniqueKey desc,
@@ -25,7 +26,8 @@ public interface JpaContractRepository extends JpaRepository<TravelContractEntit
             """
                 select c
                 from TravelContractEntity c
-                where c.authUniqueKey = :authUniqueKey
+                where c.deletedAt is null
+                  and c.authUniqueKey = :authUniqueKey
                   and c.status <> com.nexsol.tpa.core.enums.TravelContractStatus.PENDING
                 order by c.id desc
             """)

@@ -11,8 +11,12 @@ public class ApplyValidator {
     public void validate(ContractApply cmd) {
         requireNotNull(cmd.insurerId(), "insurerId");
         requireNotNull(cmd.partnerId(), "partnerId");
+        requireNotBlank(cmd.partnerName(), "partnerName");
         requireNotNull(cmd.channelId(), "channelId");
+        requireNotBlank(cmd.channelName(), "channelName");
         requireNotNull(cmd.familyId(), "familyId");
+        requireNotBlank(cmd.meritzQuoteGroupNumber(), "meritzQuoteGroupNumber");
+        requireNotBlank(cmd.meritzQuoteRequestNumber(), "meritzQuoteRequestNumber");
         requireNotNull(cmd.insureBeginDate(), "insureBeginDate");
         requireNotNull(cmd.insureEndDate(), "insureEndDate");
         requireNotBlank(cmd.countryCode(), "countryCode");
