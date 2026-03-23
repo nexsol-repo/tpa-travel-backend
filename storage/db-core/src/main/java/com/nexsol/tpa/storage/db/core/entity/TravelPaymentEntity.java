@@ -97,6 +97,7 @@ public class TravelPaymentEntity extends BaseEntity {
                                 ? com.nexsol.tpa.core.enums.TravelPaymentMethod.valueOf(
                                         p.paymentMethod())
                                 : null)
+                .paymentDate(p.paymentDate())
                 .paidAmount(p.paidAmount())
                 .status(
                         p.status() != null

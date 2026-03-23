@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 
 import org.springframework.stereotype.Component;
 
+import com.nexsol.tpa.core.domain.refund.Refund;
 import com.nexsol.tpa.core.domain.repository.PaymentRepository;
 import com.nexsol.tpa.core.enums.TravelPaymentMethod;
 import com.nexsol.tpa.core.enums.TravelPaymentStatus;
@@ -28,7 +29,7 @@ public class PaymentWriter {
                         .build());
     }
 
-    public void markCanceled(Payment payment) {
-        paymentRepository.markCanceled(payment.id());
+    public void cancelPayment(Payment payment, Refund refund) {
+        paymentRepository.cancelPayment(payment.id(), refund);
     }
 }
