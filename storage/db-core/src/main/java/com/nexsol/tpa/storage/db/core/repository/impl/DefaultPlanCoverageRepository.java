@@ -1,11 +1,18 @@
 package com.nexsol.tpa.storage.db.core.repository.impl;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Repository;
 
 import com.nexsol.tpa.core.domain.coverage.PlanCoverage;
 import com.nexsol.tpa.core.domain.repository.PlanCoverageRepository;
+import com.nexsol.tpa.storage.db.core.entity.TravelInsuranceCoverageEntity;
+import com.nexsol.tpa.storage.db.core.entity.TravelPlanCoverageEntity;
+import com.nexsol.tpa.storage.db.core.repository.JpaInsuranceCoverageRepository;
 import com.nexsol.tpa.storage.db.core.repository.JpaPlanCoverageRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -14,28 +21,36 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class DefaultPlanCoverageRepository implements PlanCoverageRepository {
 
-    private final JpaPlanCoverageRepository jpaRepository;
+    private final JpaPlanCoverageRepository jpaPlanCoverageRepository;
+    private final JpaInsuranceCoverageRepository jpaInsuranceCoverageRepository;
 
     @Override
     public List<PlanCoverage> findByPlanId(Long planId) {
-        return jpaRepository.findRowsByPlanId(planId).stream()
+        List<TravelPlanCoverageEntity> planCoverages =
+                jpaPlanCoverageRepository.findByPlanIdOrderBySortOrderAscIdAsc(planId);
+        if (planCoverages.isEmpty()) {
+            return List.of();
+        }
+
+        Set<Long> coverageIds =
+                planCoverages.stream()
+                        .map(TravelPlanCoverageEntity::getCoverageId)
+                        .collect(Collectors.toSet());
+
+        Map<Long, TravelInsuranceCoverageEntity> coverageMap =
+                jpaInsuranceCoverageRepository.findAllById(coverageIds).stream()
+                        .collect(
+                                Collectors.toMap(
+                                        TravelInsuranceCoverageEntity::getId, Function.identity()));
+
+        return planCoverages.stream()
                 .map(
-                        row ->
-                                PlanCoverage.builder()
-                                        .planId(row.getPlanId())
-                                        .coverageCode(row.getCoverageCode())
-                                        .coverageName(row.getCoverageName())
-                                        .displayName(row.getDisplayName())
-                                        .included(row.isIncluded())
-                                        .sortOrder(row.getSortOrder())
-                                        .majorCoverage(row.isMajorCoverage())
-                                        .titleYn(row.isTitleYn())
-                                        .categoryCode(row.getCategoryCode())
-                                        .claimReasonOverride(row.getClaimReasonOverride())
-                                        .claimContentOverride(row.getClaimContentOverride())
-                                        .subTitleOverride(row.getSubTitleOverride())
-                                        .subContentOverride(row.getSubContentOverride())
-                                        .build())
+                        pc -> {
+                            TravelInsuranceCoverageEntity cov = coverageMap.get(pc.getCoverageId());
+                            String coverageCode = cov != null ? cov.getCoverageCode() : null;
+                            String coverageName = cov != null ? cov.getCoverageName() : null;
+                            return pc.toDomain(coverageCode, coverageName);
+                        })
                 .toList();
     }
 }
