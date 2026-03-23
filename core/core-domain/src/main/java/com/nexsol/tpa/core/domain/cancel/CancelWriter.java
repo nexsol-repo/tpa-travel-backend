@@ -6,7 +6,7 @@ import com.nexsol.tpa.core.domain.contract.ContractInfo;
 import com.nexsol.tpa.core.domain.payment.Payment;
 import com.nexsol.tpa.core.domain.payment.PaymentWriter;
 import com.nexsol.tpa.core.domain.refund.ContractRefund;
-import com.nexsol.tpa.core.domain.refund.RefundWriter;
+import com.nexsol.tpa.core.domain.refund.Refund;
 import com.nexsol.tpa.core.domain.snapshot.SnapshotAppender;
 import com.nexsol.tpa.core.enums.TravelPaymentMethod;
 
@@ -20,24 +20,24 @@ import tools.jackson.databind.ObjectMapper;
 public class CancelWriter {
 
     private final PaymentWriter paymentWriter;
-    private final RefundWriter refundWriter;
     private final SnapshotAppender snapshotAppender;
     private final ObjectMapper objectMapper;
 
     public void save(ContractInfo contract, Payment payment, ContractRefund contractRefund) {
 
-        paymentWriter.markCanceled(payment);
+        Refund refund =
+                Refund.builder()
+                        .paymentId(payment.id())
+                        .contractId(contract.id())
+                        .refundAmount(contract.totalPremium())
+                        .refundMethod(TravelPaymentMethod.CARD)
+                        .bankName(contractRefund.bankName())
+                        .accountNumber(contractRefund.accountNumber())
+                        .depositorName(contractRefund.depositorName())
+                        .refundReason(contractRefund.refundReason())
+                        .build();
 
-        refundWriter.create(
-                new ContractRefund(
-                        contract.id(),
-                        payment.id(),
-                        contract.totalPremium(),
-                        TravelPaymentMethod.CARD,
-                        contractRefund.bankName(),
-                        contractRefund.accountNumber(),
-                        contractRefund.depositorName(),
-                        contractRefund.refundReason()));
+        paymentWriter.cancelPayment(payment, refund);
 
         snapshotAppender.append(contract.id(), contract.insurerId(), "CANCEL", toJson("CANCELED"));
     }
