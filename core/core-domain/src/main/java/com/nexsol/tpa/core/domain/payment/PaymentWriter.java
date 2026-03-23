@@ -29,15 +29,6 @@ public class PaymentWriter {
     }
 
     public void markCanceled(Payment payment) {
-        paymentRepository.save(
-                Payment.builder()
-                        .id(payment.id())
-                        .contractId(payment.contractId())
-                        .paymentMethod(payment.paymentMethod())
-                        .paidAmount(payment.paidAmount())
-                        .status(TravelPaymentStatus.CANCELED.name())
-                        .paymentDate(payment.paymentDate())
-                        .cancelDate(LocalDateTime.now())
-                        .build());
+        paymentRepository.markCanceled(payment.id());
     }
 }

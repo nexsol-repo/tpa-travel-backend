@@ -26,6 +26,13 @@ public class DefaultPaymentRepository implements PaymentRepository {
     }
 
     @Override
+    public void markCanceled(Long paymentId) {
+        jpaRepository
+                .findById(paymentId)
+                .ifPresent(entity -> entity.markCanceled(null));
+    }
+
+    @Override
     public Optional<Payment> findByContractId(Long contractId) {
         return jpaRepository.findByContractId(contractId).map(TravelPaymentEntity::toDomain);
     }
