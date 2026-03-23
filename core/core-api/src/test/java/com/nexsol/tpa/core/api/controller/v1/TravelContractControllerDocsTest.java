@@ -19,7 +19,10 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 
-import com.nexsol.tpa.core.api.controller.v1.response.ContractQueryResponse;
+import com.nexsol.tpa.core.api.controller.v1.response.ContractDetail;
+import com.nexsol.tpa.core.api.controller.v1.response.ContractListItem;
+import com.nexsol.tpa.core.api.controller.v1.response.Contractor;
+import com.nexsol.tpa.core.api.controller.v1.response.InsuredPersonDetail;
 import com.nexsol.tpa.core.domain.contract.*;
 import com.nexsol.tpa.core.domain.contract.TravelContractQueryService;
 import com.nexsol.tpa.core.domain.payment.Payment;
@@ -42,7 +45,7 @@ class TravelContractControllerDocsTest extends RestDocsTest {
     @Test
     void contractListByAuthKey() throws Exception {
         var item =
-                ContractQueryResponse.ContractListItem.builder()
+                ContractListItem.builder()
                         .id(100L)
                         .policyNumber("POL001")
                         .totalPremium(new BigDecimal("27000"))
@@ -62,7 +65,7 @@ class TravelContractControllerDocsTest extends RestDocsTest {
                                         .build())
                         .auth(AuthInfo.builder().build())
                         .contractor(
-                                ContractQueryResponse.Contractor.builder()
+                                Contractor.builder()
                                         .name("홍길동")
                                         .phone("01012345678")
                                         .email("hong@test.com")
@@ -213,6 +216,8 @@ class TravelContractControllerDocsTest extends RestDocsTest {
                     .type(STRING)
                     .description("여권번호 (마스킹)")
                     .optional(),
+            fieldWithPath("data.people[].phone").type(STRING).description("연락처").optional(),
+            fieldWithPath("data.people[].email").type(STRING).description("이메일").optional(),
             fieldWithPath("data.people[].insurePremium")
                     .type(NUMBER)
                     .description("피보험자 보험료")
@@ -222,8 +227,8 @@ class TravelContractControllerDocsTest extends RestDocsTest {
 
     // ── Sample Data ──
 
-    private ContractQueryResponse.ContractDetail sampleContractDetail() {
-        return ContractQueryResponse.ContractDetail.builder()
+    private ContractDetail sampleContractDetail() {
+        return ContractDetail.builder()
                 .contract(
                         ContractInfo.builder()
                                 .id(100L)
@@ -259,14 +264,16 @@ class TravelContractControllerDocsTest extends RestDocsTest {
                                 .build())
                 .people(
                         List.of(
-                                ContractQueryResponse.InsuredPersonView.builder()
+                                InsuredPersonDetail.builder()
                                         .id(1L)
                                         .name("홍길동")
                                         .gender("1")
                                         .isContractor(true)
                                         .residentNumberMasked("900101-*******")
+                                        .phone("01012345678")
+                                        .email("hong@test.com")
                                         .build(),
-                                ContractQueryResponse.InsuredPersonView.builder()
+                                InsuredPersonDetail.builder()
                                         .id(2L)
                                         .name("김영희")
                                         .gender("2")

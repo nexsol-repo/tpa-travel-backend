@@ -2,16 +2,12 @@ package com.nexsol.tpa.core.api.controller.v1.response;
 
 import static com.nexsol.tpa.core.support.MaskingUtils.*;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import com.nexsol.tpa.core.domain.contract.*;
 import com.nexsol.tpa.core.domain.payment.Payment;
 import com.nexsol.tpa.core.domain.plan.InsurancePlan;
 import com.nexsol.tpa.core.domain.plan.Insurer;
-
-import lombok.Builder;
 
 public final class ContractQueryResponse {
 
@@ -20,61 +16,7 @@ public final class ContractQueryResponse {
 
     private ContractQueryResponse() {}
 
-    // ── 목록 조회 ──
-
-    @Builder
-    public record ContractListItem(
-            Long id,
-            String policyNumber,
-            BigDecimal totalPremium,
-            String status,
-            int insuredPeopleNumber,
-            LocalDateTime applyDate,
-            String termsUrl,
-            String policyLink,
-            Insurer insurer,
-            Partner partner,
-            Channel channel,
-            InsurancePlan plan,
-            InsurePeriod insurePeriod,
-            AuthInfo auth,
-            Contractor contractor,
-            Payment payment,
-            List<PersonSummary> people) {}
-
-    // ── 상세 조회 ──
-
-    @Builder
-    public record ContractDetail(
-            ContractInfo contract,
-            Insurer insurer,
-            Partner partner,
-            Channel channel,
-            InsurancePlan plan,
-            Payment payment,
-            String termsUrl,
-            String policyLink,
-            List<InsuredPersonView> people) {}
-
-    @Builder
-    public record InsuredPersonView(
-            Long id,
-            Long planId,
-            boolean isContractor,
-            String name,
-            String englishName,
-            String gender,
-            String residentNumberMasked,
-            String passportNumberMasked,
-            BigDecimal insurePremium) {}
-
-    @Builder
-    public record Contractor(
-            String name, String residentNumberMasked, String phone, String email) {}
-
-    // ── 개념객체 → Presentation 변환 ──
-
-    public static ContractListItem toContractListItem(
+    public static ContractListItem of(
             ContractInfo c, Payment payment, InsurancePlan plan, List<InsuredPerson> people) {
 
         var contractor =
@@ -112,7 +54,7 @@ public final class ContractQueryResponse {
                 .build();
     }
 
-    public static ContractDetail toContractDetail(
+    public static ContractDetail of(
             ContractInfo contract,
             Payment payment,
             List<InsuredPerson> people,
@@ -134,7 +76,7 @@ public final class ContractQueryResponse {
                         people.stream()
                                 .map(
                                         p ->
-                                                InsuredPersonView.builder()
+                                                InsuredPersonDetail.builder()
                                                         .id(p.id())
                                                         .planId(p.planId())
                                                         .isContractor(p.isContractor())
@@ -145,6 +87,8 @@ public final class ContractQueryResponse {
                                                                 maskRrn(p.residentNumber()))
                                                         .passportNumberMasked(
                                                                 maskPassport(p.passportNumber()))
+                                                        .phone(p.phone())
+                                                        .email(p.email())
                                                         .insurePremium(p.insurePremium())
                                                         .build())
                                 .toList())
