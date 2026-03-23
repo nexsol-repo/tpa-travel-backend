@@ -3,6 +3,8 @@ package com.nexsol.tpa.storage.db.core.entity;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import com.nexsol.tpa.core.domain.auth.AuthCertResultInfo;
+
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -161,5 +163,47 @@ public class TpaAuthCertResultEntity extends BaseEntity {
         this.matchedYn = matchedYn;
         this.matchFailReason = matchFailReason;
         this.rawResJson = rawResJson;
+    }
+
+    public AuthCertResultInfo toDomain() {
+        return AuthCertResultInfo.builder()
+                .id(id)
+                .logId(logId)
+                .moid(moid)
+                .impUid(impUid)
+                .requestId(requestId)
+                .uniqueKey(uniqueKey)
+                .resultStatus(resultStatus)
+                .resultCode(resultCode)
+                .resultMsg(resultMsg)
+                .certName(certName)
+                .certBirthday(certBirthday)
+                .certGender(certGender)
+                .certPhone(certPhone)
+                .matched("Y".equals(matchedYn))
+                .matchedYn(matchedYn)
+                .matchFailReason(matchFailReason)
+                .rawResJson(rawResJson)
+                .build();
+    }
+
+    public static TpaAuthCertResultEntity fromDomain(AuthCertResultInfo info) {
+        return TpaAuthCertResultEntity.builder()
+                .logId(info.logId())
+                .moid(info.moid())
+                .impUid(info.impUid())
+                .requestId(info.requestId())
+                .uniqueKey(info.uniqueKey())
+                .resultStatus(info.resultStatus())
+                .resultCode(info.resultCode())
+                .resultMsg(info.resultMsg())
+                .certName(info.certName())
+                .certBirthday(info.certBirthday())
+                .certGender(info.certGender())
+                .certPhone(info.certPhone())
+                .matchedYn(info.matchedYn())
+                .matchFailReason(info.matchFailReason())
+                .rawResJson(info.rawResJson())
+                .build();
     }
 }

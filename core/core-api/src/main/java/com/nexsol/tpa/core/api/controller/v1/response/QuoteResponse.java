@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.nexsol.tpa.core.domain.plan.TravelPlanReader.PlanFamily;
+import com.nexsol.tpa.core.domain.plan.PlanFamily;
 import com.nexsol.tpa.core.domain.premium.PlanCondition;
 import com.nexsol.tpa.core.domain.premium.PremiumResult;
 import com.nexsol.tpa.core.domain.premium.QuoteResult;
@@ -157,7 +157,7 @@ public class QuoteResponse {
 
         List<PlanCard> cards = new ArrayList<>();
         for (PlanFamily family : families) {
-            Long planId = family.repPlan().getId();
+            Long planId = family.repPlan().id();
             PremiumResult premium = premiumMap.get(planId);
             if (premium == null) continue;
 
@@ -168,13 +168,13 @@ public class QuoteResponse {
             cards.add(
                     PlanCard.builder()
                             .planId(planId)
-                            .planGrpCd(family.repPlan().getPlanGroupCode())
-                            .planCd(family.repPlan().getPlanCode())
+                            .planGrpCd(family.repPlan().planGroupCode())
+                            .planCd(family.repPlan().planCode())
                             .planNm(toDisplayName(family.familyName()))
                             .planNmRaw(
-                                    family.repPlan().getPlanFullName() != null
-                                            ? family.repPlan().getPlanFullName()
-                                            : family.repPlan().getPlanName())
+                                    family.repPlan().planFullName() != null
+                                            ? family.repPlan().planFullName()
+                                            : family.repPlan().planName())
                             .premium(
                                     Premium.builder()
                                             .ttPrem(premium.totalPremium())
@@ -230,14 +230,14 @@ public class QuoteResponse {
         String coverageTitle = buildCoverageTitle(dbCoverages, premium.coverageAmounts());
 
         return PlanCard.builder()
-                .planId(family.repPlan().getId())
-                .planGrpCd(family.repPlan().getPlanGroupCode())
-                .planCd(family.repPlan().getPlanCode())
+                .planId(family.repPlan().id())
+                .planGrpCd(family.repPlan().planGroupCode())
+                .planCd(family.repPlan().planCode())
                 .planNm(toDisplayName(family.familyName()))
                 .planNmRaw(
-                        family.repPlan().getPlanFullName() != null
-                                ? family.repPlan().getPlanFullName()
-                                : family.repPlan().getPlanName())
+                        family.repPlan().planFullName() != null
+                                ? family.repPlan().planFullName()
+                                : family.repPlan().planName())
                 .premium(Premium.builder().ttPrem(premium.totalPremium()).currency("KRW").build())
                 .insuredPremiums(
                         premium.insuredPremiums() != null

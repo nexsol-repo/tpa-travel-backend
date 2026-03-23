@@ -5,10 +5,10 @@ import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
-import com.nexsol.tpa.client.meritz.bridge.dto.MeritzBridgeApiResponse;
-import com.nexsol.tpa.client.meritz.contract.MeritzContractClient;
 import com.nexsol.tpa.core.api.controller.v1.request.ContractInquiryRequest;
 import com.nexsol.tpa.core.api.controller.v1.request.ContractListRequest;
+import com.nexsol.tpa.core.domain.client.InsuranceContractClient;
+import com.nexsol.tpa.core.domain.client.InsuranceContractClient.BridgeApiResult;
 
 import lombok.RequiredArgsConstructor;
 
@@ -16,9 +16,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class InquiryService {
 
-    private final MeritzContractClient meritzClient;
+    private final InsuranceContractClient meritzClient;
 
-    public MeritzBridgeApiResponse contractList(String company, ContractListRequest request) {
+    public BridgeApiResult contractList(String company, ContractListRequest request) {
         Map<String, Object> bodyFields = new LinkedHashMap<>();
         if (request.polNo() != null) bodyFields.put("polNo", request.polNo());
         if (request.quotReqNo() != null) bodyFields.put("quotReqNo", request.quotReqNo());
@@ -27,7 +27,7 @@ public class InquiryService {
         return meritzClient.contractList(company, bodyFields);
     }
 
-    public MeritzBridgeApiResponse contractDetail(String company, ContractInquiryRequest request) {
+    public BridgeApiResult contractDetail(String company, ContractInquiryRequest request) {
         Map<String, Object> bodyFields = new LinkedHashMap<>();
         if (request.polNo() != null) bodyFields.put("polNo", request.polNo());
         if (request.ctrNo() != null) bodyFields.put("ctrNo", request.ctrNo());

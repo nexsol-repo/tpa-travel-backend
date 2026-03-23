@@ -3,6 +3,7 @@ package com.nexsol.tpa.storage.db.core.entity;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import com.nexsol.tpa.core.domain.refund.Refund;
 import com.nexsol.tpa.core.enums.TravelPaymentMethod;
 
 import jakarta.persistence.*;
@@ -68,5 +69,33 @@ public class TravelRefundEntity extends BaseEntity {
         this.depositorName = depositorName;
         this.refundReason = refundReason;
         this.refundedAt = LocalDateTime.now();
+    }
+
+    public Refund toDomain() {
+        return Refund.builder()
+                .id(id)
+                .paymentId(paymentId)
+                .contractId(contractId)
+                .refundAmount(refundAmount)
+                .refundMethod(refundMethod)
+                .bankName(bankName)
+                .accountNumber(accountNumber)
+                .depositorName(depositorName)
+                .refundReason(refundReason)
+                .refundedAt(refundedAt)
+                .build();
+    }
+
+    public static TravelRefundEntity fromDomain(Refund r) {
+        return TravelRefundEntity.builder()
+                .paymentId(r.paymentId())
+                .contractId(r.contractId())
+                .refundAmount(r.refundAmount())
+                .refundMethod(r.refundMethod())
+                .bankName(r.bankName())
+                .accountNumber(r.accountNumber())
+                .depositorName(r.depositorName())
+                .refundReason(r.refundReason())
+                .build();
     }
 }

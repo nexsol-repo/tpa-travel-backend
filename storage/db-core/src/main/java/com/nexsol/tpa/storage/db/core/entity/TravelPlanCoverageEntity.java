@@ -2,6 +2,8 @@ package com.nexsol.tpa.storage.db.core.entity;
 
 import java.time.LocalDateTime;
 
+import com.nexsol.tpa.core.domain.coverage.PlanCoverage;
+
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -106,5 +108,23 @@ public class TravelPlanCoverageEntity extends BaseEntity {
         this.claimContentOverride = claimContentOverride;
         this.subTitleOverride = subTitleOverride;
         this.subContentOverride = subContentOverride;
+    }
+
+    public PlanCoverage toDomain(String coverageCode, String coverageName) {
+        return PlanCoverage.builder()
+                .planId(planId)
+                .coverageCode(coverageCode)
+                .coverageName(coverageName)
+                .displayName(displayName)
+                .included(Boolean.TRUE.equals(isIncluded))
+                .sortOrder(sortOrder != null ? sortOrder : 0)
+                .majorCoverage(Boolean.TRUE.equals(isMajorCoverage))
+                .titleYn(Boolean.TRUE.equals(titleYn))
+                .categoryCode(categoryCode)
+                .claimReasonOverride(claimReasonOverride)
+                .claimContentOverride(claimContentOverride)
+                .subTitleOverride(subTitleOverride)
+                .subContentOverride(subContentOverride)
+                .build();
     }
 }

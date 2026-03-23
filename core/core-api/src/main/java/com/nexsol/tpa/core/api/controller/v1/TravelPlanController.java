@@ -11,7 +11,7 @@ import com.nexsol.tpa.core.api.controller.v1.request.PlanRequest;
 import com.nexsol.tpa.core.api.controller.v1.response.PlanCoverageResponse;
 import com.nexsol.tpa.core.api.controller.v1.response.PlanListResponse;
 import com.nexsol.tpa.core.domain.coverage.TravelCoverageService;
-import com.nexsol.tpa.core.domain.plan.TravelPlanReader.PlanFamily;
+import com.nexsol.tpa.core.domain.plan.PlanFamily;
 import com.nexsol.tpa.core.domain.plan.TravelPlanService;
 import com.nexsol.tpa.core.domain.premium.PlanCondition;
 import com.nexsol.tpa.core.domain.premium.PremiumResult;
@@ -55,7 +55,7 @@ public class TravelPlanController {
                 premiumService.calculateSingle(
                         request.toPlanCondition(), family, request.getRepresentativeIndex());
         List<QuoteResult.DbCoverage> coverages =
-                coverageService.findCoverages(family.repPlan().getId());
+                coverageService.findCoverages(family.repPlan().id());
         return PlanCoverageResponse.of(family, premium, coverages);
     }
 }

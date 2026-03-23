@@ -13,6 +13,7 @@ import com.nexsol.tpa.client.meritz.bridge.MeritzBridgeFeignClient;
 import com.nexsol.tpa.client.meritz.bridge.dto.MeritzBridgeApiResponse;
 import com.nexsol.tpa.client.meritz.config.CompaniesConfigsProperties;
 import com.nexsol.tpa.client.meritz.config.CompaniesConfigsProperties.CompanyConfig;
+import com.nexsol.tpa.core.domain.client.InsuranceContractClient;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class MeritzContractClient {
+public class MeritzContractClient implements InsuranceContractClient {
 
     private final MeritzBridgeFeignClient bridgeClient;
     private final CompaniesConfigsProperties companies;
@@ -28,21 +29,22 @@ public class MeritzContractClient {
 
     // ── estimateSave (가입확정) ──
 
-    public SubscriptionApiResult estimateSave(EstimateSaveRequest req) {
-        CompanyConfig cfg = companies.resolve(req.company());
+    @Override
+    public SubscriptionResult estimateSave(EstimateSaveCommand cmd) {
+        CompanyConfig cfg = companies.resolve(cmd.company());
 
         Map<String, Object> body = companyBody(cfg);
-        body.put("polNo", req.polNo());
-        body.put("pdCd", req.pdCd());
-        body.put("untPdCd", req.untPdCd());
-        body.put("sbcpDt", req.sbcpDt());
-        body.put("insBgnDt", req.insBgnDt());
-        body.put("insEdDt", req.insEdDt());
-        body.put("trvArCd", req.trvArCd());
-        body.put("inspeCnt", req.insuredPeople().size());
+        body.put("polNo", cmd.polNo());
+        body.put("pdCd", cmd.pdCd());
+        body.put("untPdCd", cmd.untPdCd());
+        body.put("sbcpDt", cmd.sbcpDt());
+        body.put("insBgnDt", cmd.insBgnDt());
+        body.put("insEdDt", cmd.insEdDt());
+        body.put("trvArCd", cmd.trvArCd());
+        body.put("inspeCnt", cmd.insuredPeople().size());
 
         List<Map<String, Object>> insuredVos =
-                req.insuredPeople().stream()
+                cmd.insuredPeople().stream()
                         .map(
                                 p -> {
                                     Map<String, Object> m = new LinkedHashMap<>();
@@ -58,16 +60,16 @@ public class MeritzContractClient {
                         .toList();
         body.put("opapiTrvPremCmptInspeInfCbcVo", insuredVos);
 
-        if (req.grupSalChnDivCd() != null && !req.grupSalChnDivCd().isBlank()) {
-            body.put("grupSalChnDivCd", req.grupSalChnDivCd());
+        if (cmd.grupSalChnDivCd() != null && !cmd.grupSalChnDivCd().isBlank()) {
+            body.put("grupSalChnDivCd", cmd.grupSalChnDivCd());
         }
 
-        if (req.cardNo() != null && !req.cardNo().isBlank()) {
+        if (cmd.cardNo() != null && !cmd.cardNo().isBlank()) {
             Map<String, Object> card = new LinkedHashMap<>();
-            card.put("crdNo", req.cardNo());
-            card.put("efctPrd", req.efctPrd());
-            card.put("dporNm", req.dporNm());
-            card.put("dporCd", req.dporCd());
+            card.put("crdNo", cmd.cardNo());
+            card.put("efctPrd", cmd.efctPrd());
+            card.put("dporNm", cmd.dporNm());
+            card.put("dporCd", cmd.dporCd());
             body.put("ctrTrsInfBcVo", card);
         }
 
@@ -75,11 +77,11 @@ public class MeritzContractClient {
         log.info("[MERITZ][EST_SAVE] success={}, errCd={}", res.isSuccess(), res.getErrCd());
 
         if (!res.isSuccess()) {
-            return SubscriptionApiResult.fail(res.getErrCd(), res.getErrMsg(), res);
+            return SubscriptionResult.fail(res.getErrCd(), res.getErrMsg(), res);
         }
 
         JsonNode data = parseData(res.getData());
-        return SubscriptionApiResult.success(
+        return SubscriptionResult.success(
                 parseBigDecimal(data, "ttPrem"),
                 data.path("polNo").asText(null),
                 data.path("quotGrpNo").asText(null),
@@ -89,6 +91,7 @@ public class MeritzContractClient {
 
     // ── 계약 취소 ──
 
+    @Override
     public void cancelContract(String company, String polNo, String quotGrpNo, String quotReqNo) {
         CompanyConfig cfg = companies.resolve(company);
 
@@ -112,7 +115,8 @@ public class MeritzContractClient {
 
     // ── 증명서 ──
 
-    public CertificateApiResult issueCertificate(
+    @Override
+    public CertificateLinkResult issueCertificate(
             String company,
             String polNo,
             String pdCd,
@@ -125,10 +129,11 @@ public class MeritzContractClient {
                 callCertificate(company, polNo, pdCd, quotGrpNo, quotReqNo, otptDiv, otptTpCd);
 
         JsonNode data = parseData(res.getData());
-        return new CertificateApiResult(data.path("rltLinkUrl").asText(null));
+        return new CertificateLinkResult(data.path("rltLinkUrl").asText(null));
     }
 
-    public MeritzBridgeApiResponse issueCertificateRaw(
+    @Override
+    public BridgeApiResult issueCertificateRaw(
             String company,
             String polNo,
             String pdCd,
@@ -137,7 +142,9 @@ public class MeritzContractClient {
             String otptDiv,
             String otptTpCd) {
 
-        return callCertificate(company, polNo, pdCd, quotGrpNo, quotReqNo, otptDiv, otptTpCd);
+        MeritzBridgeApiResponse res =
+                callCertificate(company, polNo, pdCd, quotGrpNo, quotReqNo, otptDiv, otptTpCd);
+        return new BridgeApiResult(res.isSuccess(), res.getErrCd(), res.getErrMsg(), res.getData());
     }
 
     private MeritzBridgeApiResponse callCertificate(
@@ -171,7 +178,8 @@ public class MeritzContractClient {
 
     // ── 계약 목록/상세 조회 ──
 
-    public MeritzBridgeApiResponse contractList(String company, Map<String, Object> bodyFields) {
+    @Override
+    public BridgeApiResult contractList(String company, Map<String, Object> bodyFields) {
         CompanyConfig cfg = companies.resolve(company);
 
         Map<String, Object> body = companyBody(cfg);
@@ -184,10 +192,11 @@ public class MeritzContractClient {
             throw new MeritzContractClientException(
                     "계약목록조회 실패. errCd=" + res.getErrCd() + ", errMsg=" + res.getErrMsg());
         }
-        return res;
+        return new BridgeApiResult(res.isSuccess(), res.getErrCd(), res.getErrMsg(), res.getData());
     }
 
-    public MeritzBridgeApiResponse contractDetail(String company, Map<String, Object> bodyFields) {
+    @Override
+    public BridgeApiResult contractDetail(String company, Map<String, Object> bodyFields) {
         CompanyConfig cfg = companies.resolve(company);
 
         Map<String, Object> body = companyBody(cfg);
@@ -200,7 +209,7 @@ public class MeritzContractClient {
             throw new MeritzContractClientException(
                     "계약조회 실패. errCd=" + res.getErrCd() + ", errMsg=" + res.getErrMsg());
         }
-        return res;
+        return new BridgeApiResult(res.isSuccess(), res.getErrCd(), res.getErrMsg(), res.getData());
     }
 
     // ── private helpers ──
@@ -232,32 +241,5 @@ public class MeritzContractClient {
         } catch (NumberFormatException e) {
             return null;
         }
-    }
-
-    // ── estimateSave 요청 DTO ──
-
-    public record EstimateSaveRequest(
-            String company,
-            String polNo,
-            String pdCd,
-            String untPdCd,
-            String sbcpDt,
-            String insBgnDt,
-            String insEdDt,
-            String trvArCd,
-            String grupSalChnDivCd,
-            String cardNo,
-            String efctPrd,
-            String dporNm,
-            String dporCd,
-            List<InsuredPerson> insuredPeople) {
-
-        public record InsuredPerson(
-                String inspeBdt,
-                String gndrCd,
-                String inspeNm,
-                String engInspeNm,
-                String planGrpCd,
-                String planCd) {}
     }
 }

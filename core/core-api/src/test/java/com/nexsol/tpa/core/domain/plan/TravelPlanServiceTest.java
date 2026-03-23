@@ -10,31 +10,27 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import com.nexsol.tpa.core.domain.plan.TravelPlanReader.PlanFamily;
 import com.nexsol.tpa.core.domain.premium.PlanCondition;
-import com.nexsol.tpa.core.support.error.CoreApiException;
-import com.nexsol.tpa.storage.db.core.entity.TravelInsurancePlanEntity;
+import com.nexsol.tpa.core.error.CoreException;
 
 class TravelPlanServiceTest {
 
-    private TravelPlanReader planReader;
+    private PlanReader planReader;
     private QuotePlanPolicy policy;
     private TravelPlanService service;
 
     @BeforeEach
     void setUp() {
-        planReader = mock(TravelPlanReader.class);
+        planReader = mock(PlanReader.class);
         policy = new QuotePlanPolicy();
         service = new TravelPlanService(planReader, policy);
     }
 
     // ── 테스트 데이터 ──
 
-    private static TravelInsurancePlanEntity plan(
-            Long id, int ageGroupId, String planCode, String planName) {
-        return TravelInsurancePlanEntity.builder()
+    private static InsurancePlan plan(Long id, int ageGroupId, String planCode, String planName) {
+        return InsurancePlan.builder()
                 .id(id)
-                .insurerId(1L)
                 .familyId(1L)
                 .planName(planName)
                 .planFullName(planName)
@@ -43,8 +39,6 @@ class TravelPlanServiceTest {
                 .productCode("15540")
                 .unitProductCode("15541")
                 .ageGroupId(ageGroupId)
-                .isActive(true)
-                .sortOrder(0)
                 .build();
     }
 
@@ -52,9 +46,15 @@ class TravelPlanServiceTest {
             Long familyId,
             String familyName,
             boolean isLoss,
-            TravelInsurancePlanEntity repPlan,
-            List<TravelInsurancePlanEntity> plans) {
-        return new PlanFamily(familyId, familyName, isLoss, repPlan, plans);
+            InsurancePlan repPlan,
+            List<InsurancePlan> plans) {
+        return PlanFamily.builder()
+                .familyId(familyId)
+                .familyName(familyName)
+                .isLoss(isLoss)
+                .repPlan(repPlan)
+                .plans(plans)
+                .build();
     }
 
     private static PlanCondition condition(
@@ -89,9 +89,9 @@ class TravelPlanServiceTest {
                 family(15L, "가뿐한플랜B 실손제외", false, planB_15_69_ex, List.of(planB_15_69_ex)));
     }
 
-    private static void assertCoreApiException(Throwable t, String dataContains) {
-        assertThat(t).isInstanceOf(CoreApiException.class);
-        assertThat(((CoreApiException) t).getData().toString()).contains(dataContains);
+    private static void assertCoreException(Throwable t, String messageContains) {
+        assertThat(t).isInstanceOf(CoreException.class);
+        assertThat(t.getMessage()).contains(messageContains);
     }
 
     // ── 검증 실패 ──
@@ -106,7 +106,7 @@ class TravelPlanServiceTest {
             var cmd = condition("20260326", List.of());
 
             assertThatThrownBy(() -> service.findQuoteFamilies(cmd))
-                    .satisfies(t -> assertCoreApiException(t, "insuredList is empty"));
+                    .satisfies(t -> assertCoreException(t, "insuredList is empty"));
         }
 
         @Test
@@ -123,7 +123,7 @@ class TravelPlanServiceTest {
                             false);
 
             assertThatThrownBy(() -> service.findQuoteFamilies(cmd))
-                    .satisfies(t -> assertCoreApiException(t, "insurerId is required"));
+                    .satisfies(t -> assertCoreException(t, "insurerId is required"));
         }
 
         @Test
@@ -140,7 +140,7 @@ class TravelPlanServiceTest {
                             false);
 
             assertThatThrownBy(() -> service.findQuoteFamilies(cmd))
-                    .satisfies(t -> assertCoreApiException(t, "representativeIndex is invalid"));
+                    .satisfies(t -> assertCoreException(t, "representativeIndex is invalid"));
         }
     }
 
@@ -249,7 +249,7 @@ class TravelPlanServiceTest {
                             List.of(insured("19941118", "1"), insured("19550101", "1")));
 
             assertThatThrownBy(() -> service.findFamilyByPlanId(cmd, 8L))
-                    .satisfies(t -> assertCoreApiException(t, "planId=8"));
+                    .satisfies(t -> assertCoreException(t, "planId=8"));
         }
 
         @Test
@@ -260,7 +260,7 @@ class TravelPlanServiceTest {
             var cmd = condition("20260326", List.of(insured("19941118", "1")));
 
             assertThatThrownBy(() -> service.findFamilyByPlanId(cmd, 999L))
-                    .satisfies(t -> assertCoreApiException(t, "planId=999"));
+                    .satisfies(t -> assertCoreException(t, "planId=999"));
         }
     }
 

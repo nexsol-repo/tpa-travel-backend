@@ -10,6 +10,8 @@ import com.nexsol.tpa.client.meritz.bridge.MeritzBridgeFeignClient;
 import com.nexsol.tpa.client.meritz.bridge.dto.MeritzBridgeApiResponse;
 import com.nexsol.tpa.client.meritz.config.CompaniesConfigsProperties;
 import com.nexsol.tpa.client.meritz.config.CompaniesConfigsProperties.CompanyConfig;
+import com.nexsol.tpa.core.domain.client.InsuranceContractClient.BridgeApiResult;
+import com.nexsol.tpa.core.domain.client.InsurancePaymentClient;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,12 +19,13 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class MeritzPaymentClient {
+public class MeritzPaymentClient implements InsurancePaymentClient {
 
     private final MeritzBridgeFeignClient bridgeClient;
     private final CompaniesConfigsProperties companies;
 
-    public MeritzBridgeApiResponse approveCard(
+    @Override
+    public BridgeApiResult approveCard(
             String company,
             String polNo,
             String quotGrpNo,
@@ -58,10 +61,11 @@ public class MeritzPaymentClient {
 
         MeritzBridgeApiResponse res = bridgeClient.cardApprove(body);
         log.info("[PAYMENT][CARD_APPROVE] success={}, errCd={}", res.isSuccess(), res.getErrCd());
-        return res;
+        return new BridgeApiResult(res.isSuccess(), res.getErrCd(), res.getErrMsg(), res.getData());
     }
 
-    public MeritzBridgeApiResponse cancelCard(
+    @Override
+    public BridgeApiResult cancelCard(
             String company, String polNo, String estNo, String orgApvNo, String cncAmt) {
 
         CompanyConfig cfg = companies.resolve(company);
@@ -78,6 +82,6 @@ public class MeritzPaymentClient {
 
         MeritzBridgeApiResponse res = bridgeClient.cardCancel(body);
         log.info("[PAYMENT][CARD_CANCEL] success={}, errCd={}", res.isSuccess(), res.getErrCd());
-        return res;
+        return new BridgeApiResult(res.isSuccess(), res.getErrCd(), res.getErrMsg(), res.getData());
     }
 }

@@ -3,6 +3,9 @@ meritz:
     url: ${MERITZ_API_URL:https://apiportaldev.meritzfire.com:26000}
     oauth-uri: ${MERITZ_OAUTH_URI:/b2b/v1/oauth/2.0/token}
 
+  bridge:
+    base-url: ${MERITZ_BRIDGE_BASE_URL:https://dev-meritz-bridge.nexsol.ai}
+
   client-id: ${MERITZ_CLIENT_ID:}
   client-secret: ${MERITZ_CLIENT_SECRET:}
 
@@ -11,5 +14,15 @@ meritz:
     response-timeout-ms: 120000
 
   ssl:
-    # 로컬에서만 true로 쓰는 옵션 (신뢰서버/인증서 문제 우회용)
     insecure: ${MERITZ_SSL_INSECURE:false}
+
+companies:
+  configs:
+    tpa:
+      client-id: ${MERITZ_TPA_CLIENT_ID:}
+      client-secret: ${MERITZ_TPA_CLIENT_SECRET:}
+      company-code: ${MERITZ_TPA_COMPANY_CODE:TPA}
+      aflco-div-cd: ${MERITZ_TPA_AFLCO_DIV_CD:TPA}
+      gnr-aflco-cd: ${MERITZ_TPA_GNR_AFLCO_CD:020}
+      bizpe-no: ${MERITZ_TPA_BIZPE_NO:}
+      pol-no: ${MERITZ_TPA_POL_NO:}
