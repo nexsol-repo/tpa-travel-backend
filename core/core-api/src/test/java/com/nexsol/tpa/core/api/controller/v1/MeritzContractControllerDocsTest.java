@@ -343,7 +343,7 @@ class MeritzContractControllerDocsTest extends RestDocsTest {
                     .description("메리츠 견적요청번호")
                     .optional(),
             fieldWithPath("countryCode").type(STRING).description("국가코드"),
-            fieldWithPath("countryName").type(STRING).description("국가명"),
+            fieldWithPath("countryName").type(STRING).description("국가명").optional(),
             fieldWithPath("insureBeginDate").type(STRING).description("보험시작일 (YYYY-MM-DD)"),
             fieldWithPath("insureEndDate").type(STRING).description("보험종료일 (YYYY-MM-DD)"),
             fieldWithPath("totalPremium").type(NUMBER).description("총 보험료"),
@@ -353,7 +353,7 @@ class MeritzContractControllerDocsTest extends RestDocsTest {
             fieldWithPath("people[].gender").type(STRING).description("성별 (1: 남, 2: 여)"),
             fieldWithPath("people[].residentNumber").type(STRING).description("주민등록번호"),
             fieldWithPath("people[].englishName").type(STRING).description("영문이름"),
-            fieldWithPath("people[].passportNumber").type(STRING).description("여권번호"),
+            fieldWithPath("people[].passportNumber").type(STRING).description("여권번호").optional(),
             fieldWithPath("people[].phone").type(STRING).description("휴대폰번호").optional(),
             fieldWithPath("people[].email").type(STRING).description("이메일").optional(),
             fieldWithPath("people[].insurePremium").type(NUMBER).description("피보험자 보험료"),

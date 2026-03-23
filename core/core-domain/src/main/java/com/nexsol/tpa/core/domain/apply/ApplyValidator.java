@@ -15,8 +15,6 @@ public class ApplyValidator {
         requireNotNull(cmd.channelId(), "channelId");
         requireNotBlank(cmd.channelName(), "channelName");
         requireNotNull(cmd.familyId(), "familyId");
-        requireNotBlank(cmd.meritzQuoteGroupNumber(), "meritzQuoteGroupNumber");
-        requireNotBlank(cmd.meritzQuoteRequestNumber(), "meritzQuoteRequestNumber");
         requireNotNull(cmd.insureBeginDate(), "insureBeginDate");
         requireNotNull(cmd.insureEndDate(), "insureEndDate");
         requireNotBlank(cmd.countryCode(), "countryCode");
@@ -34,7 +32,10 @@ public class ApplyValidator {
     private void validatePerson(NewInsuredPerson p, int index) {
         requireNotNull(p.planId(), "people[" + index + "].planId");
         requireNotBlank(p.name(), "people[" + index + "].name");
+        requireNotBlank(p.gender(), "people[" + index + "].gender");
+        requireNotBlank(p.englishName(), "people[" + index + "].englishName");
         requireNotBlank(p.residentNumber(), "people[" + index + "].residentNumber");
+        requireNotNull(p.insurePremium(), "people[" + index + "].insurePremium");
     }
 
     private void requireNotNull(Object value, String fieldName) {
