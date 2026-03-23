@@ -35,10 +35,11 @@ public class DefaultPaymentRepository implements PaymentRepository {
     public void cancelPayment(Long paymentId, Refund refund) {
         jpaRepository
                 .findById(paymentId)
-                .ifPresent(entity -> {
-                    entity.markCanceled(null);
-                    jpaRepository.save(entity);
-                });
+                .ifPresent(
+                        entity -> {
+                            entity.markCanceled(null);
+                            jpaRepository.save(entity);
+                        });
         refundJpaRepository.save(TravelRefundEntity.fromDomain(refund));
     }
 
