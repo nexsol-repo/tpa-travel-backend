@@ -1,12 +1,13 @@
 package com.nexsol.tpa.core.domain.contract;
 
-import static com.nexsol.tpa.core.api.controller.v1.response.ContractQueryResponse.*;
-
 import java.util.List;
 import java.util.Objects;
 
 import org.springframework.stereotype.Service;
 
+import com.nexsol.tpa.core.api.controller.v1.response.ContractDetail;
+import com.nexsol.tpa.core.api.controller.v1.response.ContractListItem;
+import com.nexsol.tpa.core.api.controller.v1.response.ContractQueryResponse;
 import com.nexsol.tpa.core.support.PageResult;
 import com.nexsol.tpa.core.support.SortPage;
 
@@ -52,7 +53,7 @@ public class TravelContractQueryService {
                                                     .filter(Objects::nonNull)
                                                     .findFirst()
                                                     .orElse(null);
-                                    return toContractListItem(
+                                    return ContractQueryResponse.of(
                                             c,
                                             payMap.get(c.id()),
                                             repPlanId != null ? planMap.get(repPlanId) : null,
@@ -79,6 +80,6 @@ public class TravelContractQueryService {
         var partner = referenceFinder.findPartner(contract.partnerId());
         var channel = referenceFinder.findChannel(contract.channelId());
 
-        return toContractDetail(contract, payment, people, plan, insurer, partner, channel);
+        return ContractQueryResponse.of(contract, payment, people, plan, insurer, partner, channel);
     }
 }
