@@ -101,6 +101,9 @@ public class TravelContractEntity extends BaseEntity {
     @Column(name = "auth_date")
     private LocalDateTime authDate;
 
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
+
     // ── 생성 ──
 
     public static TravelContractEntity create(
@@ -209,6 +212,9 @@ public class TravelContractEntity extends BaseEntity {
                                 .build())
                 .auth(
                         AuthInfo.builder()
+                                .provider(authProvider)
+                                .impUid(authImpUid)
+                                .requestId(authRequestId)
                                 .uniqueKey(authUniqueKey)
                                 .status(authStatus)
                                 .date(authDate)
@@ -246,6 +252,9 @@ public class TravelContractEntity extends BaseEntity {
             entity.countryName = info.insurePeriod().countryName();
         }
         if (info.auth() != null) {
+            entity.authProvider = info.auth().provider();
+            entity.authImpUid = info.auth().impUid();
+            entity.authRequestId = info.auth().requestId();
             entity.authUniqueKey = info.auth().uniqueKey();
             entity.authStatus = info.auth().status();
             entity.authDate = info.auth().date();

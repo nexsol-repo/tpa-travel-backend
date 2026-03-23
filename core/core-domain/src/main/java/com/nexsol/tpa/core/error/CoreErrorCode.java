@@ -32,5 +32,6 @@ public enum CoreErrorCode {
     // 본인인증
     T6000,
     T6001,
-    T6002;
+    T6002,
+    T6003;
 }
