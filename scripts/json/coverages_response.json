@@ -1,0 +1,349 @@
+{
+  "coverageTitle": "보장금액 : 해외여행중상해_사망 2억원 / 해외여행중상해_후유장해 2억원 / 휴대품손해(분실제외,자기부담금1만원,보상한도개당20만원)특별약관 70만원",
+  "coverages": [
+    {
+      "categoryCode": "DEATH_DISABILITY",
+      "covCd": "151910",
+      "covNm": "해외여행중상해_사망",
+      "cur": "KRW",
+      "insdAmt": 200000000,
+      "units": [
+        {
+          "ageBandCode": "AGE_15_69",
+          "ageBandLabel": "15~69세",
+          "count": 1,
+          "insdAmt": 200000000,
+          "premSum": 591
+        }
+      ]
+    },
+    {
+      "categoryCode": "DEATH_DISABILITY",
+      "covCd": "151920",
+      "covNm": "해외여행중상해_후유장해",
+      "cur": "KRW",
+      "insdAmt": 200000000,
+      "units": [
+        {
+          "ageBandCode": "AGE_15_69",
+          "ageBandLabel": "15~69세",
+          "count": 1,
+          "insdAmt": 200000000,
+          "premSum": 591
+        }
+      ]
+    },
+    {
+      "categoryCode": "DEATH_DISABILITY",
+      "covCd": "154960",
+      "covNm": "질병사망 및 질병 80%이상 고도후유장해",
+      "cur": "KRW",
+      "insdAmt": 20000000,
+      "units": [
+        {
+          "ageBandCode": "AGE_15_69",
+          "ageBandLabel": "15~69세",
+          "count": 1,
+          "insdAmt": 20000000,
+          "premSum": 144
+        }
+      ]
+    },
+    {
+      "categoryCode": "LOST_DELAY",
+      "covCd": "157400",
+      "covNm": "해외여행중 여권분실후 재발급비용 특별약관",
+      "cur": "KRW",
+      "insdAmt": 60000,
+      "units": [
+        {
+          "ageBandCode": "AGE_15_69",
+          "ageBandLabel": "15~69세",
+          "count": 1,
+          "insdAmt": 60000,
+          "premSum": 12
+        }
+      ]
+    },
+    {
+      "categoryCode": "LOST_DELAY",
+      "covCd": "157410",
+      "covNm": "해외여행중 항공기 및 수하물 지연비용",
+      "cur": "KRW",
+      "insdAmt": 200000,
+      "units": [
+        {
+          "ageBandCode": "AGE_15_69",
+          "ageBandLabel": "15~69세",
+          "count": 1,
+          "insdAmt": 200000,
+          "premSum": 280
+        }
+      ]
+    },
+    {
+      "categoryCode": "LOST_DELAY",
+      "covCd": "100230",
+      "covNm": "휴대품손해(분실제외,자기부담금1만원,보상한도개당20만원)특별약관",
+      "cur": "KRW",
+      "insdAmt": 700000,
+      "units": [
+        {
+          "ageBandCode": "AGE_15_69",
+          "ageBandLabel": "15~69세",
+          "count": 1,
+          "insdAmt": 700000,
+          "premSum": 1971
+        }
+      ]
+    },
+    {
+      "categoryCode": "LOST_DELAY",
+      "covCd": "157420",
+      "covNm": "해외여행중 중단사고발생 특별약관",
+      "cur": "KRW",
+      "insdAmt": 200000,
+      "units": [
+        {
+          "ageBandCode": "AGE_15_69",
+          "ageBandLabel": "15~69세",
+          "count": 1,
+          "insdAmt": 200000,
+          "premSum": 7
+        }
+      ]
+    },
+    {
+      "categoryCode": "LOST_DELAY",
+      "covCd": "155570",
+      "covNm": "항공기납치",
+      "cur": "KRW",
+      "insdAmt": 1400000,
+      "units": [
+        {
+          "ageBandCode": "AGE_15_69",
+          "ageBandLabel": "15~69세",
+          "count": 1,
+          "insdAmt": 1400000,
+          "premSum": 9
+        }
+      ]
+    },
+    {
+      "categoryCode": "RETURN_TREATMENT",
+      "covCd": "163770",
+      "covNm": "해외여행중 골절진단비(치아파절 제외) 특별약관",
+      "cur": "KRW",
+      "insdAmt": 100000,
+      "units": [
+        {
+          "ageBandCode": "AGE_15_69",
+          "ageBandLabel": "15~69세",
+          "count": 1,
+          "insdAmt": 100000,
+          "premSum": 23
+        }
+      ]
+    },
+    {
+      "categoryCode": "RETURN_TREATMENT",
+      "covCd": "160064",
+      "covNm": "해외여행중식중독비용",
+      "cur": "KRW",
+      "insdAmt": 200000,
+      "units": [
+        {
+          "ageBandCode": "AGE_15_69",
+          "ageBandLabel": "15~69세",
+          "count": 1,
+          "insdAmt": 200000,
+          "premSum": 6
+        }
+      ]
+    },
+    {
+      "categoryCode": "RETURN_TREATMENT",
+      "covCd": "155840",
+      "covNm": "여행중 중대사고 송환비용",
+      "cur": "KRW",
+      "insdAmt": 30000000,
+      "units": [
+        {
+          "ageBandCode": "AGE_15_69",
+          "ageBandLabel": "15~69세",
+          "count": 1,
+          "insdAmt": 30000000,
+          "premSum": 63
+        }
+      ]
+    },
+    {
+      "categoryCode": "OVERSEAS_TREATMENT",
+      "covCd": "150690",
+      "covNm": "해외발생의료실비_상해",
+      "cur": "KRW",
+      "insdAmt": 30000000,
+      "units": [
+        {
+          "ageBandCode": "AGE_15_69",
+          "ageBandLabel": "15~69세",
+          "count": 1,
+          "insdAmt": 30000000,
+          "premSum": 939
+        }
+      ]
+    },
+    {
+      "categoryCode": "OVERSEAS_TREATMENT",
+      "covCd": "155300",
+      "covNm": "해외발생의료실비_질병",
+      "cur": "KRW",
+      "insdAmt": 30000000,
+      "units": [
+        {
+          "ageBandCode": "AGE_15_69",
+          "ageBandLabel": "15~69세",
+          "count": 1,
+          "insdAmt": 30000000,
+          "premSum": 1304
+        }
+      ]
+    },
+    {
+      "categoryCode": "OVERSEAS_TREATMENT",
+      "covCd": "159680",
+      "covNm": "4세대 3대비급여 실손의료비(개인)",
+      "cur": "KRW",
+      "insdAmt": 3500000,
+      "units": [
+        {
+          "ageBandCode": "AGE_15_69",
+          "ageBandLabel": "15~69세",
+          "count": 1,
+          "insdAmt": 3500000,
+          "premSum": 15
+        }
+      ]
+    },
+    {
+      "categoryCode": "OVERSEAS_TREATMENT",
+      "covCd": "159640",
+      "covNm": "4세대 상해급여 실손의료비(개인)",
+      "cur": "KRW",
+      "insdAmt": 10000000,
+      "units": [
+        {
+          "ageBandCode": "AGE_15_69",
+          "ageBandLabel": "15~69세",
+          "count": 1,
+          "insdAmt": 10000000,
+          "premSum": 65
+        }
+      ]
+    },
+    {
+      "categoryCode": "OVERSEAS_TREATMENT",
+      "covCd": "159660",
+      "covNm": "4세대 상해비급여 실손의료비(개인)",
+      "cur": "KRW",
+      "insdAmt": 10000000,
+      "units": [
+        {
+          "ageBandCode": "AGE_15_69",
+          "ageBandLabel": "15~69세",
+          "count": 1,
+          "insdAmt": 10000000,
+          "premSum": 61
+        }
+      ]
+    },
+    {
+      "categoryCode": "LIABILITY",
+      "covCd": "159650",
+      "covNm": "4세대 질병급여 실손의료비(개인)",
+      "cur": "KRW",
+      "insdAmt": 10000000,
+      "units": [
+        {
+          "ageBandCode": "AGE_15_69",
+          "ageBandLabel": "15~69세",
+          "count": 1,
+          "insdAmt": 10000000,
+          "premSum": 52
+        }
+      ]
+    },
+    {
+      "categoryCode": "MAJOR_ACCIDENT",
+      "covCd": "159670",
+      "covNm": "4세대 질병비급여 실손의료비(개인)",
+      "cur": "KRW",
+      "insdAmt": 10000000,
+      "units": [
+        {
+          "ageBandCode": "AGE_15_69",
+          "ageBandLabel": "15~69세",
+          "count": 1,
+          "insdAmt": 10000000,
+          "premSum": 43
+        }
+      ]
+    },
+    {
+      "categoryCode": "MAJOR_ACCIDENT",
+      "covCd": "201040",
+      "covNm": "여행중배상책임_대인대물",
+      "cur": "KRW",
+      "insdAmt": 30000000,
+      "units": [
+        {
+          "ageBandCode": "AGE_15_69",
+          "ageBandLabel": "15~69세",
+          "count": 1,
+          "insdAmt": 30000000,
+          "premSum": 13
+        }
+      ]
+    },
+    {
+      "categoryCode": null,
+      "covCd": "102390",
+      "covNm": "해외여행중 자택 도난손해(가재) 보장 특별약관",
+      "cur": "KRW",
+      "insdAmt": 1000000,
+      "units": [
+        {
+          "ageBandCode": "AGE_15_69",
+          "ageBandLabel": "15~69세",
+          "count": 1,
+          "insdAmt": 1000000,
+          "premSum": 97
+        }
+      ]
+    }
+  ],
+  "familyId": 10,
+  "insuredPremiums": [
+    {
+      "ageBandCode": null,
+      "ageBandLabel": null,
+      "birth": "19941118",
+      "currency": "KRW",
+      "cusEngNm": "HONG GIL DONG",
+      "cusNm": "홍길동",
+      "gndrCd": "1",
+      "index": 0,
+      "planId": 10,
+      "ppsPrem": 7010
+    }
+  ],
+  "planCd": "TA4",
+  "planGrpCd": "TPA",
+  "planId": 10,
+  "planNm": "딱좋은플랜",
+  "planNmRaw": "딱좋은플랜B_15~69세",
+  "premium": {
+    "currency": "KRW",
+    "ttPrem": 7010
+  }
+}

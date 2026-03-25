@@ -2,7 +2,7 @@ package com.nexsol.tpa.core.domain.cancel;
 
 import org.springframework.stereotype.Service;
 
-import com.nexsol.tpa.core.domain.client.InsuranceContractClient;
+import com.nexsol.tpa.core.domain.client.CancelProvider;
 import com.nexsol.tpa.core.domain.contract.ContractInfo;
 import com.nexsol.tpa.core.domain.contract.ContractReader;
 import com.nexsol.tpa.core.domain.contract.ContractValidator;
@@ -16,7 +16,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CancelService {
 
-    private final InsuranceContractClient meritzClient;
+    private final CancelProvider cancelProvider;
     private final ContractReader contractReader;
     private final ContractValidator contractValidator;
     private final PaymentReader paymentReader;
@@ -33,11 +33,11 @@ public class CancelService {
             ContractValidator.requireNotBlank(
                     contract.policyNumber(), "policyNumber(polNo) is required");
 
-            meritzClient.cancelContract(
+            cancelProvider.cancelContract(
                     company,
                     contract.policyNumber(),
-                    contract.meritzQuote().groupNumber(),
-                    contract.meritzQuote().requestNumber());
+                    contract.quote().groupNumber(),
+                    contract.quote().requestNumber());
 
             cancelWriter.save(contract, payment, contractRefund);
         }

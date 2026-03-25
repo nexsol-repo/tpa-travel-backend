@@ -61,6 +61,7 @@ public class QuoteInsuredAssembler {
             return null;
         }
 
+        int repIdx = cmd.representativeIndex() == null ? 0 : cmd.representativeIndex();
         return new PremiumCommand(
                 DEFAULT_COMPANY,
                 repPlan.productCode(),
@@ -69,6 +70,7 @@ public class QuoteInsuredAssembler {
                 cmd.insBgnDt(),
                 cmd.insEdDt(),
                 cmd.trvArCd(),
+                repIdx,
                 insuredPersons);
     }
 

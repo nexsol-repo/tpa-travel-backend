@@ -22,9 +22,6 @@ public class MeritzQuoteClient implements InsuranceQuoteClient {
     private final CompaniesConfigsProperties companies;
     private final ObjectMapper objectMapper;
 
-    /**
-     * 보험료 산출 API 호출. 성공 시 raw JSON 문자열 반환, 실패 시 null 반환.
-     */
     @Override
     public String calculatePremium(PremiumCommand command) {
         CompanyConfig cfg = companies.resolve(command.company());
@@ -69,10 +66,9 @@ public class MeritzQuoteClient implements InsuranceQuoteClient {
         }
 
         try {
-            String json = objectMapper.writeValueAsString(res.getData());
-            return json;
+            return objectMapper.writeValueAsString(res.getData());
         } catch (Exception e) {
-            log.error("[QUOTE] 응답 파싱 실패", e);
+            log.error("[QUOTE] 응답 직렬화 실패", e);
             return null;
         }
     }

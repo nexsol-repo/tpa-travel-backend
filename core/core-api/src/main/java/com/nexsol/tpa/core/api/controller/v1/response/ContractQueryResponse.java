@@ -53,45 +53,4 @@ public final class ContractQueryResponse {
                 .people(people.stream().map(p -> new PersonSummary(p.id(), p.name())).toList())
                 .build();
     }
-
-    public static ContractDetail of(
-            ContractInfo contract,
-            Payment payment,
-            List<InsuredPerson> people,
-            InsurancePlan plan,
-            Insurer insurer,
-            Partner partner,
-            Channel channel) {
-
-        return ContractDetail.builder()
-                .contract(contract)
-                .insurer(insurer)
-                .partner(partner)
-                .channel(channel)
-                .plan(plan)
-                .payment(payment)
-                .termsUrl(TERMS_URL)
-                .policyLink(contract.policyLink())
-                .people(
-                        people.stream()
-                                .map(
-                                        p ->
-                                                InsuredPersonDetail.builder()
-                                                        .id(p.id())
-                                                        .planId(p.planId())
-                                                        .isContractor(p.isContractor())
-                                                        .name(p.name())
-                                                        .englishName(p.englishName())
-                                                        .gender(p.gender())
-                                                        .residentNumberMasked(
-                                                                maskRrn(p.residentNumber()))
-                                                        .passportNumberMasked(
-                                                                maskPassport(p.passportNumber()))
-                                                        .phone(p.phone())
-                                                        .email(p.email())
-                                                        .insurePremium(p.insurePremium())
-                                                        .build())
-                                .toList())
-                .build();
-    }
 }
