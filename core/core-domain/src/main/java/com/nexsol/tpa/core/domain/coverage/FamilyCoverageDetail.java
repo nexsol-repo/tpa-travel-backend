@@ -9,10 +9,11 @@ public record FamilyCoverageDetail(
         int sortOrder,
         boolean featured,
         String displayName,
-        String sectionName) {
+        String sectionName,
+        int sectionSortOrder) {
 
     public static FamilyCoverageDetail of(
-            FamilyCoverage fc, Coverage coverage, String sectionName) {
+            FamilyCoverage fc, Coverage coverage, String sectionName, int sectionSortOrder) {
         return FamilyCoverageDetail.builder()
                 .familyId(fc.familyId())
                 .coverage(coverage)
@@ -20,6 +21,7 @@ public record FamilyCoverageDetail(
                 .featured(fc.featured())
                 .displayName(fc.displayName())
                 .sectionName(sectionName)
+                .sectionSortOrder(sectionSortOrder)
                 .build();
     }
 

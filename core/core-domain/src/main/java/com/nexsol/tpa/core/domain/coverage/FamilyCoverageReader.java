@@ -64,13 +64,21 @@ public class FamilyCoverageReader {
                         fc -> {
                             Coverage coverage = coverageMap.get(fc.coverageId());
                             String sectionName = null;
+                            int sectionSortOrder = Integer.MAX_VALUE;
                             if (coverage != null) {
                                 CoverageSection section = sectionMap.get(coverage.sectionCode());
-                                sectionName = section != null ? section.sectionName() : null;
+                                if (section != null) {
+                                    sectionName = section.sectionName();
+                                    sectionSortOrder = section.sortOrder();
+                                }
                             }
-                            return FamilyCoverageDetail.of(fc, coverage, sectionName);
+                            return FamilyCoverageDetail.of(
+                                    fc, coverage, sectionName, sectionSortOrder);
                         })
                 .filter(detail -> detail.coverage() != null)
+                .sorted(
+                        java.util.Comparator.comparingInt(FamilyCoverageDetail::sectionSortOrder)
+                                .thenComparingInt(FamilyCoverageDetail::sortOrder))
                 .toList();
     }
 }

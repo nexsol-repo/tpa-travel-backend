@@ -11,5 +11,7 @@ public class RepresentativeCoverageResponse {
 
     private String covNm;
 
+    private String coverageName;
+
     private long insdAmt;
 }
