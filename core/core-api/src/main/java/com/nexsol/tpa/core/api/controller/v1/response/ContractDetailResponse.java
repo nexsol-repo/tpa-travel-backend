@@ -7,10 +7,10 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.nexsol.tpa.core.domain.contract.*;
+import com.nexsol.tpa.core.domain.contract.ContractDetail;
+import com.nexsol.tpa.core.domain.contract.ContractInfo;
 import com.nexsol.tpa.core.domain.payment.Payment;
 import com.nexsol.tpa.core.domain.plan.InsurancePlan;
-import com.nexsol.tpa.core.domain.plan.Insurer;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -67,14 +67,10 @@ public class ContractDetailResponse {
     private static final String TERMS_URL =
             "https://filer.bucket.nexsol.ai/buckets/tpa-travel-dev/insurance/term.pdf";
 
-    public static ContractDetailResponse of(
-            ContractInfo contract,
-            Payment payment,
-            List<InsuredPerson> people,
-            InsurancePlan plan,
-            Insurer insurer,
-            Partner partner,
-            Channel channel) {
+    public static ContractDetailResponse of(ContractDetail detail) {
+        ContractInfo contract = detail.contract();
+        Payment payment = detail.payment();
+        InsurancePlan plan = detail.plan();
 
         return ContractDetailResponse.builder()
                 .contractId(contract.id())
@@ -101,12 +97,12 @@ public class ContractDetailResponse {
                 .quoteGroupNumber(contract.quote() != null ? contract.quote().groupNumber() : null)
                 .quoteRequestNumber(
                         contract.quote() != null ? contract.quote().requestNumber() : null)
-                .insurerId(insurer != null ? insurer.id() : null)
-                .insurerName(insurer != null ? insurer.name() : null)
-                .partnerId(partner != null ? partner.id() : null)
-                .partnerName(partner != null ? partner.name() : null)
-                .channelId(channel != null ? channel.id() : null)
-                .channelName(channel != null ? channel.name() : null)
+                .insurerId(contract.insurerId())
+                .insurerName(contract.insurerName())
+                .partnerId(contract.partnerId())
+                .partnerName(contract.partnerName())
+                .channelId(contract.channelId())
+                .channelName(contract.channelName())
                 .planId(plan != null ? plan.id() : null)
                 .planName(plan != null ? plan.planName() : null)
                 .planCode(plan != null ? plan.planCode() : null)
@@ -115,7 +111,7 @@ public class ContractDetailResponse {
                 .paidAmount(payment != null ? payment.paidAmount() : null)
                 .paymentDate(payment != null ? payment.paymentDate() : null)
                 .people(
-                        people.stream()
+                        detail.people().stream()
                                 .map(
                                         p ->
                                                 InsuredPersonDetail.builder()

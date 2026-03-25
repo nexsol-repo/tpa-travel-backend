@@ -12,12 +12,13 @@ import com.nexsol.tpa.core.api.controller.v1.response.CertificateLinkResponse;
 import com.nexsol.tpa.core.api.controller.v1.response.ContractCompletedResponse;
 import com.nexsol.tpa.core.api.controller.v1.response.ContractDetailResponse;
 import com.nexsol.tpa.core.api.controller.v1.response.ContractListItem;
+import com.nexsol.tpa.core.api.controller.v1.response.ContractQueryResponse;
 import com.nexsol.tpa.core.api.controller.v1.response.InsuredContractDetailResponse;
 import com.nexsol.tpa.core.api.controller.v1.response.InsuredContractListResponse;
 import com.nexsol.tpa.core.domain.apply.ApplyService;
 import com.nexsol.tpa.core.domain.cancel.CancelService;
 import com.nexsol.tpa.core.domain.certificate.CertificateService;
-import com.nexsol.tpa.core.domain.contract.TravelContractQueryService;
+import com.nexsol.tpa.core.domain.contract.ContractQueryService;
 import com.nexsol.tpa.core.domain.inquiry.InquiryService;
 import com.nexsol.tpa.core.domain.subscription.SubscriptionService;
 import com.nexsol.tpa.core.support.PageResult;
@@ -35,7 +36,7 @@ public class ContractController {
     private final CancelService cancelService;
     private final CertificateService certificateService;
     private final InquiryService inquiryService;
-    private final TravelContractQueryService queryService;
+    private final ContractQueryService queryService;
 
     // ── 계약 조회 (우리 DB) ──
 
@@ -45,13 +46,20 @@ public class ContractController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
         var result = queryService.list(authUniqueKey, page, size);
-        return ApiResponse.success(result);
+        var items =
+                result.getContent().stream()
+                        .map(
+                                r ->
+                                        ContractQueryResponse.of(
+                                                r.contract(), r.payment(), r.plan(), r.people()))
+                        .toList();
+        return ApiResponse.success(PageResult.of(items, result.getTotalElements(), size, page));
     }
 
     @GetMapping("/contracts/{id}")
     public ApiResponse<ContractDetailResponse> get(@PathVariable Long id) {
         var detail = queryService.get(id);
-        return ApiResponse.success(detail);
+        return ApiResponse.success(ContractDetailResponse.of(detail));
     }
 
     // ── 계약 조회 (보험사 API) ──
