@@ -3,12 +3,12 @@ package com.nexsol.tpa.core.domain.coverage;
 import lombok.Builder;
 
 @Builder
-public record CoverageResult(
+public record Coverage(
         Long id,
+        Long insurerId,
         String coverageCode,
         String coverageName,
         String sectionCode,
-        String sectionName,
         String claimReason,
         String claimContent,
         String subTitle,

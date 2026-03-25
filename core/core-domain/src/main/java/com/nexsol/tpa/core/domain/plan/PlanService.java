@@ -19,7 +19,7 @@ import lombok.RequiredArgsConstructor;
  */
 @Service
 @RequiredArgsConstructor
-public class TravelPlanService {
+public class PlanService {
 
     private final PlanReader planReader;
     private final QuotePlanPolicy policy;

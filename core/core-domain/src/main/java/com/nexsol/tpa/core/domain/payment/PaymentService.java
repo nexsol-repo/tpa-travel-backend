@@ -2,10 +2,7 @@ package com.nexsol.tpa.core.domain.payment;
 
 import org.springframework.stereotype.Service;
 
-import com.nexsol.tpa.core.domain.client.InsuranceContractClient.BridgeApiResult;
-import com.nexsol.tpa.core.domain.client.InsurancePaymentClient;
-import com.nexsol.tpa.core.error.CoreErrorType;
-import com.nexsol.tpa.core.error.CoreException;
+import com.nexsol.tpa.core.domain.client.PaymentProvider;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,13 +10,11 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class MeritzPaymentService {
+public class PaymentService {
 
-    private static final String DEFAULT_COMPANY = "tpa";
+    private final PaymentProvider paymentProvider;
 
-    private final InsurancePaymentClient paymentClient;
-
-    public BridgeApiResult approveCard(
+    public CardApproval approveCard(
             String company,
             String polNo,
             String quotGrpNo,
@@ -29,50 +24,12 @@ public class MeritzPaymentService {
             String dporNm,
             String dporCd,
             String rcptPrem) {
-
-        String resolvedCompany = resolveCompany(company);
-        BridgeApiResult res =
-                paymentClient.approveCard(
-                        resolvedCompany,
-                        polNo,
-                        quotGrpNo,
-                        quotReqNo,
-                        crdNo,
-                        efctPrd,
-                        dporNm,
-                        dporCd,
-                        rcptPrem);
-
-        if (!res.success()) {
-            throw new CoreException(
-                    CoreErrorType.DEFAULT_ERROR,
-                    "카드승인 실패. errCd=" + res.errCd() + ", errMsg=" + res.errMsg());
-        }
-        return res;
+        return paymentProvider.approveCard(
+                company, polNo, quotGrpNo, quotReqNo, crdNo, efctPrd, dporNm, dporCd, rcptPrem);
     }
 
-    public BridgeApiResult cancelCard(
+    public CardCancellation cancelCard(
             String company, String polNo, String estNo, String orgApvNo, String cncAmt) {
-
-        String resolvedCompany = resolveCompany(company);
-        BridgeApiResult res =
-                paymentClient.cancelCard(resolvedCompany, polNo, estNo, orgApvNo, cncAmt);
-
-        if (!res.success()) {
-            throw new CoreException(
-                    CoreErrorType.DEFAULT_ERROR,
-                    "카드취소 실패. errCd=" + res.errCd() + ", errMsg=" + res.errMsg());
-        }
-        return res;
-    }
-
-    private String resolveCompany(String company) {
-        if (company == null || company.isBlank() || "TPA".equalsIgnoreCase(company)) {
-            return DEFAULT_COMPANY;
-        }
-        if ("INSBOON".equalsIgnoreCase(company)) {
-            return "insboon";
-        }
-        throw new CoreException(CoreErrorType.INVALID_REQUEST, "Unknown company: " + company);
+        return paymentProvider.cancelCard(company, polNo, estNo, orgApvNo, cncAmt);
     }
 }

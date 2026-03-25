@@ -2,7 +2,6 @@ package com.nexsol.tpa.core.domain.subscription;
 
 import org.springframework.stereotype.Component;
 
-import com.nexsol.tpa.core.domain.client.InsuranceContractClient.SubscriptionResult;
 import com.nexsol.tpa.core.domain.contract.ContractInfo;
 import com.nexsol.tpa.core.domain.contract.ContractUpdater;
 import com.nexsol.tpa.core.domain.contract.ContractWriter;
@@ -22,7 +21,7 @@ public class SubscriptionWriter {
     private final PaymentReader paymentReader;
     private final PaymentWriter paymentWriter;
 
-    public ContractInfo updateSubscription(ContractInfo contract, SubscriptionResult apiResult) {
+    public ContractInfo updateSubscription(ContractInfo contract, EstimateSaveResult apiResult) {
         ContractInfo updated =
                 contractUpdater.updateMeritzResult(
                         contract,

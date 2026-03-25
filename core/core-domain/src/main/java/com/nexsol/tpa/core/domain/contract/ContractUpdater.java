@@ -18,7 +18,7 @@ public class ContractUpdater {
                 .channelName(contract.channelName())
                 .familyId(contract.familyId())
                 .policyNumber(contract.policyNumber())
-                .meritzQuote(contract.meritzQuote())
+                .quote(contract.quote())
                 .totalPremium(contract.totalPremium())
                 .policyLink(contract.policyLink())
                 .status("COMPLETED")
@@ -44,19 +44,19 @@ public class ContractUpdater {
         if (ttPrem != null) builder.totalPremium(ttPrem);
         if (polNo != null && !polNo.isBlank()) builder.policyNumber(polNo);
         if (quotGrpNo != null || quotReqNo != null) {
-            builder.meritzQuote(
-                    MeritzQuote.builder()
+            builder.quote(
+                    Quote.builder()
                             .groupNumber(
                                     quotGrpNo != null && !quotGrpNo.isBlank()
                                             ? quotGrpNo
-                                            : contract.meritzQuote() != null
-                                                    ? contract.meritzQuote().groupNumber()
+                                            : contract.quote() != null
+                                                    ? contract.quote().groupNumber()
                                                     : null)
                             .requestNumber(
                                     quotReqNo != null && !quotReqNo.isBlank()
                                             ? quotReqNo
-                                            : contract.meritzQuote() != null
-                                                    ? contract.meritzQuote().requestNumber()
+                                            : contract.quote() != null
+                                                    ? contract.quote().requestNumber()
                                                     : null)
                             .build());
         }
@@ -98,7 +98,7 @@ public class ContractUpdater {
                 .channelName(c.channelName())
                 .familyId(c.familyId())
                 .policyNumber(c.policyNumber())
-                .meritzQuote(c.meritzQuote())
+                .quote(c.quote())
                 .totalPremium(c.totalPremium())
                 .policyLink(c.policyLink())
                 .status(c.status())

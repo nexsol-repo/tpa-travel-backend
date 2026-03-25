@@ -4,9 +4,7 @@ import java.util.*;
 
 import org.springframework.stereotype.Component;
 
-import com.nexsol.tpa.core.domain.coverage.PlanCoverage;
 import com.nexsol.tpa.core.domain.repository.InsurancePlanRepository;
-import com.nexsol.tpa.core.domain.repository.PlanCoverageRepository;
 import com.nexsol.tpa.core.domain.repository.PlanFamilyRepository;
 import com.nexsol.tpa.core.error.CoreErrorType;
 import com.nexsol.tpa.core.error.CoreException;
@@ -19,7 +17,6 @@ public class PlanReader {
 
     private final InsurancePlanRepository planRepository;
     private final PlanFamilyRepository familyRepository;
-    private final PlanCoverageRepository coverageRepository;
 
     public InsurancePlan getById(Long planId) {
         return planRepository
@@ -73,10 +70,6 @@ public class PlanReader {
                         })
                 .filter(Objects::nonNull)
                 .toList();
-    }
-
-    public List<PlanCoverage> loadCoverages(Long planId) {
-        return coverageRepository.findByPlanId(planId);
     }
 
     private InsurancePlan pickRepPlan(List<InsurancePlan> plans) {

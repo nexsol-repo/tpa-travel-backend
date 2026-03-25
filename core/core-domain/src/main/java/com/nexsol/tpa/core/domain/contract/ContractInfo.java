@@ -16,7 +16,7 @@ public record ContractInfo(
         String channelName,
         Long familyId,
         String policyNumber,
-        MeritzQuote meritzQuote,
+        Quote quote,
         BigDecimal totalPremium,
         String policyLink,
         String status,
