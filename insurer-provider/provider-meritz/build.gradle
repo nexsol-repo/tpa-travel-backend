@@ -1,0 +1,16 @@
+plugins {
+    id 'java-library'
+}
+
+dependencies {
+    implementation project(':core:core-domain')
+    implementation project(':clients:client-meritz')
+
+    implementation "org.springframework.boot:spring-boot-autoconfigure"
+    implementation "org.springframework.boot:spring-boot"
+    implementation "org.springframework.boot:spring-boot-starter-json"
+}
+
+test {
+    useJUnitPlatform()
+}
