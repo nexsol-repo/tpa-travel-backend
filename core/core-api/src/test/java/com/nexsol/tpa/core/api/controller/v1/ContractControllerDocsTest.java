@@ -26,7 +26,7 @@ import com.nexsol.tpa.core.domain.cancel.CancelService;
 import com.nexsol.tpa.core.domain.certificate.CertificateCommand;
 import com.nexsol.tpa.core.domain.certificate.CertificateLink;
 import com.nexsol.tpa.core.domain.certificate.CertificateService;
-import com.nexsol.tpa.core.domain.contract.TravelContractQueryService;
+import com.nexsol.tpa.core.domain.contract.ContractQueryService;
 import com.nexsol.tpa.core.domain.inquiry.InquiryService;
 import com.nexsol.tpa.core.domain.inquiry.InsuredContractDetail;
 import com.nexsol.tpa.core.domain.inquiry.InsuredContractSummary;
@@ -44,7 +44,7 @@ class ContractControllerDocsTest extends RestDocsTest {
     private final CancelService cancelService = mock(CancelService.class);
     private final CertificateService certificateService = mock(CertificateService.class);
     private final InquiryService inquiryService = mock(InquiryService.class);
-    private final TravelContractQueryService queryService = mock(TravelContractQueryService.class);
+    private final ContractQueryService queryService = mock(ContractQueryService.class);
 
     @BeforeEach
     void setUpMockMvc(RestDocumentationContextProvider restDocumentation) {

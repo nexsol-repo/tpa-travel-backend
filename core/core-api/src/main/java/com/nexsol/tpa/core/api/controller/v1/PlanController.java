@@ -55,5 +55,3 @@ public class PlanController {
         return ApiResponse.success(PlanCoverageResponse.of(family, premium, coverages));
     }
 }
-
-
