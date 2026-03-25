@@ -136,7 +136,7 @@ public class TravelContractEntity extends BaseEntity {
         this.countryName = countryName;
     }
 
-    public void applyMeritzQuote(
+    public void applyQuote(
             String policyNumber, String quoteGroupNumber, String quoteRequestNumber) {
         this.policyNumber = policyNumber;
         this.meritzQuoteGroupNumber = quoteGroupNumber;
@@ -194,8 +194,8 @@ public class TravelContractEntity extends BaseEntity {
                 .channelName(channelName)
                 .familyId(familyId)
                 .policyNumber(policyNumber)
-                .meritzQuote(
-                        MeritzQuote.builder()
+                .quote(
+                        Quote.builder()
                                 .groupNumber(meritzQuoteGroupNumber)
                                 .requestNumber(meritzQuoteRequestNumber)
                                 .build())
@@ -235,9 +235,9 @@ public class TravelContractEntity extends BaseEntity {
         entity.channelName = info.channelName();
         entity.familyId = info.familyId();
         entity.policyNumber = info.policyNumber();
-        if (info.meritzQuote() != null) {
-            entity.meritzQuoteGroupNumber = info.meritzQuote().groupNumber();
-            entity.meritzQuoteRequestNumber = info.meritzQuote().requestNumber();
+        if (info.quote() != null) {
+            entity.meritzQuoteGroupNumber = info.quote().groupNumber();
+            entity.meritzQuoteRequestNumber = info.quote().requestNumber();
         }
         entity.totalPremium =
                 info.totalPremium() != null ? info.totalPremium() : java.math.BigDecimal.ZERO;
