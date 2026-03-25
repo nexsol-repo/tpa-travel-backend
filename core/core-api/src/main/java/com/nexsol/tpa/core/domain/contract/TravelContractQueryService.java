@@ -5,7 +5,7 @@ import java.util.Objects;
 
 import org.springframework.stereotype.Service;
 
-import com.nexsol.tpa.core.api.controller.v1.response.ContractDetail;
+import com.nexsol.tpa.core.api.controller.v1.response.ContractDetailResponse;
 import com.nexsol.tpa.core.api.controller.v1.response.ContractListItem;
 import com.nexsol.tpa.core.api.controller.v1.response.ContractQueryResponse;
 import com.nexsol.tpa.core.support.PageResult;
@@ -64,7 +64,7 @@ public class TravelContractQueryService {
         return PageResult.of(items, contracts.getTotalElements(), sortPage.size(), sortPage.page());
     }
 
-    public ContractDetail get(Long id) {
+    public ContractDetailResponse get(Long id) {
         var contract = contractFinder.findById(id);
         var payment = paymentFinder.findByContractId(id);
         var people = peopleFinder.findByContractId(id);
@@ -80,6 +80,7 @@ public class TravelContractQueryService {
         var partner = referenceFinder.findPartner(contract.partnerId());
         var channel = referenceFinder.findChannel(contract.channelId());
 
-        return ContractQueryResponse.of(contract, payment, people, plan, insurer, partner, channel);
+        return ContractDetailResponse.of(
+                contract, payment, people, plan, insurer, partner, channel);
     }
 }

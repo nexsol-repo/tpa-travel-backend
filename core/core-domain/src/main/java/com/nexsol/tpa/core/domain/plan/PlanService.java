@@ -1,5 +1,6 @@
 package com.nexsol.tpa.core.domain.plan;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -64,10 +65,18 @@ public class TravelPlanService {
     }
 
     /**
-     * 실손포함 대표 planId → 대응하는 실손제외 대표 planId 매핑을 반환한다.
-     * planCode 기반 매칭: "TA21" (실손포함) → "TA21P" (실손제외)
+     * 실손제외 플랜 매핑을 반환한다.
+     * silsonExclude=true이면 빈 맵, false이면 실손포함→실손제외 planId 매핑.
      */
-    public Map<Long, Long> findSilsonExcludePlanIdMap(PlanCondition cmd) {
+    public Map<Long, Long> resolveSilsonExcludeMap(PlanCondition cmd) {
+        boolean silsonExclude = cmd.silsonExclude() != null && cmd.silsonExclude();
+        if (silsonExclude) {
+            return Collections.emptyMap();
+        }
+        return findSilsonExcludePlanIdMap(cmd);
+    }
+
+    private Map<Long, Long> findSilsonExcludePlanIdMap(PlanCondition cmd) {
         validateQuoteCommand(cmd);
 
         List<PlanFamily> allFamilies = planReader.loadAllFamilies(cmd.insurerId());

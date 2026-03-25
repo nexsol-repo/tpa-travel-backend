@@ -11,40 +11,41 @@ import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
-import java.util.Map;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 
-import com.nexsol.tpa.core.domain.client.InsuranceContractClient.BridgeApiResult;
-import com.nexsol.tpa.core.domain.payment.MeritzPaymentService;
+import com.nexsol.tpa.core.domain.payment.CardApproval;
+import com.nexsol.tpa.core.domain.payment.CardCancellation;
+import com.nexsol.tpa.core.domain.payment.PaymentService;
 import com.nexsol.tpa.test.api.RestDocsTest;
 
 @Tag("restdocs")
-class MeritzPaymentControllerDocsTest extends RestDocsTest {
+class PaymentControllerDocsTest extends RestDocsTest {
 
-    private final MeritzPaymentService service = mock(MeritzPaymentService.class);
+    private final PaymentService service = mock(PaymentService.class);
 
     @BeforeEach
     void setUpMockMvc(RestDocumentationContextProvider restDocumentation) {
         super.setUp(restDocumentation);
-        this.mockMvc = mockController(new MeritzPaymentController(service));
+        this.mockMvc = mockController(new PaymentController(service));
     }
 
     @Test
     void approveCard() throws Exception {
         var response =
-                new BridgeApiResult(
-                        true, null, null, Map.of("apvNo", "APV20260312001", "apvDt", "20260312"));
+                CardApproval.builder()
+                        .approvalNumber("APV20260312001")
+                        .approvalDate("20260312")
+                        .build();
 
         when(service.approveCard(eq("TPA"), any(), any(), any(), any(), any(), any(), any(), any()))
                 .thenReturn(response);
 
         mockMvc.perform(
-                        post("/v1/meritz/payments/cards/approve")
+                        post("/v1/travel/payments/cards/approve")
                                 .param("company", "TPA")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(
@@ -63,7 +64,7 @@ class MeritzPaymentControllerDocsTest extends RestDocsTest {
                 .andDo(print())
                 .andDo(
                         document(
-                                "meritz-payment-card-approve",
+                                "payment-card-approve",
                                 queryParameters(
                                         parameterWithName("company")
                                                 .description("회사코드 (기본값: TPA)")
@@ -90,12 +91,12 @@ class MeritzPaymentControllerDocsTest extends RestDocsTest {
 
     @Test
     void cancelCard() throws Exception {
-        var response = new BridgeApiResult(true, null, null, Map.of("cncNo", "CNC20260312001"));
+        var response = CardCancellation.builder().cancellationNumber("CNC20260312001").build();
 
         when(service.cancelCard(eq("TPA"), any(), any(), any(), any())).thenReturn(response);
 
         mockMvc.perform(
-                        post("/v1/meritz/payments/cards/cancel")
+                        post("/v1/travel/payments/cards/cancel")
                                 .param("company", "TPA")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(
@@ -110,7 +111,7 @@ class MeritzPaymentControllerDocsTest extends RestDocsTest {
                 .andDo(print())
                 .andDo(
                         document(
-                                "meritz-payment-card-cancel",
+                                "payment-card-cancel",
                                 queryParameters(
                                         parameterWithName("company")
                                                 .description("회사코드 (기본값: TPA)")
@@ -125,10 +126,9 @@ class MeritzPaymentControllerDocsTest extends RestDocsTest {
 
     private static org.springframework.restdocs.payload.FieldDescriptor[] bridgeResponseFields() {
         return new org.springframework.restdocs.payload.FieldDescriptor[] {
-            fieldWithPath("success").type(BOOLEAN).description("성공 여부"),
-            fieldWithPath("errCd").type(STRING).description("에러 코드").optional(),
-            fieldWithPath("errMsg").type(STRING).description("에러 메시지").optional(),
+            fieldWithPath("result").type(STRING).description("결과"),
             subsectionWithPath("data").description("응답 데이터").optional(),
+            fieldWithPath("error").type(OBJECT).description("에러 정보").optional(),
         };
     }
 }

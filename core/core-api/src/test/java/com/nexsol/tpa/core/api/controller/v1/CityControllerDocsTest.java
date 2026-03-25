@@ -23,7 +23,7 @@ import com.nexsol.tpa.core.domain.city.FavoriteCityService;
 import com.nexsol.tpa.test.api.RestDocsTest;
 
 @Tag("restdocs")
-class MeritzCityControllerDocsTest extends RestDocsTest {
+class CityControllerDocsTest extends RestDocsTest {
 
     private final FavoriteCityService favoriteCityService = mock(FavoriteCityService.class);
     private final CitySearchService citySearchService = mock(CitySearchService.class);
@@ -31,19 +31,18 @@ class MeritzCityControllerDocsTest extends RestDocsTest {
     @BeforeEach
     void setUpMockMvc(RestDocumentationContextProvider restDocumentation) {
         super.setUp(restDocumentation);
-        this.mockMvc =
-                mockController(new MeritzCityController(favoriteCityService, citySearchService));
+        this.mockMvc = mockController(new CityController(favoriteCityService, citySearchService));
     }
 
     @Test
     void getFavoriteCities() throws Exception {
         when(favoriteCityService.getFavoriteCities()).thenReturn(sampleCities());
 
-        mockMvc.perform(get("/v1/meritz/favorite-cities"))
+        mockMvc.perform(get("/v1/travel/favorite-cities"))
                 .andDo(print())
                 .andDo(
                         document(
-                                "meritz-favorite-cities",
+                                "favorite-cities",
                                 responseFields(
                                         fieldWithPath("result").type(STRING).description("결과"),
                                         fieldWithPath("data").type(ARRAY).description("도시 목록"),
@@ -78,11 +77,11 @@ class MeritzCityControllerDocsTest extends RestDocsTest {
     void getMeritzCities() throws Exception {
         when(citySearchService.search(eq("일본"), eq("2"))).thenReturn(sampleCities());
 
-        mockMvc.perform(get("/v1/meritz/meritz-cities").param("keyword", "일본").param("type", "2"))
+        mockMvc.perform(get("/v1/travel/meritz-cities").param("keyword", "일본").param("type", "2"))
                 .andDo(print())
                 .andDo(
                         document(
-                                "meritz-cities",
+                                "city-search",
                                 queryParameters(
                                         parameterWithName("keyword").description("검색 키워드"),
                                         parameterWithName("type")

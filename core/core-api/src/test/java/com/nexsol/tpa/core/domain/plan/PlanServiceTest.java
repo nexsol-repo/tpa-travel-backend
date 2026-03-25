@@ -13,17 +13,17 @@ import org.junit.jupiter.api.Test;
 import com.nexsol.tpa.core.domain.premium.PlanCondition;
 import com.nexsol.tpa.core.error.CoreException;
 
-class TravelPlanServiceTest {
+class PlanServiceTest {
 
     private PlanReader planReader;
     private QuotePlanPolicy policy;
-    private TravelPlanService service;
+    private PlanService service;
 
     @BeforeEach
     void setUp() {
         planReader = mock(PlanReader.class);
         policy = new QuotePlanPolicy();
-        service = new TravelPlanService(planReader, policy);
+        service = new PlanService(planReader, policy);
     }
 
     // ── 테스트 데이터 ──
@@ -264,10 +264,10 @@ class TravelPlanServiceTest {
         }
     }
 
-    // ── findSilsonExcludePlanIdMap ──
+    // ── resolveSilsonExcludeMap ──
 
     @Nested
-    @DisplayName("findSilsonExcludePlanIdMap")
+    @DisplayName("resolveSilsonExcludeMap")
     class SilsonExcludeMap {
 
         @Test
@@ -277,7 +277,7 @@ class TravelPlanServiceTest {
 
             var cmd = condition("20260326", List.of(insured("19941118", "1")));
 
-            var map = service.findSilsonExcludePlanIdMap(cmd);
+            var map = service.resolveSilsonExcludeMap(cmd);
 
             assertThat(map).containsEntry(8L, 21L);
         }

@@ -15,9 +15,9 @@ import com.nexsol.tpa.core.support.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/v1/meritz")
+@RequestMapping("/v1/travel")
 @RequiredArgsConstructor
-public class MeritzCityController {
+public class CityController {
 
     private final FavoriteCityService favoriteCityService;
 

@@ -5,7 +5,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class MeritzCardApproveRequest {
+public class CardApproveRequest {
 
     private String polNo;
 

@@ -37,7 +37,8 @@ class CoverageControllerDocsTest extends RestDocsTest {
                         1L,
                         "151910",
                         "해외상해사망",
-                        "DEATH",
+                        "DEATH_DISABILITY",
+                        "사망 또는 장해가 생겼을 때",
                         "상해로 인한 사망 시",
                         "보험가입금액 전액 지급",
                         "해외여행 중 상해사망",
@@ -46,34 +47,46 @@ class CoverageControllerDocsTest extends RestDocsTest {
         when(coverageService.getCoverage(eq(1L), eq("151910"))).thenReturn(result);
 
         mockMvc.perform(
-                        get("/v1/meritz/travel/coverages")
+                        get("/v1/travel/coverages")
                                 .param("insurerId", "1")
                                 .param("coverageCode", "151910"))
                 .andDo(print())
                 .andDo(
                         document(
-                                "meritz-coverage",
+                                "coverage",
                                 queryParameters(
                                         parameterWithName("insurerId").description("보험사 ID"),
                                         parameterWithName("coverageCode").description("담보코드")),
                                 responseFields(
-                                        fieldWithPath("id").type(NUMBER).description("담보 ID"),
-                                        fieldWithPath("coverageCode")
+                                        fieldWithPath("result").type(STRING).description("결과"),
+                                        fieldWithPath("data.id").type(NUMBER).description("담보 ID"),
+                                        fieldWithPath("data.coverageCode")
                                                 .type(STRING)
                                                 .description("담보코드"),
-                                        fieldWithPath("coverageName")
+                                        fieldWithPath("data.coverageName")
                                                 .type(STRING)
                                                 .description("담보명"),
-                                        fieldWithPath("groupCode").type(STRING).description("그룹코드"),
-                                        fieldWithPath("claimReason")
+                                        fieldWithPath("data.sectionCode")
+                                                .type(STRING)
+                                                .description("보장 섹션 코드"),
+                                        fieldWithPath("data.sectionName")
+                                                .type(STRING)
+                                                .description("보장 섹션명"),
+                                        fieldWithPath("data.claimReason")
                                                 .type(STRING)
                                                 .description("청구사유"),
-                                        fieldWithPath("claimContent")
+                                        fieldWithPath("data.claimContent")
                                                 .type(STRING)
                                                 .description("청구내용"),
-                                        fieldWithPath("subTitle").type(STRING).description("부제목"),
-                                        fieldWithPath("subContent")
+                                        fieldWithPath("data.subTitle")
                                                 .type(STRING)
-                                                .description("부내용"))));
+                                                .description("부제목"),
+                                        fieldWithPath("data.subContent")
+                                                .type(STRING)
+                                                .description("부내용"),
+                                        fieldWithPath("error")
+                                                .type(OBJECT)
+                                                .description("에러 정보")
+                                                .optional())));
     }
 }

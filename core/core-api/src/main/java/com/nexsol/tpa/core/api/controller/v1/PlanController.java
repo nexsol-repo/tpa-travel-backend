@@ -1,6 +1,5 @@
 package com.nexsol.tpa.core.api.controller.v1;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -10,52 +9,49 @@ import org.springframework.web.bind.annotation.*;
 import com.nexsol.tpa.core.api.controller.v1.request.PlanRequest;
 import com.nexsol.tpa.core.api.controller.v1.response.PlanCoverageResponse;
 import com.nexsol.tpa.core.api.controller.v1.response.PlanListResponse;
-import com.nexsol.tpa.core.domain.coverage.TravelCoverageService;
+import com.nexsol.tpa.core.domain.coverage.CoverageService;
+import com.nexsol.tpa.core.domain.coverage.FamilyCoverageDetail;
 import com.nexsol.tpa.core.domain.plan.PlanFamily;
-import com.nexsol.tpa.core.domain.plan.TravelPlanService;
+import com.nexsol.tpa.core.domain.plan.PlanService;
 import com.nexsol.tpa.core.domain.premium.PlanCondition;
-import com.nexsol.tpa.core.domain.premium.PremiumResult;
+import com.nexsol.tpa.core.domain.premium.Premium;
 import com.nexsol.tpa.core.domain.premium.PremiumService;
-import com.nexsol.tpa.core.domain.premium.QuoteResult;
+import com.nexsol.tpa.core.support.response.ApiResponse;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/v1/meritz/travel")
+@RequestMapping("/v1/travel")
 @RequiredArgsConstructor
-public class TravelPlanController {
+public class PlanController {
 
-    private final TravelPlanService planService;
-    private final TravelCoverageService coverageService;
+    private final PlanService planService;
+    private final CoverageService coverageService;
     private final PremiumService premiumService;
 
     @PostMapping(value = "/plans", produces = MediaType.APPLICATION_JSON_VALUE)
-    public PlanListResponse plans(@Valid @RequestBody PlanRequest request) {
+    public ApiResponse<PlanListResponse> plans(@Valid @RequestBody PlanRequest request) {
         PlanCondition cmd = request.toPlanCondition();
         List<PlanFamily> families = planService.findQuoteFamilies(cmd);
-        Map<Long, PremiumResult> premiums = premiumService.calculateAll(cmd, families);
-        Map<Long, List<QuoteResult.DbCoverage>> coverages =
+        Map<Long, Premium> premiums = premiumService.calculateAll(cmd, families);
+        Map<Long, List<FamilyCoverageDetail>> coverages =
                 coverageService.findCoveragesForFamilies(families);
+        Map<Long, Long> silsonExcludeMap = planService.resolveSilsonExcludeMap(cmd);
 
-        boolean silsonExclude = cmd.silsonExclude() != null && cmd.silsonExclude();
-        Map<Long, Long> silsonExcludeMap =
-                silsonExclude
-                        ? Collections.emptyMap()
-                        : planService.findSilsonExcludePlanIdMap(cmd);
-
-        return PlanListResponse.of(cmd, families, premiums, coverages, silsonExcludeMap);
+        return ApiResponse.success(
+                PlanListResponse.of(cmd, families, premiums, coverages, silsonExcludeMap));
     }
 
     @PostMapping(value = "/plans/{planId}/coverages", produces = MediaType.APPLICATION_JSON_VALUE)
-    public PlanCoverageResponse planCoverages(
+    public ApiResponse<PlanCoverageResponse> planCoverages(
             @PathVariable Long planId, @Valid @RequestBody PlanRequest request) {
         PlanFamily family = planService.findFamilyByPlanId(request.toPlanCondition(), planId);
-        PremiumResult premium =
+        Premium premium =
                 premiumService.calculateSingle(
                         request.toPlanCondition(), family, request.getRepresentativeIndex());
-        List<QuoteResult.DbCoverage> coverages =
-                coverageService.findCoverages(family.repPlan().id());
-        return PlanCoverageResponse.of(family, premium, coverages);
+        List<FamilyCoverageDetail> coverages = coverageService.findCoverages(family.familyId());
+
+        return ApiResponse.success(PlanCoverageResponse.of(family, premium, coverages));
     }
 }

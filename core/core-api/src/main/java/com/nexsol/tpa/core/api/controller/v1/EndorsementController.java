@@ -6,8 +6,8 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/v1/meritz")
-public class MeritzEndorsementController {
+@RequestMapping("/v1/travel")
+public class EndorsementController {
 
     // private final MeritzEndorsementService service;
 
