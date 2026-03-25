@@ -164,7 +164,10 @@ class PlanControllerDocsTest extends RestDocsTest {
                     .description("대표 담보코드"),
             fieldWithPath("data.plans[].representativeCoverages[].covNm")
                     .type(STRING)
-                    .description("대표 담보명"),
+                    .description("대표 담보 표시명"),
+            fieldWithPath("data.plans[].representativeCoverages[].coverageName")
+                    .type(STRING)
+                    .description("대표 담보 원본명"),
             fieldWithPath("data.plans[].representativeCoverages[].insdAmt")
                     .type(NUMBER)
                     .description("대표 보장금액"),
@@ -313,6 +316,7 @@ class PlanControllerDocsTest extends RestDocsTest {
                                 .featured(true)
                                 .displayName("상해사망")
                                 .sectionName("사망 또는 장해가 생겼을 때")
+                                .sectionSortOrder(1)
                                 .build(),
                         FamilyCoverageDetail.builder()
                                 .familyId(1L)
@@ -321,6 +325,7 @@ class PlanControllerDocsTest extends RestDocsTest {
                                 .featured(true)
                                 .displayName("해외상해의료비")
                                 .sectionName("해외여행 중 다치거나 아팠을 때")
+                                .sectionSortOrder(2)
                                 .build()));
     }
 }

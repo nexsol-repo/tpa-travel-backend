@@ -97,6 +97,7 @@ public class PlanListResponse {
                     RepresentativeCoverageResponse.builder()
                             .covCd(detail.coverageCode())
                             .covNm(detail.resolvedName())
+                            .coverageName(detail.coverage().coverageName())
                             .insdAmt(amount)
                             .build());
         }
