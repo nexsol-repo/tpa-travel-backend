@@ -35,8 +35,8 @@ public class CertificateLinkIssuer {
 
         String polNo = contract.policyNumber();
         String pdCd = plan.productCode();
-        String quotGrpNo = contract.meritzQuote().groupNumber();
-        String quotReqNo = contract.meritzQuote().requestNumber();
+        String quotGrpNo = contract.quote().groupNumber();
+        String quotReqNo = contract.quote().requestNumber();
 
         ContractValidator.requireNotBlank(polNo, "policyNumber(polNo) is required");
         ContractValidator.requireNotBlank(quotGrpNo, "quotGrpNo is required");

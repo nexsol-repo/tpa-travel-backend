@@ -4,10 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.nexsol.tpa.core.domain.coverage.FamilyCoverageDetail;
 import com.nexsol.tpa.core.domain.plan.PlanFamily;
+import com.nexsol.tpa.core.domain.premium.CoverageAmount;
 import com.nexsol.tpa.core.domain.premium.PlanCondition;
-import com.nexsol.tpa.core.domain.premium.PremiumResult;
-import com.nexsol.tpa.core.domain.premium.QuoteResult;
+import com.nexsol.tpa.core.domain.premium.Premium;
+import com.nexsol.tpa.core.error.CoreErrorType;
+import com.nexsol.tpa.core.error.CoreException;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -16,84 +19,34 @@ import lombok.Getter;
 @Builder
 public class PlanListResponse {
 
-    private boolean ok;
-
-    private String errCd;
-
-    private String errMsg;
-
-    private Period period;
+    private PlanPeriodResponse period;
 
     private Integer insuredCount;
 
-    private List<PlanSummary> plans;
-
-    @Getter
-    @Builder
-    public static class Period {
-
-        private String insBgnDt;
-
-        private String insEdDt;
-    }
-
-    @Getter
-    @Builder
-    public static class PlanSummary {
-
-        private Long familyId;
-
-        private Long planId;
-
-        private String planGrpCd;
-
-        private String planCd;
-
-        private String planNm;
-
-        private String planNmRaw;
-
-        private Long silsonExcludePlanId;
-
-        private long totalPremium;
-
-        private String currency;
-
-        private List<RepresentativeCoverage> representativeCoverages;
-    }
-
-    @Getter
-    @Builder
-    public static class RepresentativeCoverage {
-
-        private String covCd;
-
-        private String covNm;
-
-        private long insdAmt;
-    }
+    private List<PlanSummaryResponse> plans;
 
     // ── Factory Methods ──
 
     public static PlanListResponse of(
             PlanCondition cmd,
             List<PlanFamily> families,
-            Map<Long, PremiumResult> premiumMap,
-            Map<Long, List<QuoteResult.DbCoverage>> coverageMap,
+            Map<Long, Premium> premiumMap,
+            Map<Long, List<FamilyCoverageDetail>> coverageMap,
             Map<Long, Long> silsonExcludeMap) {
 
-        List<PlanSummary> plans = new ArrayList<>();
+        List<PlanSummaryResponse> plans = new ArrayList<>();
         for (PlanFamily family : families) {
             Long planId = family.repPlan().id();
-            PremiumResult premium = premiumMap.get(planId);
+            Premium premium = premiumMap.get(planId);
             if (premium == null) continue;
 
-            List<QuoteResult.DbCoverage> dbCoverages = coverageMap.getOrDefault(planId, List.of());
-            List<RepresentativeCoverage> repCoverages =
-                    buildRepresentativeCoverages(dbCoverages, premium.coverageAmounts());
+            List<FamilyCoverageDetail> coverages =
+                    coverageMap.getOrDefault(family.familyId(), List.of());
+            List<RepresentativeCoverageResponse> repCoverages =
+                    buildRepresentativeCoverages(coverages, premium.coverageAmounts());
 
             plans.add(
-                    PlanSummary.builder()
+                    PlanSummaryResponse.builder()
                             .familyId(family.familyId())
                             .planId(planId)
                             .planGrpCd(family.repPlan().planGroupCode())
@@ -112,37 +65,39 @@ public class PlanListResponse {
         }
 
         if (plans.isEmpty()) {
-            return fail("PREM_FAIL", "보험료 산출 결과가 없습니다.");
+            throw new CoreException(CoreErrorType.PREMIUM_CALCULATION_FAILED, "보험료 산출 결과가 없습니다.");
         }
 
-        return success(
-                Period.builder().insBgnDt(cmd.insBgnDt()).insEdDt(cmd.insEdDt()).build(),
-                cmd.insuredList().size(),
-                plans);
+        return PlanListResponse.builder()
+                .period(
+                        PlanPeriodResponse.builder()
+                                .insBgnDt(cmd.insBgnDt())
+                                .insEdDt(cmd.insEdDt())
+                                .build())
+                .insuredCount(cmd.insuredList().size())
+                .plans(plans)
+                .build();
     }
 
-    /**
-     * titleYn=true인 대표 담보 목록 + 보장금액을 추출한다.
-     */
-    private static List<RepresentativeCoverage> buildRepresentativeCoverages(
-            List<QuoteResult.DbCoverage> dbCoverages,
-            Map<String, QuoteResult.CoverageAmount> coverageAmounts) {
-        if (dbCoverages == null) return List.of();
+    private static List<RepresentativeCoverageResponse> buildRepresentativeCoverages(
+            List<FamilyCoverageDetail> coverages, Map<String, CoverageAmount> coverageAmounts) {
+        if (coverages == null) return List.of();
 
-        List<RepresentativeCoverage> result = new ArrayList<>();
-        for (QuoteResult.DbCoverage row : dbCoverages) {
-            if (!row.titleYn()) continue;
+        List<RepresentativeCoverageResponse> result = new ArrayList<>();
+        for (FamilyCoverageDetail detail : coverages) {
+            if (!detail.featured()) continue;
 
             long amount = 0L;
             if (coverageAmounts != null) {
-                QuoteResult.CoverageAmount amt = coverageAmounts.get(row.covCd());
+                CoverageAmount amt = coverageAmounts.get(detail.coverageCode());
                 if (amt != null) amount = amt.insdAmt();
             }
 
             result.add(
-                    RepresentativeCoverage.builder()
-                            .covCd(row.covCd())
-                            .covNm(row.covNm())
+                    RepresentativeCoverageResponse.builder()
+                            .covCd(detail.coverageCode())
+                            .covNm(detail.resolvedName())
+                            .coverageName(detail.coverage().coverageName())
                             .insdAmt(amount)
                             .build());
         }
@@ -156,24 +111,5 @@ public class PlanListResponse {
                 .replace("플랜B", "플랜")
                 .replace(" 실손제외", "(실손제외)")
                 .trim();
-    }
-
-    public static PlanListResponse success(
-            Period period, int insuredCount, List<PlanSummary> plans) {
-        return PlanListResponse.builder()
-                .ok(true)
-                .period(period)
-                .insuredCount(insuredCount)
-                .plans(plans)
-                .build();
-    }
-
-    public static PlanListResponse fail(String errCd, String errMsg) {
-        return PlanListResponse.builder()
-                .ok(false)
-                .errCd(errCd)
-                .errMsg(errMsg)
-                .plans(List.of())
-                .build();
     }
 }

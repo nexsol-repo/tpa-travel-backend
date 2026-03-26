@@ -14,6 +14,8 @@ dependencies {
     implementation project(":clients:client-aligo")
     implementation project(":clients:client-portone")
 
+    runtimeOnly project(":insurer-provider:provider-meritz")
+
     implementation ("org.springframework.boot:spring-boot-starter-webmvc")
 
     testImplementation project(":tests:api-docs")

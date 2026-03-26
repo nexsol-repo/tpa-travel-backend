@@ -1,3 +1,11 @@
-logging.config: classpath:logback/logback-${spring.profiles.active}.xml
+logging:
+  config: classpath:logback/logback-${spring.profiles.active}.xml
 
-management.otlp.metrics.export.enabled: false
+management:
+  otlp:
+    metrics:
+      export:
+        enabled: false
+
+sentry:
+  dsn: ${SENTRY_DSN:}

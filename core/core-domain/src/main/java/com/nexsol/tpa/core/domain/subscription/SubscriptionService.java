@@ -3,7 +3,7 @@ package com.nexsol.tpa.core.domain.subscription;
 import org.springframework.stereotype.Service;
 
 import com.nexsol.tpa.core.domain.certificate.CertificateLinkIssuer;
-import com.nexsol.tpa.core.domain.client.InsuranceContractClient;
+import com.nexsol.tpa.core.domain.client.SubscriptionProvider;
 import com.nexsol.tpa.core.domain.contract.ContractInfo;
 import com.nexsol.tpa.core.domain.contract.ContractReader;
 import com.nexsol.tpa.core.domain.contract.ContractUpdater;
@@ -22,7 +22,7 @@ public class SubscriptionService {
     private final ContractUpdater contractUpdater;
     private final ContractWriter contractWriter;
     private final SubscriptionValidator subscriptionValidator;
-    private final SubscriptionEstimateSaver subscriptionEstimateSaver;
+    private final SubscriptionProvider subscriptionProvider;
     private final SubscriptionWriter subscriptionWriter;
     private final SubscriptionSnapshotAppender subscriptionSnapshotAppender;
     private final SubscriptionAlimtalkAppender subscriptionAlimtalkAppender;
@@ -34,8 +34,7 @@ public class SubscriptionService {
         contractValidator.requirePending(contract);
         subscriptionValidator.validate(cmd, contract);
 
-        InsuranceContractClient.SubscriptionResult apiResult =
-                subscriptionEstimateSaver.save(company, contract, cmd);
+        EstimateSaveResult apiResult = subscriptionProvider.estimateSave(company, contract, cmd);
 
         if (!apiResult.success()) {
             subscriptionSnapshotAppender.appendFail(contract, apiResult.rawData());

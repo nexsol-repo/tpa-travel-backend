@@ -17,8 +17,8 @@ public class ContractCreator {
                 .channelName(cmd.channelName())
                 .familyId(cmd.familyId())
                 .policyNumber(policyNumber)
-                .meritzQuote(
-                        MeritzQuote.builder()
+                .quote(
+                        Quote.builder()
                                 .groupNumber(cmd.meritzQuoteGroupNumber())
                                 .requestNumber(cmd.meritzQuoteRequestNumber())
                                 .build())

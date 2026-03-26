@@ -1,14 +1,16 @@
 package com.nexsol.tpa.core.api.controller.v1.response;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.nexsol.tpa.core.domain.coverage.FamilyCoverageDetail;
 import com.nexsol.tpa.core.domain.plan.AgeBand;
 import com.nexsol.tpa.core.domain.plan.InsurancePlan;
 import com.nexsol.tpa.core.domain.plan.PlanFamily;
-import com.nexsol.tpa.core.domain.premium.PremiumResult;
-import com.nexsol.tpa.core.domain.premium.QuoteResult;
+import com.nexsol.tpa.core.domain.premium.CoverageAmount;
+import com.nexsol.tpa.core.domain.premium.Premium;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -29,86 +31,21 @@ public class PlanCoverageResponse {
 
     private String planNmRaw;
 
-    private Premium premium;
+    private PremiumSummary premium;
 
-    private List<InsuredPremium> insuredPremiums;
+    private List<InsuredPremiumResponse> insuredPremiums;
 
     private String coverageTitle;
 
-    private List<Coverage> coverages;
-
-    @Getter
-    @Builder
-    public static class Premium {
-
-        private long ttPrem;
-
-        private String currency;
-    }
-
-    @Getter
-    @Builder
-    public static class InsuredPremium {
-
-        private Integer index;
-
-        private Long planId;
-
-        private String currency;
-
-        private Long ppsPrem;
-
-        private String birth;
-
-        private String gndrCd;
-
-        private String cusNm;
-
-        private String cusEngNm;
-
-        private String ageBandCode;
-
-        private String ageBandLabel;
-    }
-
-    @Getter
-    @Builder
-    public static class Coverage {
-
-        private String covCd;
-
-        private String covNm;
-
-        private long insdAmt;
-
-        private String cur;
-
-        private List<CoverageUnit> units;
-
-        private String categoryCode;
-    }
-
-    @Getter
-    @Builder
-    public static class CoverageUnit {
-
-        private String ageBandCode;
-
-        private String ageBandLabel;
-
-        private Integer count;
-
-        private Long insdAmt;
-
-        private Long premSum;
-    }
+    private List<CoverageSectionResponse> sections;
 
     // ── Factory Method ──
 
     public static PlanCoverageResponse of(
-            PlanFamily family, PremiumResult premium, List<QuoteResult.DbCoverage> dbCoverages) {
-        List<Coverage> coverages = assembleCoverages(dbCoverages, premium.coverageAmounts());
-        String coverageTitle = buildCoverageTitle(dbCoverages, premium.coverageAmounts());
+            PlanFamily family, Premium premium, List<FamilyCoverageDetail> coverageDetails) {
+        List<CoverageSectionResponse> sections =
+                assembleSections(coverageDetails, premium.coverageAmounts());
+        String coverageTitle = buildCoverageTitle(coverageDetails, premium.coverageAmounts());
 
         return PlanCoverageResponse.builder()
                 .familyId(family.familyId())
@@ -120,7 +57,11 @@ public class PlanCoverageResponse {
                         family.repPlan().planFullName() != null
                                 ? family.repPlan().planFullName()
                                 : family.repPlan().planName())
-                .premium(Premium.builder().ttPrem(premium.totalPremium()).currency("KRW").build())
+                .premium(
+                        PremiumSummary.builder()
+                                .ttPrem(premium.totalPremium())
+                                .currency("KRW")
+                                .build())
                 .insuredPremiums(
                         premium.insuredPremiums() != null
                                 ? premium.insuredPremiums().stream()
@@ -128,14 +69,14 @@ public class PlanCoverageResponse {
                                         .toList()
                                 : List.of())
                 .coverageTitle(coverageTitle)
-                .coverages(coverages)
+                .sections(sections)
                 .build();
     }
 
-    private static InsuredPremium toInsuredPremium(
-            QuoteResult.InsuredPremium ip, List<InsurancePlan> familyPlans) {
+    private static InsuredPremiumResponse toInsuredPremium(
+            com.nexsol.tpa.core.domain.premium.InsuredPremium ip, List<InsurancePlan> familyPlans) {
         Long planId = resolvePlanId(ip.birth(), familyPlans);
-        return InsuredPremium.builder()
+        return InsuredPremiumResponse.builder()
                 .index(ip.index())
                 .planId(planId)
                 .currency(ip.currency())
@@ -167,74 +108,75 @@ public class PlanCoverageResponse {
 
     // ── Presentation ──
 
-    private static List<Coverage> assembleCoverages(
-            List<QuoteResult.DbCoverage> dbCoverages,
-            Map<String, QuoteResult.CoverageAmount> coverageAmounts) {
-        if (dbCoverages == null) return List.of();
+    private static List<CoverageSectionResponse> assembleSections(
+            List<FamilyCoverageDetail> coverageDetails,
+            Map<String, CoverageAmount> coverageAmounts) {
+        if (coverageDetails == null) return List.of();
 
-        List<Coverage> result = new ArrayList<>();
-        for (QuoteResult.DbCoverage row : dbCoverages) {
-            QuoteResult.CoverageAmount amt =
-                    coverageAmounts != null ? coverageAmounts.get(row.covCd()) : null;
+        Map<String, List<CoverageAmountResponse>> grouped = new LinkedHashMap<>();
+        Map<String, String> sectionNames = new LinkedHashMap<>();
 
-            if (amt == null) {
-                result.add(
-                        Coverage.builder()
-                                .covCd(row.covCd())
-                                .covNm(row.covNm())
-                                .insdAmt(0L)
-                                .cur("KRW")
-                                .units(List.of())
-                                .categoryCode(row.categoryCode())
-                                .build());
-            } else {
-                result.add(
-                        Coverage.builder()
-                                .covCd(row.covCd())
-                                .covNm(row.covNm())
-                                .insdAmt(amt.insdAmt())
-                                .cur(amt.currency())
-                                .units(
-                                        amt.units() != null
-                                                ? amt.units().stream()
-                                                        .map(
-                                                                u ->
-                                                                        CoverageUnit.builder()
-                                                                                .ageBandCode(
-                                                                                        u
-                                                                                                .ageBandCode())
-                                                                                .ageBandLabel(
-                                                                                        u
-                                                                                                .ageBandLabel())
-                                                                                .count(u.count())
-                                                                                .insdAmt(
-                                                                                        u.insdAmt())
-                                                                                .premSum(
-                                                                                        u.premSum())
-                                                                                .build())
-                                                        .toList()
-                                                : List.of())
-                                .categoryCode(row.categoryCode())
-                                .build());
-            }
+        for (FamilyCoverageDetail detail : coverageDetails) {
+            String sectionCode = detail.sectionCode();
+            sectionNames.putIfAbsent(sectionCode, detail.sectionName());
+
+            CoverageAmount amt =
+                    coverageAmounts != null ? coverageAmounts.get(detail.coverageCode()) : null;
+
+            CoverageAmountResponse item =
+                    CoverageAmountResponse.builder()
+                            .covCd(detail.coverageCode())
+                            .covNm(detail.resolvedName())
+                            .coverageName(detail.coverage().coverageName())
+                            .insdAmt(amt != null ? amt.insdAmt() : 0L)
+                            .cur(amt != null ? amt.currency() : "KRW")
+                            .units(
+                                    amt != null && amt.units() != null
+                                            ? amt.units().stream()
+                                                    .map(
+                                                            u ->
+                                                                    CoverageUnitResponse.builder()
+                                                                            .ageBandCode(
+                                                                                    u.ageBandCode())
+                                                                            .ageBandLabel(
+                                                                                    u
+                                                                                            .ageBandLabel())
+                                                                            .count(u.count())
+                                                                            .insdAmt(u.insdAmt())
+                                                                            .premSum(u.premSum())
+                                                                            .build())
+                                                    .toList()
+                                            : List.of())
+                            .build();
+
+            grouped.computeIfAbsent(sectionCode, k -> new ArrayList<>()).add(item);
         }
-        return result;
+
+        return grouped.entrySet().stream()
+                .map(
+                        entry ->
+                                CoverageSectionResponse.builder()
+                                        .sectionCode(entry.getKey())
+                                        .sectionName(sectionNames.get(entry.getKey()))
+                                        .coverages(entry.getValue())
+                                        .build())
+                .toList();
     }
 
     private static String buildCoverageTitle(
-            List<QuoteResult.DbCoverage> dbCoverages,
-            Map<String, QuoteResult.CoverageAmount> coverageAmounts) {
-        if (dbCoverages == null || coverageAmounts == null) return null;
+            List<FamilyCoverageDetail> coverageDetails,
+            Map<String, CoverageAmount> coverageAmounts) {
+        if (coverageDetails == null || coverageAmounts == null) return null;
 
         List<String> parts = new ArrayList<>();
-        for (QuoteResult.DbCoverage row : dbCoverages) {
-            if (!row.titleYn()) continue;
+        for (FamilyCoverageDetail detail : coverageDetails) {
+            if (!detail.featured()) continue;
 
-            QuoteResult.CoverageAmount amt = coverageAmounts.get(row.covCd());
+            CoverageAmount amt = coverageAmounts.get(detail.coverageCode());
             long amount = (amt != null) ? amt.insdAmt() : 0L;
             if (amount <= 0) continue;
 
-            parts.add(row.covNm() + " " + formatWonShort(amount));
+            parts.add(detail.resolvedName() + " " + formatWonShort(amount));
         }
         return parts.isEmpty() ? null : "보장금액 : " + String.join(" / ", parts);
     }

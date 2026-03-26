@@ -2,8 +2,7 @@ package com.nexsol.tpa.core.domain.certificate;
 
 import org.springframework.stereotype.Service;
 
-import com.nexsol.tpa.core.domain.client.InsuranceContractClient;
-import com.nexsol.tpa.core.domain.client.InsuranceContractClient.BridgeApiResult;
+import com.nexsol.tpa.core.domain.client.CertificateProvider;
 import com.nexsol.tpa.core.domain.contract.ContractInfo;
 import com.nexsol.tpa.core.domain.contract.ContractReader;
 import com.nexsol.tpa.core.domain.contract.ContractValidator;
@@ -22,15 +21,14 @@ import tools.jackson.databind.ObjectMapper;
 @RequiredArgsConstructor
 public class CertificateService {
 
-    private final InsuranceContractClient meritzClient;
+    private final CertificateProvider certificateProvider;
     private final ContractReader contractReader;
     private final SubscriptionInsuredReader subscriptionInsuredReader;
     private final SnapshotAppender snapshotAppender;
     private final ObjectMapper objectMapper;
     private final CertificateLinkIssuer certificateLinkIssuer;
 
-    /** 증명서 원본 응답 반환 */
-    public BridgeApiResult issue(String company, CertificateCommand cmd) {
+    public CertificateLink issue(String company, CertificateCommand cmd) {
         if (cmd == null || cmd.contractId() == null) {
             throw new CoreException(
                     CoreErrorType.INVALID_CONTRACT_REQUEST, "contractId is required");
@@ -42,8 +40,8 @@ public class CertificateService {
         CertificateParams params = resolveParams(cmd.contractId());
         validateParams(params);
 
-        BridgeApiResult res =
-                meritzClient.issueCertificateRaw(
+        CertificateLink result =
+                certificateProvider.issueCertificate(
                         company,
                         params.polNo,
                         params.pdCd,
@@ -52,12 +50,11 @@ public class CertificateService {
                         otptDiv,
                         otptTpCd);
 
-        snapshotAppender.append(cmd.contractId(), params.insurerId, "CERTIFICATE", toJson(res));
+        snapshotAppender.append(cmd.contractId(), params.insurerId, "CERTIFICATE", toJson(result));
 
-        return res;
+        return result;
     }
 
-    /** 증명서 링크 URL만 반환 */
     public String issueLink(String company, Long contractId, String otptDiv, String otptTpCd) {
         return certificateLinkIssuer.issue(company, contractId, otptDiv, otptTpCd);
     }
@@ -70,8 +67,8 @@ public class CertificateService {
                 contract.insurerId(),
                 contract.policyNumber(),
                 plan.productCode(),
-                contract.meritzQuote().groupNumber(),
-                contract.meritzQuote().requestNumber());
+                contract.quote().groupNumber(),
+                contract.quote().requestNumber());
     }
 
     private void validateParams(CertificateParams params) {

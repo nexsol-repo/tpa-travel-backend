@@ -18,6 +18,7 @@ COPY core/core-enum/build.gradle ./core/core-enum/
 COPY clients/client-meritz/build.gradle ./clients/client-meritz/
 COPY clients/client-aligo/build.gradle ./clients/client-aligo/
 COPY clients/client-portone/build.gradle ./clients/client-portone/
+COPY insurer-provider/provider-meritz/build.gradle ./insurer-provider/provider-meritz/
 COPY storage/db-core/build.gradle ./storage/db-core/
 COPY support/logging/build.gradle ./support/logging/
 COPY support/monitoring/build.gradle ./support/monitoring/
