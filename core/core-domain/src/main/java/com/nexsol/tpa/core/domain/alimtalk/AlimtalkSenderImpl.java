@@ -13,7 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class AlimtalkServiceImpl implements AlimtalkService {
+public class AlimtalkSenderImpl implements AlimtalkSender {
 
     private final NotificationClient notificationClient;
 
