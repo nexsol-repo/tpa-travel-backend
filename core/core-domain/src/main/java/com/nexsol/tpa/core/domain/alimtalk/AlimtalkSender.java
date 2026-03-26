@@ -1,6 +1,6 @@
 package com.nexsol.tpa.core.domain.alimtalk;
 
-public interface AlimtalkService {
+public interface AlimtalkSender {
 
     void sendTravelContractCompleted(AlimtalkCompletedCommand cmd);
 }

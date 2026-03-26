@@ -25,8 +25,8 @@ public class SubscriptionService {
     private final SubscriptionProvider subscriptionProvider;
     private final SubscriptionWriter subscriptionWriter;
     private final SubscriptionSnapshotAppender subscriptionSnapshotAppender;
-    private final SubscriptionAlimtalkAppender subscriptionAlimtalkAppender;
     private final SubscriptionResultReader subscriptionResultReader;
+    private final SubscriptionAlimtalkAppender subscriptionAlimtalkAppender;
     private final CertificateLinkIssuer certificateLinkIssuer;
 
     public SubscriptionResult subscribe(String company, SubscriptionCommand cmd) {
@@ -46,7 +46,7 @@ public class SubscriptionService {
         contract = subscriptionWriter.complete(contract);
         subscriptionWriter.createCompletedPayment(contract);
         subscriptionSnapshotAppender.appendSuccess(contract, apiResult.rawData());
-        subscriptionAlimtalkAppender.appendCompleted(contract);
+        subscriptionAlimtalkAppender.appendCompleted(contract.id());
         return subscriptionResultReader.read(contract);
     }
 

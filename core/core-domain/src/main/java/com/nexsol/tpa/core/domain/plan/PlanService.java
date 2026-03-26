@@ -1,9 +1,9 @@
 package com.nexsol.tpa.core.domain.plan;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -85,22 +85,18 @@ public class PlanService {
         List<PlanFamily> lossFamilies = policy.filterFamilies(allFamilies, planType, false);
         List<PlanFamily> excludeFamilies = policy.filterFamilies(allFamilies, planType, true);
 
-        // 실손제외 planCode → repPlanId 인덱싱
-        Map<String, Long> excludeByCode = new HashMap<>();
-        for (PlanFamily f : excludeFamilies) {
-            excludeByCode.put(f.repPlan().planCode(), f.repPlan().id());
-        }
+        Map<String, Long> excludeByCode =
+                excludeFamilies.stream()
+                        .collect(
+                                Collectors.toMap(
+                                        f -> f.repPlan().planCode(), f -> f.repPlan().id()));
 
-        // 실손포함 repPlanId → 실손제외 repPlanId 매핑 (planCode + "P")
-        Map<Long, Long> result = new HashMap<>();
-        for (PlanFamily f : lossFamilies) {
-            String excludeCode = f.repPlan().planCode() + "P";
-            Long excludePlanId = excludeByCode.get(excludeCode);
-            if (excludePlanId != null) {
-                result.put(f.repPlan().id(), excludePlanId);
-            }
-        }
-        return result;
+        return lossFamilies.stream()
+                .filter(f -> excludeByCode.containsKey(f.repPlan().planCode() + "P"))
+                .collect(
+                        Collectors.toMap(
+                                f -> f.repPlan().id(),
+                                f -> excludeByCode.get(f.repPlan().planCode() + "P")));
     }
 
     // ── 내부 로직 ──
