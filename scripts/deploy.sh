@@ -10,7 +10,7 @@ BASE_PATH="/home/nex3/app/${APP_NAME}"
 
 if [ "$TARGET_ENV" == "prod" ]; then
   ENV_FILE=".env.prod"
-  NGINX_CONF="/etc/nginx/conf.d/tpa-travel-api.conf"
+  NGINX_CONF="/etc/nginx/conf.d/tpa-travel-api-prod.conf"
   DEFAULT_PORT="8061"
   ALT_PORT="8062"
 elif [ "$TARGET_ENV" == "dev" ]; then
