@@ -61,6 +61,9 @@ public class ContractDetailResponse {
     private BigDecimal paidAmount;
     private LocalDateTime paymentDate;
 
+    // 환불
+    private RefundDetail refund;
+
     // 피보험자
     private List<InsuredPersonDetail> people;
 
@@ -110,6 +113,7 @@ public class ContractDetailResponse {
                 .paymentStatus(payment != null ? payment.status() : null)
                 .paidAmount(payment != null ? payment.paidAmount() : null)
                 .paymentDate(payment != null ? payment.paymentDate() : null)
+                .refund(detail.refund() != null ? RefundDetail.from(detail.refund()) : null)
                 .people(
                         detail.people().stream()
                                 .map(

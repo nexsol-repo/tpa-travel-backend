@@ -105,6 +105,30 @@ include::{snippets}/auth-cert-history-complete/response-fields.adoc[]
 
 == 계약 (Contract)
 
+=== 계약 목록 조회 (DB)
+==== Curl Request
+include::{snippets}/contract-list-db/curl-request.adoc[]
+==== Query Parameters
+include::{snippets}/contract-list-db/query-parameters.adoc[]
+==== Http Response
+include::{snippets}/contract-list-db/http-response.adoc[]
+==== Response Fields
+include::{snippets}/contract-list-db/response-fields.adoc[]
+
+'''
+
+=== 계약 상세 조회
+==== Curl Request
+include::{snippets}/contract-detail/curl-request.adoc[]
+==== Path Parameters
+include::{snippets}/contract-detail/path-parameters.adoc[]
+==== Http Response
+include::{snippets}/contract-detail/http-response.adoc[]
+==== Response Fields
+include::{snippets}/contract-detail/response-fields.adoc[]
+
+'''
+
 === 여행자보험 접수
 ==== Curl Request
 include::{snippets}/contract-apply/curl-request.adoc[]

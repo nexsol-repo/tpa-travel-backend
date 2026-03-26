@@ -5,6 +5,9 @@ import java.util.Objects;
 
 import org.springframework.stereotype.Service;
 
+import com.nexsol.tpa.core.domain.plan.PlanFinder;
+import com.nexsol.tpa.core.domain.plan.PlanReader;
+import com.nexsol.tpa.core.domain.refund.RefundReader;
 import com.nexsol.tpa.core.support.PageResult;
 import com.nexsol.tpa.core.support.SortPage;
 
@@ -17,7 +20,9 @@ public class ContractQueryService {
     private final ContractFinder contractFinder;
     private final ContractPaymentFinder paymentFinder;
     private final ContractPeopleFinder peopleFinder;
-    private final ContractReferenceFinder referenceFinder;
+    private final PlanFinder planFinder;
+    private final PlanReader planReader;
+    private final RefundReader refundReader;
 
     public PageResult<ContractDetail> list(String authUniqueKey, int page, int size) {
         SortPage sortPage =
@@ -37,7 +42,7 @@ public class ContractQueryService {
                         .filter(Objects::nonNull)
                         .distinct()
                         .toList();
-        var planMap = referenceFinder.findPlanMapByIds(planIds);
+        var planMap = planFinder.findMapByIds(planIds);
 
         List<ContractDetail> items =
                 contracts.getContent().stream()
@@ -73,13 +78,16 @@ public class ContractQueryService {
                         .filter(Objects::nonNull)
                         .findFirst()
                         .orElse(null);
-        var plan = referenceFinder.findPlan(repPlanId);
+        var plan = planReader.readById(repPlanId);
+
+        var refund = refundReader.readByContractId(id);
 
         return ContractDetail.builder()
                 .contract(contract)
                 .payment(payment)
                 .people(people)
                 .plan(plan)
+                .refund(refund)
                 .build();
     }
 }
