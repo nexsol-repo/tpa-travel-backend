@@ -21,7 +21,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class PlanService {
 
-    private final PlanReader planReader;
+    private final PlanFinder planFinder;
     private final QuotePlanPolicy policy;
 
     /**
@@ -31,7 +31,7 @@ public class PlanService {
     public List<PlanFamily> findQuoteFamilies(PlanCondition cmd) {
         validateQuoteCommand(cmd);
 
-        List<PlanFamily> allFamilies = planReader.loadAllFamilies(cmd.insurerId());
+        List<PlanFamily> allFamilies = planFinder.findAllFamilies(cmd.insurerId());
         String planType = policy.resolvePlanType(cmd.insuredList());
         boolean silsonExclude = cmd.silsonExclude() != null && cmd.silsonExclude();
         List<PlanFamily> families = policy.filterFamilies(allFamilies, planType, silsonExclude);
@@ -50,7 +50,7 @@ public class PlanService {
     public PlanFamily findFamilyByPlanId(PlanCondition cmd, Long planId) {
         validateQuoteCommand(cmd);
 
-        List<PlanFamily> allFamilies = planReader.loadAllFamilies(cmd.insurerId());
+        List<PlanFamily> allFamilies = planFinder.findAllFamilies(cmd.insurerId());
         String planType = policy.resolvePlanType(cmd.insuredList());
         String typeMarker = "플랜" + planType;
 
@@ -79,7 +79,7 @@ public class PlanService {
     private Map<Long, Long> findSilsonExcludePlanIdMap(PlanCondition cmd) {
         validateQuoteCommand(cmd);
 
-        List<PlanFamily> allFamilies = planReader.loadAllFamilies(cmd.insurerId());
+        List<PlanFamily> allFamilies = planFinder.findAllFamilies(cmd.insurerId());
         String planType = policy.resolvePlanType(cmd.insuredList());
 
         List<PlanFamily> lossFamilies = policy.filterFamilies(allFamilies, planType, false);

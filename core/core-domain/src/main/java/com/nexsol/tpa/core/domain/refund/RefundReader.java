@@ -24,6 +24,10 @@ public class RefundReader {
                                         "refund not found. contractId=" + contractId));
     }
 
+    public Refund readByContractId(Long contractId) {
+        return refundRepository.findByContractId(contractId).orElse(null);
+    }
+
     public Refund getByPaymentId(Long paymentId) {
         return refundRepository
                 .findByPaymentId(paymentId)
