@@ -9,16 +9,18 @@
         </encoder>
     </appender>
 
+    <springProperty name="SENTRY_DSN" source="sentry.dsn" defaultValue=""/>
+
     <appender name="SENTRY" class="io.sentry.logback.SentryAppender">
         <options>
-            <dsn>YOUR_DSN</dsn>
+            <dsn>${SENTRY_DSN}</dsn>
         </options>
         <minimumEventLevel>WARN</minimumEventLevel>
         <minimumBreadcrumbLevel>INFO</minimumBreadcrumbLevel>
     </appender>
 
     <logger name="org.springframework" level="WARN"/>
-    <logger name="io.dodn.springboot" level="INFO"/>
+    <logger name="com.nexsol.tpa" level="INFO"/>
 
     <root level="INFO">
         <appender-ref ref="STDOUT"/>
