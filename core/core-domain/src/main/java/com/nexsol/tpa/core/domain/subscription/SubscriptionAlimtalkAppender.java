@@ -3,9 +3,10 @@ package com.nexsol.tpa.core.domain.subscription;
 import org.springframework.stereotype.Component;
 
 import com.nexsol.tpa.core.domain.alimtalk.AlimtalkCompletedCommand;
-import com.nexsol.tpa.core.domain.alimtalk.AlimtalkService;
+import com.nexsol.tpa.core.domain.alimtalk.AlimtalkSender;
 import com.nexsol.tpa.core.domain.contract.ContractInfo;
 import com.nexsol.tpa.core.domain.contract.ContractPeopleFinder;
+import com.nexsol.tpa.core.domain.contract.ContractReader;
 import com.nexsol.tpa.core.domain.contract.InsuredPerson;
 
 import lombok.RequiredArgsConstructor;
@@ -14,13 +15,15 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SubscriptionAlimtalkAppender {
 
-    private final AlimtalkService alimtalkService;
+    private final AlimtalkSender alimtalkSender;
+    private final ContractReader contractReader;
     private final ContractPeopleFinder peopleFinder;
 
-    public void appendCompleted(ContractInfo contract) {
+    public void appendCompleted(Long contractId) {
         try {
-            InsuredPerson contractor = peopleFinder.findContractor(contract.id());
-            alimtalkService.sendTravelContractCompleted(
+            ContractInfo contract = contractReader.getById(contractId);
+            InsuredPerson contractor = peopleFinder.findContractor(contractId);
+            alimtalkSender.sendTravelContractCompleted(
                     new AlimtalkCompletedCommand(
                             contractor != null ? contractor.phone() : null,
                             contractor != null ? contractor.name() : null,

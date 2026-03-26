@@ -1,6 +1,10 @@
 package com.nexsol.tpa.core.domain.premium;
 
-import java.util.*;
+import java.util.AbstractMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -26,20 +30,15 @@ public class PremiumService {
     private final QuoteInsuredAssembler quoteAssembler;
 
     public Map<Long, Premium> calculateAll(PlanCondition cmd, List<PlanFamily> families) {
-        Map<Long, Premium> results = new LinkedHashMap<>();
-
-        for (PlanFamily family : families) {
-            Premium result = calculate(cmd, family);
-            if (result == null) {
-                log.warn(
-                        "[PREMIUM] calculation skipped. familyId={}, planCd={}",
-                        family.familyId(),
-                        family.repPlan().planCode());
-                continue;
-            }
-            results.put(family.repPlan().id(), result);
-        }
-        return results;
+        return families.stream()
+                .map(family -> new AbstractMap.SimpleEntry<>(family, calculate(cmd, family)))
+                .filter(this::isCalculated)
+                .collect(
+                        Collectors.toMap(
+                                e -> e.getKey().repPlan().id(),
+                                Map.Entry::getValue,
+                                (a, b) -> a,
+                                LinkedHashMap::new));
     }
 
     public Premium calculateSingle(PlanCondition cmd, PlanFamily family, int repIdx) {
@@ -58,5 +57,16 @@ public class PremiumService {
             return null;
         }
         return premiumProvider.calculate(request);
+    }
+
+    private boolean isCalculated(Map.Entry<PlanFamily, Premium> entry) {
+        if (entry.getValue() != null) {
+            return true;
+        }
+        log.warn(
+                "[PREMIUM] calculation skipped. familyId={}, planCd={}",
+                entry.getKey().familyId(),
+                entry.getKey().repPlan().planCode());
+        return false;
     }
 }
