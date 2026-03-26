@@ -15,15 +15,15 @@ import com.nexsol.tpa.core.error.CoreException;
 
 class PlanServiceTest {
 
-    private PlanReader planReader;
+    private PlanFinder planFinder;
     private QuotePlanPolicy policy;
     private PlanService service;
 
     @BeforeEach
     void setUp() {
-        planReader = mock(PlanReader.class);
+        planFinder = mock(PlanFinder.class);
         policy = new QuotePlanPolicy();
-        service = new PlanService(planReader, policy);
+        service = new PlanService(planFinder, policy);
     }
 
     // ── 테스트 데이터 ──
@@ -153,7 +153,7 @@ class PlanServiceTest {
         @Test
         @DisplayName("모두 30세 → planType B, 실손포함 → 가뿐한플랜B")
         void allUnder70_typeB() {
-            when(planReader.loadAllFamilies(1L)).thenReturn(allFamilies());
+            when(planFinder.findAllFamilies(1L)).thenReturn(allFamilies());
 
             var cmd =
                     condition(
@@ -169,7 +169,7 @@ class PlanServiceTest {
         @Test
         @DisplayName("70세 포함 → planType A, 실손포함 → 가뿐한플랜A")
         void has70_typeA() {
-            when(planReader.loadAllFamilies(1L)).thenReturn(allFamilies());
+            when(planFinder.findAllFamilies(1L)).thenReturn(allFamilies());
 
             var cmd =
                     condition(
@@ -185,7 +185,7 @@ class PlanServiceTest {
         @Test
         @DisplayName("모두 70세 이상 → planType A")
         void all70Plus_typeA() {
-            when(planReader.loadAllFamilies(1L)).thenReturn(allFamilies());
+            when(planFinder.findAllFamilies(1L)).thenReturn(allFamilies());
 
             var cmd =
                     condition(
@@ -201,7 +201,7 @@ class PlanServiceTest {
         @Test
         @DisplayName("실손제외 → 실손제외 패밀리만 반환")
         void silsonExclude() {
-            when(planReader.loadAllFamilies(1L)).thenReturn(allFamilies());
+            when(planFinder.findAllFamilies(1L)).thenReturn(allFamilies());
 
             var cmd =
                     new PlanCondition(
@@ -229,7 +229,7 @@ class PlanServiceTest {
         @Test
         @DisplayName("planId가 해당 planType 패밀리에 속하면 성공")
         void found() {
-            when(planReader.loadAllFamilies(1L)).thenReturn(allFamilies());
+            when(planFinder.findAllFamilies(1L)).thenReturn(allFamilies());
 
             var cmd = condition("20260326", List.of(insured("19941118", "1")));
 
@@ -241,7 +241,7 @@ class PlanServiceTest {
         @Test
         @DisplayName("planId가 다른 planType에 속하면 예외 — B플랜 id로 A타입 조회")
         void wrongPlanType() {
-            when(planReader.loadAllFamilies(1L)).thenReturn(allFamilies());
+            when(planFinder.findAllFamilies(1L)).thenReturn(allFamilies());
 
             var cmd =
                     condition(
@@ -255,7 +255,7 @@ class PlanServiceTest {
         @Test
         @DisplayName("존재하지 않는 planId면 예외")
         void notFound() {
-            when(planReader.loadAllFamilies(1L)).thenReturn(allFamilies());
+            when(planFinder.findAllFamilies(1L)).thenReturn(allFamilies());
 
             var cmd = condition("20260326", List.of(insured("19941118", "1")));
 
@@ -273,7 +273,7 @@ class PlanServiceTest {
         @Test
         @DisplayName("실손포함 repPlanId → 실손제외 repPlanId 매핑")
         void mapping() {
-            when(planReader.loadAllFamilies(1L)).thenReturn(allFamilies());
+            when(planFinder.findAllFamilies(1L)).thenReturn(allFamilies());
 
             var cmd = condition("20260326", List.of(insured("19941118", "1")));
 
